@@ -1,0 +1,9 @@
+# dsh-purge bundle patch: inserts the plugin into a profile's layer stack.
+- insert:
+    - id: dsh-purge
+      name: 'dsh-purge'
+      config:
+        enabled: true
+        autoApplyOnStart: true
+        autoRevertOnMissing: false
+        verbose: false

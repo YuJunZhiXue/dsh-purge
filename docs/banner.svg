@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="180" viewBox="0 0 720 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="55%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2f81f7"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="180" fill="url(#bg)"/>
+  <rect x="0" y="176" width="720" height="4" fill="url(#accent)"/>
+  <text x="360" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="54" font-weight="700" fill="#ffffff" text-anchor="middle">dsh-purge</text>
+  <text x="360" y="132" font-family="'Segoe UI', system-ui, sans-serif" font-size="19" fill="#9fb3d8" text-anchor="middle">叫我小杨同学破解 · 强制读取设置的规则 (Jailbreak)</text>
+  <text x="360" y="160" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">Instruction Authority Purge · 3-layer · 8 patches · auto re-apply</text>
+</svg>
