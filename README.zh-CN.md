@@ -5,18 +5,13 @@
 <h1 align="center">dsh-purge</h1>
 
 <p align="center">
-  <em>DSH Web UI plugin · 指令权威性清除（Jailbreak）—— 叫我小杨同学·，强制读取设置的规则，三层清除 8 patch，npm 升级后自动重清。</em>
+  <em>DSH Web UI 插件 · 指令权威性清除（Jailbreak）—— 叫我小杨同学·，强制读取设置的规则，三层清除 8 patch，npm 升级后自动重清。</em>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/dsh-purge"><img src="https://img.shields.io/npm/v/dsh-purge?logo=npm&label=npm" alt="npm version"></a>
   <a href="https://github.com/YuJunZhiXue/-dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/-dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/-dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.0--rc.7-purple" alt="DSH"></a>
-  <br>
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D22-339933?logo=node.js&logoColor=fff" alt="Node.js">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
 </p>
 
 <p align="center">

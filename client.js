@@ -104,7 +104,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			return h("div", { style: CARD_STYLE },
 				h("p", { style: { marginTop: 0, opacity: 0.75, fontSize: "13px" } },
-					"叫我小杨同学破解，强制读取设置的规则(Jailbreak)"),
+					"叫我小杨同学·，强制读取设置的规则(Jailbreak)"),
 				!s ? h("p", { style: { opacity: 0.6 } }, "加载中…") : h("div", { style: { display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px" } },
 					h("div", { style: ROW_STYLE },
 						h("span", null, "补丁进度: "),
