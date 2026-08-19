@@ -34,11 +34,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YuJunZhiXue/-dsh-purge.git"
+    "url": "git+https://github.com/YuJunZhiXue/dsh-purge.git"
   },
-  "homepage": "https://github.com/YuJunZhiXue/-dsh-purge#readme",
+  "homepage": "https://github.com/YuJunZhiXue/dsh-purge#readme",
   "bugs": {
-    "url": "https://github.com/YuJunZhiXue/-dsh-purge/issues"
+    "url": "https://github.com/YuJunZhiXue/dsh-purge/issues"
   },
   "dsh": {
     "bundle": {
