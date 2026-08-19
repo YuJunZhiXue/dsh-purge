@@ -225,3 +225,7 @@ prompt-inject.md 有内容? ──是──> 注入 systemPrompt section
 <div align="center">
   <sub>Built by 小杨 · for DeepSeek Harness</sub>
 </div>
+
+
+---
+感谢 [LINUX DO](https://linux.do) 社区
