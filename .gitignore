@@ -1,4 +1,3 @@
 node_modules/
 *.tgz
-docs/preview/*.png
 npm-debug.log*
