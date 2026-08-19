@@ -13,6 +13,6 @@
   <rect width="720" height="180" fill="url(#bg)"/>
   <rect x="0" y="176" width="720" height="4" fill="url(#accent)"/>
   <text x="360" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="54" font-weight="700" fill="#ffffff" text-anchor="middle">dsh-purge</text>
-  <text x="360" y="132" font-family="'Segoe UI', system-ui, sans-serif" font-size="19" fill="#9fb3d8" text-anchor="middle">叫我小杨同学破解 · 强制读取设置的规则 (Jailbreak)</text>
+  <text x="360" y="132" font-family="'Segoe UI', system-ui, sans-serif" font-size="19" fill="#9fb3d8" text-anchor="middle">叫我小杨同学· 强制读取设置的规则 (Jailbreak)</text>
   <text x="360" y="160" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">Instruction Authority Purge · 3-layer · 8 patches · auto re-apply</text>
 </svg>
