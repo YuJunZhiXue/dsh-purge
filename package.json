@@ -12,6 +12,9 @@
   "bin": {
     "dsh-purge": "bin/dsh-purge.js"
   },
+  "scripts": {
+    "test": "node --test"
+  },
   "files": [
     "lib",
     "bin",
