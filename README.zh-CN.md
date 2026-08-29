@@ -206,9 +206,10 @@ prompt-inject.md 有内容? ──是──> 注入 systemPrompt section
 按优先级自动定位：
 
 1. `DSH_BASE` 环境变量 → 插件根
-2. `npm prefix -g` / `npm config get prefix` → npm 全局目录
-3. 从全局目录反推 `node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai`
-4. 递归搜索兜底
+2. DSH Desktop → `process.resourcesPath/app.asar.unpacked/node_modules/@deepseek-ai`
+3. `npm prefix -g` / `npm config get prefix` → npm 全局目录
+4. 从全局目录反推 `node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai`
+5. 递归搜索兜底
 
 探测失败提示设置 `DSH_BASE`，不清除、不误伤。
 
