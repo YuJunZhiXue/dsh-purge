@@ -1,7 +1,7 @@
 {
   "name": "dsh-purge",
-  "version": "1.0.0",
-  "description": "dsh 指令权威性清洗插件（小杨）：三层清洗 8 patch + 启动自动重洗 + /purge 命令 + 模型工具。移植自 dsh_purge.py，功能一个不差。",
+  "version": "0.1.1-rc.1-0.2",
+  "description": "dsh 指令权威性清洗插件：25 patch + 启动自动重洗 + /purge 命令 + 模型工具。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -11,6 +11,9 @@
   },
   "bin": {
     "dsh-purge": "bin/dsh-purge.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
   },
   "files": [
     "lib",
@@ -50,7 +53,8 @@
         "@deepseek-ai/dsh-client-connection",
         "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-client-locale",
-        "@deepseek-ai/dsh-client-ui-settings"
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-api-remotes"
       ]
     }
   },

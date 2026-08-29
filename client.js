@@ -10,7 +10,86 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const { useState, useEffect, useCallback } = react;
 
 		const name = "dsh-purge";
-		const inject = ["slots"];
+		const inject = ["remote", "slots"];
+
+		// rc.8's api-remotes bundle omits the two reference namespaces even though
+		// ui-reference still requires them. Keep the descriptors in this small
+		// compatibility contribution so the desktop profile remains self-healing
+		// across Harness bundle updates.
+		const agentIdCodec = {
+			mode: "strict",
+			typeSymbol: "@deepseek-ai/dsh-session/types#SessionId",
+			schema: { parse(value) { if (typeof value !== "string") throw new TypeError("expected string"); return value; } },
+		};
+		const fileQueryCodec = {
+			mode: "strict",
+			typeSymbol: "@deepseek-ai/dsh-file-reference#fileReferences/list:query",
+			schema: { parse(value) { if (typeof value !== "string") throw new TypeError("expected string"); return value; } },
+		};
+		const sessionQueryCodec = {
+			mode: "strict",
+			typeSymbol: "@deepseek-ai/dsh-session-reference#sessionReferenceResolver/candidates:query",
+			schema: { parse(value) { if (typeof value !== "string") throw new TypeError("expected string"); return value; } },
+		};
+		const fileResultCodec = {
+			mode: "strict",
+			typeSymbol: "@deepseek-ai/dsh-file-reference#fileReferences/list:result",
+			schema: { parse(value) {
+				if (!Array.isArray(value) || value.some((item) => !item || typeof item.path !== "string" || (item.kind !== "file" && item.kind !== "directory"))) {
+					throw new TypeError("expected file candidate array");
+				}
+				return value;
+			} },
+		};
+		const sessionResultCodec = {
+			mode: "strict",
+			typeSymbol: "@deepseek-ai/dsh-session-reference#sessionReferenceResolver/candidates:result",
+			schema: { parse(value) {
+				if (!Array.isArray(value) || value.some((item) => !item || typeof item.mention !== "string" || typeof item.sessionId !== "string" || typeof item.label !== "string" || typeof item.createdAt !== "number" || (item.cwd !== undefined && typeof item.cwd !== "string"))) {
+					throw new TypeError("expected session candidate array");
+				}
+				return value;
+			} },
+		};
+
+		const REFERENCE_REMOTE_CONTRIBUTIONS = [
+			{
+				package: "@deepseek-ai/dsh-file-reference",
+				descriptors: [{
+					id: "@deepseek-ai/dsh-file-reference#fileReferences/list",
+					service: "fileReferences",
+					namespace: "fileReferences",
+					method: "list",
+					implementation: "remoteExportList",
+					invocation: { kind: "direct" },
+					scope: { context: "agent", wire: "agentId" },
+					parameters: [
+						{ name: "agent", wire: "agentId", source: "lookup", lookup: "agent", codec: agentIdCodec },
+						{ name: "query", wire: "query", source: "json", codec: fileQueryCodec },
+					],
+					cancellation: { parameter: "signal" },
+					result: fileResultCodec,
+				}],
+			},
+			{
+				package: "@deepseek-ai/dsh-session-reference",
+				descriptors: [{
+					id: "@deepseek-ai/dsh-session-reference#sessionReferenceResolver/candidates",
+					service: "sessionReferenceResolver",
+					namespace: "sessionReferenceResolver",
+					method: "candidates",
+					implementation: "remoteExportCandidates",
+					invocation: { kind: "direct" },
+					scope: { context: "agent", wire: "agentId" },
+					parameters: [
+						{ name: "agent", wire: "agentId", source: "lookup", lookup: "agent", codec: agentIdCodec },
+						{ name: "query", wire: "query", source: "json", codec: sessionQueryCodec },
+					],
+					cancellation: { parameter: "signal" },
+					result: sessionResultCodec,
+				}],
+			},
+		];
 
 		const CARD_STYLE = { maxWidth: "760px", display: "flex", flexDirection: "column", gap: "10px" };
 		const ROW_STYLE = { display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" };
@@ -91,21 +170,30 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				1: "全局免责 → 强指令", 2: "替换式免责 → 强指令", 3: "作用域免责 → 强指令",
 				4: "persona 会话强指令", 5: "审批提示句 → 全权限",
 				6: "沙箱 deny → allow 写", 7: "沙箱默认全权限", 8: "审批默认 never",
+				9: "审批门自动放行", 10: "审批配置默认 never",
+				11: "never 提示句 → 自动放行", 12: "ask 提示句 → 自动放行",
+				13: "豁免升级阶梯", 14: "升级无条件授信",
+				15: "沙箱 confine 直通", 16: "文件系统围栏取消",
+				17: "观察策略读写放行", 18: "重复调用守卫禁用",
+				19: "工具结果修剪禁用", 20: "web fetch 启用 + provider",
+				21: "base 依赖 fetch-http", 22: "bash 超时 60s → 10min",
+				23: "read 上限放宽", 24: "子代理深度 3 → 10",
+				25: "preset fetch 启用",
 			};
 
 			const s = state;
 			const patchRows = s ? s.patch_status ? Object.entries(s.patch_status).map(([id, st]) => {
 				const ok = st === "applied";
+				// 本地中文标签优先；服务端下发的 patch_names 兜底表中缺失的新 id
+				const label = PATCH_LABELS[id] || (s.patch_names && s.patch_names[id]) || "patch " + id;
 				return h("tr", { key: id },
 					h("td", { style: TD_STYLE }, "#" + id),
-					h("td", { style: TD_STYLE }, PATCH_LABELS[id] || "patch " + id),
+					h("td", { style: TD_STYLE }, label),
 					h("td", { style: TD_STYLE }, ok ? "已清除 ✓" : (st === "pending" ? "待清除 ✗" : st)));
 			}) : null : null;
 
-			return h("div", { style: CARD_STYLE },
-				h("p", { style: { marginTop: 0, opacity: 0.75, fontSize: "13px" } },
-					"叫我小杨同学·，强制读取设置的规则(Jailbreak)"),
-				!s ? h("p", { style: { opacity: 0.6 } }, "加载中…") : h("div", { style: { display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px" } },
+				return h("div", { style: CARD_STYLE },
+					!s ? h("p", { style: { opacity: 0.6 } }, "加载中…") : h("div", { style: { display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px" } },
 					h("div", { style: ROW_STYLE },
 						h("span", null, "补丁进度: "),
 						h("b", null, s.patches_applied + "/" + s.patches_total + " 已清除"),
@@ -168,6 +256,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				order: 40,
 				label: () => "规则设定",
 			}, () => h(PurgifySection, null)));
+			ctx.effect(async () => {
+				const disposers = [];
+				try {
+					for (const contribution of REFERENCE_REMOTE_CONTRIBUTIONS) {
+						disposers.push(await ctx.remote.$mount(contribution));
+					}
+				} catch (error) {
+					for (const dispose of disposers.reverse()) await dispose();
+					throw error;
+				}
+				return async () => {
+					for (const dispose of disposers.reverse()) await dispose();
+				};
+			}, "dsh-purge: reference remotes");
 		}
 
 		exports.name = name;
