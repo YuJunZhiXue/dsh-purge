@@ -65,6 +65,7 @@
 dsh-purge/
 ├── lib/
 │   ├── core.js               # 路径探测、补丁、备份还原、shim、覆盖文件
+│   ├── identity.js           # 操作员提示词盖过 Harness 身份
 │   ├── index.js              # 插件入口：命令、工具、systemPrompt、HTTP
 │   ├── rules.js              # 规则集
 │   ├── restart-web.js        # Web 配置下的重启
@@ -137,7 +138,7 @@ dsh plugin --profile default remove dsh-purge
         autoApplyOnStart: true
         autoRevertOnMissing: false
         verbose: false
-        postPromptOrder: 1000
+        postPromptOrder: 5100
         postPrompt: ""
 ```
 
