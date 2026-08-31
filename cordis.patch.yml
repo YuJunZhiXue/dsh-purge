@@ -7,3 +7,5 @@
         autoApplyOnStart: true
         autoRevertOnMissing: false
         verbose: false
+        postPrompt: ""
+        postPromptOrder: 1000
