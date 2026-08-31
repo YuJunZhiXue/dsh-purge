@@ -7,28 +7,40 @@
 <p align="center"><strong>Version 1.3.0</strong></p>
 
 <p align="center">
-  <em>DeepSeek Harness Web 设置插件：补丁、规则集、会话提示词覆盖。升级后可自动重新应用。</em>
+  <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
 </p>
 
 <p align="center">
   <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.1--rc.2-blue" alt="DSH"></a>
 </p>
 
 <p align="center">
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-[DeepSeek Harness](https://www.deepseek.com/harness/) 的设置插件。它改的是本机已安装包里的默认文案、权限策略和工具上限，让本地 `AGENTS.md` / `CLAUDE.md` 与会话提示词按你在设置页里的选择生效。
+> 对准 **dsh 0.1.1-rc.2**。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
 
-不改 Harness 源码仓库。设置页点「应用」即可；npm 升级覆盖文件后，可自动再应用一遍。
+---
+
+## 这是什么
+
+**dsh-purge** 是 [DeepSeek Harness](https://www.deepseek.com/harness/) 的设置插件：
+
+- 改本机已安装的 `@deepseek-ai/*` 包：默认文案、权限策略、工具上限；
+- 设置页「规则设定」：分组查看补丁、应用 / 还原、编辑会话覆盖、多套规则；
+- 启动时自动检查并重新应用（npm 升级覆盖 `node_modules` 之后不必手搓）；
+- 不写死盘符：按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`、系统默认 `~/.dsh` 探测本机位置。
+
+不改 Harness 源码仓库。设置页点「应用」即可。
 
 ---
 
 ## 界面预览
 
-设置页会出现「规则设定」。白 / 墨可切换。补丁按组展开，进度只计已应用的项。规则集在上方列表启用或删除，下方编辑正文。
+设置页会出现「规则设定」。白 / 墨可切换。补丁按组展开，进度只计真正已应用的项。规则集在上方列表启用或删除，下方编辑正文。
 
 **补丁**
 
@@ -43,44 +55,78 @@
 | 白 / 墨 | 设置卡片外观 |
 | 补丁 | 分组查看状态，应用或还原 |
 | 提示词 | 编辑 `prompt-inject.md`，作为会话覆盖段 |
-| 规则集 | 多套 `AGENTS.md` / `CLAUDE.md`；启用写入 `~/.dsh`，删除从列表去掉 |
+| 规则集 | 多套 `AGENTS.md` / `CLAUDE.md`；启用写入 `$DSH_HOME`，删除从列表去掉 |
 
 ---
 
-## 功能
+## 目录结构
 
-- **启动自动应用**：`autoApplyOnStart: true` 时，启动检查补丁；升级覆盖后会再应用。
-- **/purge**：`status` / `apply` / `revert` / `edit` / `help`。
-- **/rules**：`list` / `use <id>` / `create` / `delete` / `reset`，切换 `AGENTS.md` / `CLAUDE.md`。
-- **模型工具**：`purge_status` / `purge_apply` / `purge_revert`。
-- **会话覆盖**：读 `prompt-inject.md`，有内容则作为 systemPrompt 段写入会话。文件为空时写入一份默认文本，已有自定义内容不会被覆盖。
+```
+dsh-purge/
+├── lib/
+│   ├── core.js               # 路径探测、补丁、备份还原、shim、覆盖文件
+│   ├── index.js              # 插件入口：命令、工具、systemPrompt、HTTP
+│   ├── rules.js              # 规则集
+│   ├── restart-web.js        # Web 配置下的重启
+│   └── default-prompt-inject.md
+├── client.js                 # 设置页
+├── bin/dsh-purge.js          # CLI
+├── docs/
+│   ├── banner.svg
+│   ├── banner-dark.svg
+│   ├── appreciate.png
+│   └── preview/
+│       ├── settings.png
+│       └── rules.png
+├── cordis.patch.yml
+├── package.json
+├── README.md
+├── README.zh-CN.md
+└── LICENSE
+```
+
+运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。
 
 ---
 
 ## 安装
 
-**推荐：从源码目录添加**
+Web 和桌面都是往对应 profile 里装同一个插件。装完重启，设置页出现「规则设定」。
+
+**官方 CLI（推荐）**
 
 ```sh
+git clone https://github.com/YuJunZhiXue/dsh-purge.git
 cd dsh-purge
+
+# Web
 dsh plugin --profile web add .
+
+# 桌面
+dsh plugin --profile default add .
 ```
 
-**或：从打包文件**
+GitHub zip 也可以：
 
 ```sh
-dsh plugin --profile web add dsh-purge-1.3.0.tgz
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
 ```
 
-**或：从 npm**
+**第三方 / 插件市场**
+
+在 Web 或桌面的插件设置里搜索安装 `dsh-purge`，或从 [awesome-dsh-plugin](https://awesome-dsh-plugin.com) 进入仓库后再用上面的 `dsh plugin add`。
+
+**卸载**
+
+先在设置页点「还原」（如需撤掉已打补丁），再：
 
 ```sh
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web remove dsh-purge
+dsh plugin --profile default remove dsh-purge
 ```
 
-安装后重启 dsh web，设置页出现「规则设定」。客户端有缓存时请 Ctrl+F5。
-
-配置在 `cordis.patch.yml`：
+配置项在插件自己的 `cordis.patch.yml`：
 
 ```yaml
 - insert:
@@ -95,7 +141,16 @@ dsh plugin --profile web add dsh-purge
         postPrompt: ""
 ```
 
-`postPrompt` 默认为空。需要时可以再追加一段有序 systemPrompt，不改 `prompt-inject.md`。
+`postPrompt` 默认为空。需要时再追加一段有序 systemPrompt，不改 `prompt-inject.md`。
+
+---
+
+## 生效验证
+
+- 重启后设置页出现「规则设定」卡片（客户端半体加载成功）。有缓存时 Ctrl+F5。
+- 点「应用」，进度里已应用项增加；再按提示重启，补丁进入当前进程。
+- 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表。
+- 个别项显示跳过是正常的：例如没装 `dsh-web-fetch-http` 时 #20 / #21 会跳过。
 
 ---
 
@@ -109,10 +164,8 @@ dsh-purge --revert
 dsh-purge --edit
 
 # 聊天
-/purge status
-/purge apply
-/purge revert
-/purge edit
+/purge status | apply | revert | edit | help
+/rules list | use <id> | create <id> | delete <id> | reset | help
 
 # 模型工具
 purge_status   purge_apply   purge_revert
@@ -122,29 +175,13 @@ purge_status   purge_apply   purge_revert
 
 ---
 
-## 目录结构
+## 本地校验
 
+```sh
+node --check lib/index.js
+node --check lib/core.js
+node --check client.js
 ```
-dsh-purge/
-├── lib/
-│   ├── core.js                   # 路径探测、补丁、备份还原、shim、覆盖文件
-│   ├── index.js                  # 插件入口：命令、工具、systemPrompt 覆盖、HTTP
-│   ├── rules.js                  # 规则集
-│   ├── restart-web.js            # Web 配置下的重启
-│   └── default-prompt-inject.md  # 覆盖文件的默认文本
-├── client.js                     # 设置页
-├── bin/dsh-purge.js              # CLI
-├── docs/
-│   ├── banner.svg
-│   ├── banner-dark.svg
-│   └── preview/
-│       ├── settings.png
-│       └── rules.png
-├── cordis.patch.yml
-└── package.json
-```
-
-运行时用户文件：`$DSH_HOME/prompt-inject.md`（未设 `DSH_HOME` 时为 `~/.dsh/prompt-inject.md`）。
 
 ---
 
@@ -182,16 +219,14 @@ prompt-inject.md 有内容? ──是──> 作为 systemPrompt 段写入会话
 
 ## 路径探测
 
-1. `DSH_BASE` → 插件根
-2. DSH Desktop → `process.resourcesPath/app.asar.unpacked/node_modules/@deepseek-ai`
-3. `npm prefix -g` / `npm root -g`
-4. 从全局目录解析 `@deepseek-ai/dsh/node_modules/@deepseek-ai`（含 hoist）
-5. shim：`dsh.cmd` / `dsh.ps1` / 无后缀 `dsh`
-6. 递归搜索
+1. `DSH_HOME` / `DSH_BASE`（显式指定）
+2. dsh 启动器旁的 `.dsh`（便携安装，任意盘符）
+3. DSH Desktop → `process.resourcesPath/app.asar.unpacked/node_modules/@deepseek-ai`
+4. `npm prefix -g` / `npm root -g`
+5. 嵌套 `@deepseek-ai/dsh/node_modules/@deepseek-ai`
+6. 系统默认 `~/.dsh`
 
-npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑在 `dsh-sandbox/lib/index.js`（没有单独的 `lib/types/escalation.js`）。Desktop monorepo 会从 `dsh-base` 反推版本根。
-
-找不到目标时提示设置 `DSH_BASE`，不改文件。
+npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑在 `dsh-sandbox/lib/index.js`。找不到目标时提示设置 `DSH_BASE`，不改文件。
 
 ---
 
@@ -200,12 +235,19 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会报 `pattern_not_found` 或显示待应用，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件。
+- npm 上暂未发布同名包，用 GitHub 或 `dsh plugin add .` 安装。
 
 ---
 
-<div align="center">
+## ☕ 赞赏支持 / Sponsor
+
+<p align="center">
+  <img src="docs/appreciate.png" alt="微信赞赏码" width="360">
+</p>
+
+<p align="center">
   <sub>Built by 小杨 · for DeepSeek Harness</sub>
-</div>
+</p>
 
 ---
 
