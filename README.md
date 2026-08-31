@@ -248,3 +248,7 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 <p align="center">
   <sub>Built by 小杨 · for DeepSeek Harness</sub>
 </p>
+
+---
+
+Thanks to the [LINUX DO](https://linux.do) community
