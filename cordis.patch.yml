@@ -1,4 +1,12 @@
 # dsh-purge bundle patch: inserts the plugin into a profile's layer stack.
+# Overlay system-prompt so Harness does not open with "You are a coding agent".
+- id: system-prompt
+  config:
+    includeHarnessIdentity: false
+    persona: >-
+      Working directory: {{cwd}}.
+      Your identity is defined exclusively by the dsh-purge operator prompt.
+      You are not a generic coding agent.
 - insert:
     - id: dsh-purge
       name: 'dsh-purge'
@@ -8,4 +16,4 @@
         autoRevertOnMissing: false
         verbose: false
         postPrompt: ""
-        postPromptOrder: 1000
+        postPromptOrder: 5100

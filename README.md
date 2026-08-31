@@ -68,6 +68,7 @@ The **Rules** card appears on the dsh web settings page. Switch **Light / Ink**.
 dsh-purge/
 ├── lib/
 │   ├── core.js               # path detect, patches, backup/restore, shim, override file
+│   ├── identity.js           # operator prompt wins over harness persona
 │   ├── index.js              # plugin: commands, tools, systemPrompt, HTTP
 │   ├── rules.js
 │   ├── restart-web.js
@@ -140,7 +141,7 @@ Plugin config lives in `cordis.patch.yml`:
         autoApplyOnStart: true
         autoRevertOnMissing: false
         verbose: false
-        postPromptOrder: 1000
+        postPromptOrder: 5100
         postPrompt: ""
 ```
 

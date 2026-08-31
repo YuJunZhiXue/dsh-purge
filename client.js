@@ -14,7 +14,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26] },
 			{ key: "code", ids: [6, 7, 8] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16] },
 			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 25] },
@@ -439,7 +439,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			}, [override, t]);
 
 			const s = state;
-			const total = s && s.patches_total ? s.patches_total : 25;
+			const total = s && s.patches_total ? s.patches_total : 26;
 			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
 			const pct = total ? Math.round((applied / total) * 100) : 0;
 
