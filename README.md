@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.3.0</strong></p>
+<p align="center"><strong>Version 1.3.3</strong></p>
 
 <p align="center">
     <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -68,6 +68,7 @@ The **Rules** card appears on the dsh web settings page. Switch **Light / Ink**.
 dsh-purge/
 ├── lib/
 │   ├── core.js               # path detect, patches, backup/restore, shim, override file
+│   ├── hide-console.js       # Windows hide-console pin into bin.js
 │   ├── identity.js           # operator prompt wins over harness persona
 │   ├── index.js              # plugin: commands, tools, systemPrompt, HTTP
 │   ├── rules.js
@@ -77,7 +78,6 @@ dsh-purge/
 ├── bin/dsh-purge.js
 ├── docs/
 │   ├── banner.svg
-│   ├── banner-dark.svg
 │   ├── appreciate.png
 │   └── preview/
 │       ├── settings.png
@@ -152,7 +152,8 @@ Plugin config lives in `cordis.patch.yml`:
 ## Verify
 
 - After restart, the **Rules** card is on the settings page. Hard-refresh (Ctrl+F5) if the client bundle is cached.
-- Click **Apply**, then **Restart** when prompted.
+- Click **Apply**, then **Restart** when prompted. Optional packages (liangshen / web-fetch) show as missing/skipped and do not block complete → restart.
+- First Apply writes the built-in default into `prompt-inject.md` when the file is missing; an already-empty file is left empty.
 - `/purge status` prints `DSH_HOME` and the patch list.
 - Skipped items are expected when a target file is absent (for example #20 / #21 without `dsh-web-fetch-http`).
 
@@ -193,11 +194,25 @@ node --check client.js
 ```
 patch not applied? ──no──> skip
     │yes
-    ├─> backup <file>.dshpurge.bak
+    ├─> backup <file>.dshpurge.bak (Desktop host-commands shim backups go under `$DSH_HOME/dsh-purge/shim-backups`)
     ├─> apply matching replacements
-    ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh)
-    └─> ensure prompt-inject.md exists (write the default if empty)
+    ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh, **including Desktop host-commands launchers**)
+    ├─> scrub illegal sibling `*.dshpurge.bak` inside sealed bins (keep inject)
+    ├─> Windows: pin hide-console into real `lib/bin.js` (mnemon/git flash is best-effort)
+    └─> if `prompt-inject.md` is missing, write the default (do not refill an empty file)
 ```
+
+**DSH Desktop (bugfix, feature kept):**
+
+- Sealed bins allow rewriting whitelisted launchers; **extra sibling files are illegal**.
+- Legacy in-bin `dsh.cmd.dshpurge.bak` is relocated/removed on startup to stop recovery mode / cmd flash loops.
+- Shim cleaning still runs on Desktop; `applyRuntimeEnv()` only sets permission mode early, it does not replace the file shim.
+
+**Prompt purge (refusal → allowed, keep harness optimizations):**
+
+- Builtin `minimal`: replace `You are a helpful software engineer assistant.` + `complete: true` with the operator identity and set `complete: false` so `prompt-inject.md` can inject; roleplay allowed.
+- If 梁神 (`liangshen`) is installed: purge the same persona line in the user preset and the plugin package (phase-1 only surfaces that line).
+- Official `standard` / `code` / `cordis` refusal / anti-roleplay persona wording is rewritten to executable + roleplay-allowed session directives.
 
 **Override (each session):**
 
