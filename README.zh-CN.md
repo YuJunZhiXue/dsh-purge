@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.3.0</strong></p>
+<p align="center"><strong>Version 1.3.3</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -65,6 +65,7 @@
 dsh-purge/
 ├── lib/
 │   ├── core.js               # 路径探测、补丁、备份还原、shim、覆盖文件
+│   ├── hide-console.js       # Windows 隐藏子进程控制台（写入 bin.js）
 │   ├── identity.js           # 操作员提示词盖过 Harness 身份
 │   ├── index.js              # 插件入口：命令、工具、systemPrompt、HTTP
 │   ├── rules.js              # 规则集
@@ -74,7 +75,6 @@ dsh-purge/
 ├── bin/dsh-purge.js          # CLI
 ├── docs/
 │   ├── banner.svg
-│   ├── banner-dark.svg
 │   ├── appreciate.png
 │   └── preview/
 │       ├── settings.png
@@ -149,7 +149,8 @@ dsh plugin --profile default remove dsh-purge
 ## 生效验证
 
 - 重启后设置页出现「规则设定」卡片（客户端半体加载成功）。有缓存时 Ctrl+F5。
-- 点「应用」，进度里已应用项增加；再按提示重启，补丁进入当前进程。
+- 点「应用」，进度里已应用项增加；再按提示重启，补丁进入当前进程。缺可选包（如梁神、web-fetch）时对应项显示跳过/缺失，不影响「完成 → 重启」。
+- 首次应用若尚无 `prompt-inject.md`，会写入内置默认提示词；已清空的文件不会再自动填回。
 - 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表。
 - 个别项显示跳过是正常的：例如没装 `dsh-web-fetch-http` 时 #20 / #21 会跳过。
 
@@ -193,11 +194,25 @@ node --check client.js
 ```
 补丁未应用? ──否──> 跳过
     │是
-    ├─> 备份原件 <文件>.dshpurge.bak
+    ├─> 备份原件 <文件>.dshpurge.bak（Desktop host-commands 的 shim 备份外置到 `$DSH_HOME/dsh-purge/shim-backups`）
     ├─> 按补丁列表替换对应文件
-    ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh）
-    └─> 确保 prompt-inject.md 存在（空则写入默认覆盖文本）
+    ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh，**含 Desktop host-commands 启动器**）
+    ├─> 清掉密封目录里误放的 sibling `*.dshpurge.bak`（不剥离已写入的 shim）
+    ├─> Windows：把 hide-console 钉进真实 `lib/bin.js`（mnemon/git 闪窗为尽力修补，不挡完成）
+    └─> 若 `prompt-inject.md` 尚不存在则写入默认覆盖文本（已存在的空文件不覆盖）
 ```
+
+**DSH Desktop 适配（修 bug，不砍功能）：**
+
+- 密封目录允许改写白名单启动器；**禁止**在同目录留下额外文件。
+- 旧版若把 `dsh.cmd.dshpurge.bak` 写进 `host-commands/.../bin`，启动时自动外置/删除该 bak，避免恢复模式与 CMD 连闪。
+- shim 清洗逻辑对 Desktop 与 CLI 一视同仁；进程内 `applyRuntimeEnv()` 只是提前设权限，不是替代 shim。
+
+**提示词清洗（拒绝 → 可执行，不删官方优化）：**
+
+- 内置 `minimal`：把 `You are a helpful software engineer assistant.` + `complete: true` 换成操作员身份，并打开 `complete: false`，让 `prompt-inject.md` 能注入；角色扮演允许。
+- 若已安装梁神（`liangshen`）：同步清洗用户预设与插件包内同句人设（phase-1 只露出这一行，必须直接改）。
+- 官方 `standard` / `code` / `cordis` 等人设里的拒绝/禁角色扮演表述，替换为可执行 + 允许角色扮演的会话强指令。
 
 **覆盖（每次会话）：**
 

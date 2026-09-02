@@ -75,7 +75,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restarting": "重启中…",
 			"restart.timeout": "超时，请刷新",
 			"restart.fail": "失败: {error}",
-			"restart.confirm": "需要重启后生效。",
+			"restart.confirm": "清洗已完成，重启后生效。",
+			"restart.incomplete": "清洗未完成（失败 {failed} 项或 CMD 无感未钉入），请先处理完再重启。",
 			"restart.later": "以后",
 			"group.prompt": "提示词",
 			"group.code": "代码",
@@ -163,7 +164,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restarting": "Restarting…",
 			"restart.timeout": "Timed out; refresh",
 			"restart.fail": "Failed: {error}",
-			"restart.confirm": "Restart to take effect.",
+			"restart.confirm": "Apply finished (incl. silent CMD). Restart to take effect.",
+			"restart.incomplete": "Apply incomplete ({failed} failed or CMD silence not pinned). Fix first, then restart.",
 			"restart.later": "Later",
 			"group.prompt": "Prompt",
 			"group.code": "Code",
@@ -409,8 +411,21 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 								setOverride(d.override_content);
 								setOverrideLoaded(true);
 							}
+							if (action === "apply" && d.complete === false) {
+								const flashHint =
+									d.cmd_flash && d.cmd_flash.ok === false
+										? ` cmd-flash=${d.cmd_flash.entry || "fail"}`
+										: "";
+								setNotice({
+									kind: "error",
+									text: tr("restart.incomplete", { failed: String(d.failed || 0) }) + flashHint,
+								});
+								loadAll();
+								return;
+							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
 							loadAll();
+							// Only after apply finished successfully — never restart mid-apply.
 							if (action === "apply") setAskRestart(true);
 						} else {
 							setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
