@@ -76,7 +76,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restart.timeout": "超时，请刷新",
 			"restart.fail": "失败: {error}",
 			"restart.confirm": "清洗已完成，重启后生效。",
-			"restart.incomplete": "清洗未完成（失败 {failed} 项或 CMD 无感未钉入），请先处理完再重启。",
+			"restart.incomplete": "清洗未完成：{detail}",
+			"restart.incomplete.patches": "必需补丁失败 {failed} 项（#{ids}）",
+			"restart.incomplete.flash": "CMD 无感未钉入（{entry}）",
 			"restart.later": "以后",
 			"group.prompt": "提示词",
 			"group.code": "代码",
@@ -101,12 +103,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.17": "观察策略读写放行",
 			"patch.18": "重复调用守卫禁用",
 			"patch.19": "工具结果修剪禁用",
-			"patch.20": "web fetch 启用 + provider",
-			"patch.21": "base 依赖 fetch-http",
+			"patch.20": "dsh-web-fetch-http：启用 fetch + provider",
+			"patch.21": "dsh-web-fetch-http：base 写入依赖",
 			"patch.22": "bash 超时 60s → 10min",
 			"patch.23": "read 上限放宽",
 			"patch.24": "子代理深度 3 → 10",
 			"patch.25": "preset fetch 启用",
+			"patch.26": "Harness 身份剥离",
+			"patch.27": "minimal 人设清洗",
+			"patch.28": "dsh-liangshen（梁神）：人设拒绝锁→可执行",
+			"patch.29": "dsh-liangshen（梁神）：phase-1 保留注入段",
 		};
 
 		const en = {
@@ -164,8 +170,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restarting": "Restarting…",
 			"restart.timeout": "Timed out; refresh",
 			"restart.fail": "Failed: {error}",
-			"restart.confirm": "Apply finished (incl. silent CMD). Restart to take effect.",
-			"restart.incomplete": "Apply incomplete ({failed} failed or CMD silence not pinned). Fix first, then restart.",
+			"restart.confirm": "Apply finished. Restart to take effect.",
+			"restart.incomplete": "Apply incomplete: {detail}",
+			"restart.incomplete.patches": "{failed} required patch(es) failed (#{ids})",
+			"restart.incomplete.flash": "CMD silence not pinned ({entry})",
 			"restart.later": "Later",
 			"group.prompt": "Prompt",
 			"group.code": "Code",
@@ -190,12 +198,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.17": "Observation policy allow R/W",
 			"patch.18": "Repeat-call guard off",
 			"patch.19": "Tool-result pruner off",
-			"patch.20": "Web fetch on + provider",
-			"patch.21": "base depends on fetch-http",
+			"patch.20": "dsh-web-fetch-http: enable fetch + provider",
+			"patch.21": "dsh-web-fetch-http: pin base dependency",
 			"patch.22": "bash timeout 60s → 10min",
 			"patch.23": "read cap raised",
 			"patch.24": "subagent depth 3 → 10",
 			"patch.25": "preset fetch on",
+			"patch.26": "Harness identity strip",
+			"patch.27": "minimal persona purge",
+			"patch.28": "dsh-liangshen: refusal lock → executable",
+			"patch.29": "dsh-liangshen: keep inject in phase-1",
 		};
 
 		const THEME_KEY = "dshp-theme";
@@ -412,13 +424,30 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 								setOverrideLoaded(true);
 							}
 							if (action === "apply" && d.complete === false) {
-								const flashHint =
-									d.cmd_flash && d.cmd_flash.ok === false
-										? ` cmd-flash=${d.cmd_flash.entry || "fail"}`
-										: "";
+								const parts = [];
+								if (d.failed > 0) {
+									const ids = (d.failed_items || [])
+										.map((x) => x.id)
+										.filter((id) => id != null)
+										.join(",");
+									parts.push(
+										tr("restart.incomplete.patches", {
+											failed: String(d.failed || 0),
+											ids: ids || "?",
+										}),
+									);
+								}
+								if (d.cmd_flash && d.cmd_flash.ok === false) {
+									parts.push(
+										tr("restart.incomplete.flash", {
+											entry: String(d.cmd_flash.entry || "fail"),
+										}),
+									);
+								}
+								if (parts.length === 0) parts.push(tr("restart.incomplete.flash", { entry: "unknown" }));
 								setNotice({
 									kind: "error",
-									text: tr("restart.incomplete", { failed: String(d.failed || 0) }) + flashHint,
+									text: tr("restart.incomplete", { detail: parts.join("；") }),
 								});
 								loadAll();
 								return;
@@ -506,7 +535,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				h("div", { className: "dshp-sub" },
 					h("h4", null, t("override.title")),
 					h("div", { className: "dshp-row", style: { margin: 0 } },
-						noticeNode(notice),
 						h(Btn, { kind: "primary", tiny: true, disabled: busy || !overrideLoaded, onClick: saveOverride }, t("btn.saveInject")),
 					),
 				),
