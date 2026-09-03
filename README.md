@@ -76,6 +76,7 @@ dsh plugin --profile web add .
    - `/purge status` prints `DSH_HOME` and patches
    - Settings shows the Rules card (Ctrl+F5 if cached)
 4. **Expected skips:** `#20` / `#21` = `dsh-web-fetch-http`; `#28` / `#29` = `dsh-liangshen`. Missing those plugins → skip. **Do not treat as failure or thrash the install.**
+5. **DSH Desktop recovery:** If you see `unexpected entries: dsh.cmd.dshpurge.bak`, delete `%APPDATA%\DSH Desktop\host-commands\desktop\bin\*.dshpurge.bak` (or uninstall this plugin), install the latest build, restart. Sealed bins are scrub-only.
 
 **Uninstall (only if the user explicitly asks)**
 
@@ -263,19 +264,19 @@ node --check client.js
 ```
 patch not applied? ──no──> skip
     │yes
-    ├─> backup <file>.dshpurge.bak (Desktop host-commands shim backups go under `$DSH_HOME/dsh-purge/shim-backups`)
+    ├─> backup <file>.dshpurge.bak (Desktop host-commands backups stay under `$DSH_HOME/dsh-purge/shim-backups` only)
     ├─> apply matching replacements
-    ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh, **including Desktop host-commands launchers**)
-    ├─> scrub illegal sibling `*.dshpurge.bak` inside sealed bins (keep inject)
+    ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh; **skip Desktop sealed host-commands bins**)
+    ├─> scrub illegal sibling `*.dshpurge.bak` inside sealed bins (Desktop validates before plugins load)
     ├─> Windows: pin hide-console into real `lib/bin.js` (mnemon/git flash is best-effort)
     └─> if `prompt-inject.md` is missing, write the default (do not refill an empty file)
 ```
 
-**DSH Desktop (bugfix, feature kept):**
+**DSH Desktop (anywhere-labs/dsh-desktop, issue #9):**
 
-- Sealed bins allow rewriting whitelisted launchers; **extra sibling files are illegal**.
-- Legacy in-bin `dsh.cmd.dshpurge.bak` is relocated/removed on startup to stop recovery mode / cmd flash loops.
-- Shim cleaning still runs on Desktop; `applyRuntimeEnv()` only sets permission mode early, it does not replace the file shim.
+- `host-commands/<profile>/bin` is sealed: whitelisted launchers only — **no** sibling extras (including `dsh.cmd.dshpurge.bak`).
+- This plugin **scrubs only** sealed bins (no inject, no bak writes). In-process `applyRuntimeEnv()` covers env. Non-sealed launchers (npm global, etc.) still get shim inject.
+- Startup/Apply relocates or deletes leftover `*.dshpurge.bak`. If already in recovery: delete `…\host-commands\desktop\bin\dsh.cmd.dshpurge.bak` (or uninstall this plugin), install the fixed build, restart.
 
 **Prompt purge (refusal → allowed, keep harness optimizations):**
 
