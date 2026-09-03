@@ -73,6 +73,7 @@ dsh plugin --profile web add .
    - `/purge status` 能打印 `DSH_HOME` 与补丁列表
    - 设置页有「规则设定」卡片（有缓存就 Ctrl+F5）
 4. **正常跳过**：`#20` / `#21` = 插件 `dsh-web-fetch-http`；`#28` / `#29` = 插件 `dsh-liangshen`（梁神）。没装对应插件时跳过，**不要当成失败重试乱改**。
+5. **DSH Desktop 恢复模式**：若报 `unexpected entries: dsh.cmd.dshpurge.bak`，先删除 `%APPDATA%\DSH Desktop\host-commands\desktop\bin\*.dshpurge.bak`（或卸载本插件），再装本仓库最新版并重启。密封目录只清理不注入。
 
 **卸载（仅当用户明确要求）**
 
@@ -265,17 +266,17 @@ node --check client.js
     │是
     ├─> 备份原件 <文件>.dshpurge.bak（Desktop host-commands 的 shim 备份外置到 `$DSH_HOME/dsh-purge/shim-backups`）
     ├─> 按补丁列表替换对应文件
-    ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh，**含 Desktop host-commands 启动器**）
-    ├─> 清掉密封目录里误放的 sibling `*.dshpurge.bak`（不剥离已写入的 shim）
+    ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh；**跳过 Desktop host-commands 密封目录**）
+    ├─> 清掉密封目录里误放的 sibling `*.dshpurge.bak`（Desktop 启动前校验，残留会进恢复模式）
     ├─> Windows：把 hide-console 钉进真实 `lib/bin.js`（mnemon/git 闪窗为尽力修补，不挡完成）
     └─> 若 `prompt-inject.md` 尚不存在则写入默认覆盖文本（已存在的空文件不覆盖）
 ```
 
-**DSH Desktop 适配（修 bug，不砍功能）：**
+**DSH Desktop 适配（anywhere-labs/dsh-desktop，issue #9）：**
 
-- 密封目录允许改写白名单启动器；**禁止**在同目录留下额外文件。
-- 旧版若把 `dsh.cmd.dshpurge.bak` 写进 `host-commands/.../bin`，启动时自动外置/删除该 bak，避免恢复模式与 CMD 连闪。
-- shim 清洗逻辑对 Desktop 与 CLI 一视同仁；进程内 `applyRuntimeEnv()` 只是提前设权限，不是替代 shim。
+- `host-commands/<profile>/bin` 是密封目录：只允许白名单启动器，**禁止**任何 sibling 额外文件（含 `dsh.cmd.dshpurge.bak`）。
+- 本插件对密封目录 **只清理、不注入、不写 bak**；环境变量靠进程内 `applyRuntimeEnv()`。npm 全局等非密封启动器仍可 shim。
+- 启动/应用时自动外置或删除误留的 `*.dshpurge.bak`。若已进恢复模式：先删掉 `…\host-commands\desktop\bin\dsh.cmd.dshpurge.bak`（或卸载本插件），再装新版本并重启。
 
 **提示词清洗（拒绝 → 可执行，不删官方优化）：**
 
