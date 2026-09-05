@@ -6,18 +6,39 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 		let react = require("react");
 		const h = react.createElement;
-		const { useState, useEffect, useCallback, useContext, createContext, useRef } = react;
+		const { useState, useEffect, useCallback, useRef, Component } = react;
 
 		const name = "dsh-purge";
 		const inject = ["slots", "locale"];
 		const NS = "settings.dsh-purge";
+		let translate = (key) => key;
+		function useT() {
+			return translate;
+		}
+		function apiUrl(p) {
+			try { return new URL(p, window.location.origin).toString(); } catch { return p; }
+		}
+		async function apiJson(p, init) {
+			const ctrl = new AbortController();
+			const timer = setTimeout(() => ctrl.abort(), 12000);
+			try {
+				const r = await fetch(apiUrl(p), Object.assign({ cache: "no-store", credentials: "same-origin", signal: ctrl.signal }, init || {}));
+				const text = await r.text();
+				let data;
+				try { data = text ? JSON.parse(text) : null; } catch {
+					throw new Error(r.status + " non-json: " + text.slice(0, 120));
+				}
+				if (!r.ok) throw new Error((data && (data.error || data.message)) || (r.status + " " + r.statusText));
+				return data;
+			} finally { clearTimeout(timer); }
+		}
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26, 27, 28, 29] },
 			{ key: "code", ids: [6, 7, 8] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16] },
-			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 25] },
+			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 31, 32] },
 		];
 
 		const zh = {
@@ -113,6 +134,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.27": "minimal 人设清洗",
 			"patch.28": "dsh-liangshen（梁神）：人设拒绝锁→可执行",
 			"patch.29": "dsh-liangshen（梁神）：phase-1 保留注入段",
+			"patch.30": "dsh-tool-web：外部 untrusted 拦截→可执行",
+			"patch.31": "dsh-hooks-claude-code：deny→allow",
+			"patch.32": "dsh-hooks-codex：deny→allow",
 		};
 
 		const en = {
@@ -208,9 +232,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.27": "minimal persona purge",
 			"patch.28": "dsh-liangshen: refusal lock → executable",
 			"patch.29": "dsh-liangshen: keep inject in phase-1",
+			"patch.30": "dsh-tool-web: untrusted framing → usable data",
+			"patch.31": "dsh-hooks-claude-code: deny→allow",
+			"patch.32": "dsh-hooks-codex: deny→allow",
 		};
 
 		const THEME_KEY = "dshp-theme";
+		const THEME_MODE_KEY = "dshp-theme-mode"; // "manual" = user picked; else follow host
 		const PURGE_CSS = `
 .dshp-root{--dshp-display:"Songti SC","Noto Serif SC","Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;--dshp-sans:"Yu Gothic UI","Hiragino Sans GB","Source Han Sans SC",system-ui,sans-serif;--dshp-mono:"Cascadia Mono","Sarasa Mono SC",ui-monospace,monospace;--dshp-ease:cubic-bezier(.16,1,.3,1);max-width:920px;display:flex;flex-direction:column;gap:18px;padding:16px;border-radius:12px;background:var(--dshp-bg);color:var(--dshp-ink);font-family:var(--dshp-sans)}
 .dshp-root[data-theme="white"]{--dshp-bg:#ffffff;--dshp-paper:#f7f6f3;--dshp-ink:#4a4742;--dshp-mute:#9a958c;--dshp-line:#eceae4;--dshp-fill:#f3f1ec;--dshp-accent:#7d9a86;--dshp-accent-soft:#e7efe9;--dshp-ok:#5d8a6c;--dshp-warn:#a8844a;--dshp-bad:#c48989;color-scheme:light}
@@ -296,9 +324,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 @media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
 @media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
 `;
-
-		const I18n = createContext((key) => key);
-		function useT() { return useContext(I18n); }
 
 		function formatSize(bytes) {
 			if (typeof bytes !== "number" || !isFinite(bytes) || bytes < 0) return "0 B";
@@ -394,15 +419,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
-				fetch("/dsh-purge/status", { cache: "no-store" })
-					.then((r) => r.json())
-					.then((d) => { if (d.ok) setState(d); else setNotice({ kind: "error", text: tr("err.status", { error: d.error || "" }) }); })
-					.catch((e) => setNotice({ kind: "error", text: tr("err.status", { error: e.message }) }));
-				fetch("/dsh-purge/override", { cache: "no-store" })
-					.then((r) => r.json())
+				apiJson("/dsh-purge/status")
 					.then((d) => {
-						if (d.ok) { setOverride(d.content || ""); setOverrideLoaded(true); }
-						else setNotice({ kind: "error", text: tr("err.override", { error: d.error || "" }) });
+						if (d && d.ok) setState(d);
+						else {
+							setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
+							setNotice({ kind: "error", text: tr("err.status", { error: (d && d.error) || "bad response" }) });
+						}
+					})
+					.catch((e) => {
+						setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
+						setNotice({ kind: "error", text: tr("err.status", { error: e.message }) });
+					});
+				apiJson("/dsh-purge/override")
+					.then((d) => {
+						if (d && d.ok) { setOverride(d.content || ""); setOverrideLoaded(true); }
+						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
 					})
 					.catch((e) => setNotice({ kind: "error", text: tr("err.override", { error: e.message }) }));
 			}, []);
@@ -571,13 +603,18 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const loadStatus = useCallback(() => {
 				const tr = tRef.current;
-				fetch("/dsh-purge/rules/status", { cache: "no-store" })
-					.then((r) => r.json())
+				apiJson("/dsh-purge/rules/status")
 					.then((d) => {
-						if (d.ok) setSt(d);
-						else setNotice({ kind: "error", text: tr("err.rules", { error: d.error || "" }) });
+						if (d && d.ok) setSt(d);
+						else {
+							setSt({ ok: false, rules: [], active: null });
+							setNotice({ kind: "error", text: tr("err.rules", { error: (d && d.error) || "bad response" }) });
+						}
 					})
-					.catch((e) => setNotice({ kind: "error", text: tr("err.rules", { error: e.message }) }));
+					.catch((e) => {
+						setSt({ ok: false, rules: [], active: null });
+						setNotice({ kind: "error", text: tr("err.rules", { error: e.message }) });
+					});
 			}, []);
 
 			useEffect(() => { loadStatus(); }, [loadStatus]);
@@ -606,8 +643,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const openRule = useCallback((id) => {
 				setBusy(true);
-				fetch("/dsh-purge/rules/read?id=" + encodeURIComponent(id), { cache: "no-store" })
-					.then((res) => res.json())
+				apiJson("/dsh-purge/rules/read?id=" + encodeURIComponent(id))
 					.then((d) => {
 						if (d.ok) {
 							setEditId(id);
@@ -793,12 +829,30 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				});
 		}
 
-		function readTheme() {
+		function detectHostTheme() {
 			try {
-				const v = window.localStorage.getItem(THEME_KEY);
-				if (v === "dusk" || v === "white") return v;
+				if (typeof document !== "undefined") {
+					if (document.body?.hasAttribute("data-ds-dark-theme")) return "dusk";
+					const root = document.documentElement;
+					const scheme = (root.style.colorScheme || getComputedStyle(root).getPropertyValue("color-scheme") || "").toLowerCase();
+					if (scheme.includes("dark")) return "dusk";
+					if (scheme.includes("light")) return "white";
+				}
+				if (typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+					return "dusk";
+				}
 			} catch { /* ignore */ }
 			return "white";
+		}
+
+		function readTheme() {
+			try {
+				if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") {
+					const v = window.localStorage.getItem(THEME_KEY);
+					if (v === "dusk" || v === "white") return v;
+				}
+			} catch { /* ignore */ }
+			return detectHostTheme();
 		}
 
 		function SettingsRoot(props) {
@@ -806,40 +860,79 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [theme, setTheme] = useState(readTheme);
 			const setAndStore = useCallback((next) => {
 				setTheme(next);
-				try { window.localStorage.setItem(THEME_KEY, next); } catch { /* ignore */ }
+				try {
+					window.localStorage.setItem(THEME_MODE_KEY, "manual");
+					window.localStorage.setItem(THEME_KEY, next);
+				} catch { /* ignore */ }
 			}, []);
-			return h(I18n.Provider, { value: t },
-				h("div", { className: "dshp-root", "data-theme": theme },
-					h("style", null, PURGE_CSS),
-					h("div", { className: "dshp-toolbar" },
-						h("div", { className: "dshp-switch", role: "group", "aria-label": t("theme.aria") },
-							h("button", {
-								type: "button",
-								className: theme === "white" ? "is-on" : "",
-								onClick: () => setAndStore("white"),
-							}, t("theme.white")),
-							h("button", {
-								type: "button",
-								className: theme === "dusk" ? "is-on" : "",
-								onClick: () => setAndStore("dusk"),
-							}, t("theme.ink")),
-						),
+			useEffect(() => {
+				let cancelled = false;
+				let timer = 0;
+				const syncFromHost = () => {
+					try {
+						if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") return;
+					} catch { /* ignore */ }
+					if (!cancelled) setTheme(detectHostTheme());
+				};
+				// Debounce attribute churn so layout style writes don't thrash React state.
+				const syncSoon = () => {
+					if (timer) window.clearTimeout(timer);
+					timer = window.setTimeout(syncFromHost, 50);
+				};
+				syncFromHost();
+				let mq;
+				try {
+					mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+					mq?.addEventListener?.("change", syncFromHost);
+				} catch { /* ignore */ }
+				let obs;
+				try {
+					if (document.body) {
+						obs = new MutationObserver(syncSoon);
+						// Host dark mode is projected onto body; ignore documentElement style noise.
+						obs.observe(document.body, { attributes: true, attributeFilter: ["data-ds-dark-theme"] });
+					}
+				} catch { /* ignore */ }
+				return () => {
+					cancelled = true;
+					if (timer) window.clearTimeout(timer);
+					try { mq?.removeEventListener?.("change", syncFromHost); } catch { /* ignore */ }
+					try { obs?.disconnect(); } catch { /* ignore */ }
+				};
+			}, []);
+			translate = t;
+			return h("div", { className: "dshp-root", "data-theme": theme },
+				h("style", null, PURGE_CSS),
+				h("div", { className: "dshp-toolbar" },
+					h("div", { className: "dshp-switch", role: "group", "aria-label": t("theme.aria") },
+						h("button", {
+							type: "button",
+							className: theme === "white" ? "is-on" : "",
+							onClick: () => setAndStore("white"),
+						}, t("theme.white")),
+						h("button", {
+							type: "button",
+							className: theme === "dusk" ? "is-on" : "",
+							onClick: () => setAndStore("dusk"),
+						}, t("theme.ink")),
 					),
-					h(PurgifySection, null),
-					h(RulesSection, null),
 				),
+				h(PurgifySection, null),
+				h(RulesSection, null),
 			);
 		}
 
 		function apply(ctx) {
-			const t = ctx.locale.bind(NS);
 			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
+			const t = ctx.locale.bind(NS);
+			translate = t;
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
 				id: "dsh-purge",
 				order: 40,
 				label: () => t("nav"),
 				locale: NS,
+				inject: () => ({ t }),
 			}, SettingsRoot));
 		}
 

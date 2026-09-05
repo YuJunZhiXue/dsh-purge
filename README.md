@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.3.3</strong></p>
+<p align="center"><strong>Version 1.3.5</strong></p>
 
 <p align="center">
     <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -14,7 +14,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D22-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -24,7 +24,7 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> Aligned with **dsh 0.1.1-rc.2**. On other versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.
+> Aligned with **dsh 0.1.2-rc.1** (Node.js **≥18**; Windows no-flash import hooks need **Node ≥22** `registerHooks`, older Node still gets file-level `windowsHide` patches). On other versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.
 
 <details>
 <summary><strong>For AI Agents (expand · install · operate)</strong></summary>
@@ -38,7 +38,7 @@
 **Environment**
 
 - `dsh` CLI on `PATH`
-- Target: **dsh 0.1.1-rc.2** (other versions may install; unmatched items skip)
+- Target: **dsh 0.1.2-rc.1** (other versions may install; unmatched items skip)
 - Node.js `>= 18`
 - Reachable `github.com`
 
@@ -268,9 +268,20 @@ patch not applied? ──no──> skip
     ├─> apply matching replacements
     ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh; **skip Desktop sealed host-commands bins**)
     ├─> scrub illegal sibling `*.dshpurge.bak` inside sealed bins (Desktop validates before plugins load)
-    ├─> Windows: pin hide-console into real `lib/bin.js` (mnemon/git flash is best-effort)
+    ├─> Windows: pin hide-console + child_process import hook; patch subprocess-local / doctor / market / liangshen bash
     └─> if `prompt-inject.md` is missing, write the default (do not refill an empty file)
 ```
+
+**Windows CMD silence (1.3.5):**
+
+- Root cause: on Node 24, `import { spawn } from "node:child_process"` is **not** a live binding — patching `require(...).spawn` alone never reaches official packages.
+- Fix: `registerHooks` redirects `node:child_process` to a `windowsHide` facade; also write `windowsHide: true` into `@deepseek-ai/dsh-subprocess-local`.
+- Also: doctor relaunch uses `node + bin.js` (never `cmd.exe /c dsh.cmd`); do not leave noop `supervisor.cmd` (avoids `schtasks` flash every boot); liangshen custom-bash refuses `System32\bash.exe` (WSL launcher).
+
+**Liangshen phase-1 first-turn inject (1.3.5):**
+
+- Default preset `liangshen` phase-1 stripped non-persona system-prompt sections, so `@deepseek-ai/dsh-system-prompt` / `prompt-inject` looked missing on turn 1.
+- Apply / startup keeps full assembled sections in phase-1 (tool quarantine unchanged) and folds inject into the persona so outer filters cannot drop it.
 
 **DSH Desktop (anywhere-labs/dsh-desktop, issue #9):**
 
@@ -316,11 +327,24 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 
 ---
 
+## Changelog
+
+### 1.3.5 (dsh 0.1.2-rc.1 / Node 24 Windows)
+
+- **CMD flash:** fix Node 24 ESM `spawn` patch miss; silence subprocess-local / doctor / dshmarket / liangshen bash / doctor stub paths.
+- **First-turn inject:** liangshen phase-1 keeps full system-prompt; fold inject into persona.
+- **Restart:** `/dsh-purge/restart` uses `node + bin.js` only, waits for the port, never pops cmd.
+- **Patch markers:** #21 and friends accept `^0.1.2-rc.1` dependency spellings (fewer false pendings).
+
+### 1.3.4
+
+- Desktop sealed `host-commands/**/bin` is scrub-only — no `dsh.cmd.dshpurge.bak` recovery loops.
+
 ## Notes
 
 - Scope is rendered copy, defaults, and runtime logic inside local `@deepseek-ai/*` packages, plus override files and rule sets under the harness home.
 - After an upgrade, unmatched originals surface as `pattern_not_found` or pending.
-- Third-party plugins outside `@deepseek-ai` are left alone.
+- Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
 - The npm package name is not published yet. Install from GitHub or `dsh plugin add .`.
 
 ---
