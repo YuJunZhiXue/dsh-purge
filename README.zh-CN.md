@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.3.3</strong></p>
+<p align="center"><strong>Version 1.3.5</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -14,14 +14,14 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.2--rc.1-blue" alt="DSH"></a>
 </p>
 
 <p align="center">
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> 对准 **dsh 0.1.1-rc.2**。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
+> 对准 **dsh 0.1.2-rc.1**（Node.js **≥18**，Windows 无感路径依赖 **Node ≥22** 的 `registerHooks`，更低版本仍靠文件级 `windowsHide` 补丁）。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
 
 <details>
 <summary><strong>给 AI Agent（点开 · 直接装 · 直接操作）</strong></summary>
@@ -35,7 +35,7 @@
 **环境**
 
 - 已安装 `dsh` CLI，且在 `PATH` 里
-- 目标版本：**dsh 0.1.1-rc.2**（其它版本可装，原文对不上的项会跳过）
+- 目标版本：**dsh 0.1.2-rc.1**（其它版本可装，原文对不上的项会跳过）
 - Node.js `>= 18`
 - 能访问 `github.com`
 
@@ -268,9 +268,20 @@ node --check client.js
     ├─> 按补丁列表替换对应文件
     ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh；**跳过 Desktop host-commands 密封目录**）
     ├─> 清掉密封目录里误放的 sibling `*.dshpurge.bak`（Desktop 启动前校验，残留会进恢复模式）
-    ├─> Windows：把 hide-console 钉进真实 `lib/bin.js`（mnemon/git 闪窗为尽力修补，不挡完成）
+    ├─> Windows：钉 hide-console + child_process 导入钩子，并修补 subprocess-local / doctor / market / 梁神 bash
     └─> 若 `prompt-inject.md` 尚不存在则写入默认覆盖文本（已存在的空文件不覆盖）
 ```
+
+**Windows CMD 无感（1.3.5）：**
+
+- 根因：Node 24 上 `import { spawn } from "node:child_process"` **不是** live binding，只改 `require(...).spawn` 对官方包无效。
+- 做法：`registerHooks` 把 `node:child_process` 指到带 `windowsHide` 的 facade；并直接给 `@deepseek-ai/dsh-subprocess-local` 加 `windowsHide: true`。
+- 顺带：doctor 重启改走 `node + bin.js`（不 `cmd.exe /c dsh.cmd`）；不写 noop `supervisor.cmd`（避免每次启动跑 `schtasks` 闪窗）；梁神 custom-bash 拒绝回退到 `System32\bash.exe`（WSL 启动器）。
+
+**梁神 phase-1 首轮注入（1.3.5）：**
+
+- 默认预设 `liangshen` 的 phase-1 会扒掉非 persona 的 system-prompt 段，导致 `@deepseek-ai/dsh-system-prompt` / `prompt-inject` 看起来「第一轮没注入」。
+- Apply / 启动时会把 phase-1 改为保留完整 assembled sections（工具目录仍按梁神隔离）；并把 inject 折进 persona，避免被外层 filter 丢掉。
 
 **DSH Desktop 适配（anywhere-labs/dsh-desktop，issue #9）：**
 
@@ -316,11 +327,24 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 
 ---
 
+## 更新记录
+
+### 1.3.5（适配 dsh 0.1.2-rc.1 / Node 24 Windows）
+
+- **CMD 闪窗**：修复 Node 24 ESM `spawn` 补丁无效；subprocess-local / doctor / dshmarket / 梁神 bash / doctor stub 全路径无感。
+- **首轮注入**：梁神 phase-1 保留完整 system-prompt；inject 折进 persona。
+- **重启**：`/dsh-purge/restart` 只走 `node + bin.js`，等待端口释放后再拉起，不弹 cmd。
+- **补丁标记**：#21 等兼容 `^0.1.2-rc.1` 依赖写法，减少假 pending。
+
+### 1.3.4
+
+- Desktop 密封 `host-commands/**/bin` 只清理不注入，避免 `dsh.cmd.dshpurge.bak` 触发恢复模式。
+
 ## 说明
 
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会报 `pattern_not_found` 或显示待应用，不会乱改。
-- 不改动非 `@deepseek-ai` 的第三方插件。
+- 不改动非 `@deepseek-ai` 的第三方插件（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁，不是改它们的源仓库）。
 - npm 上暂未发布同名包，用 GitHub 或 `dsh plugin add .` 安装。
 
 ---
