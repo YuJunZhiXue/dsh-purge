@@ -14,6 +14,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
+  <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
   <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D22-339933?logo=node.js&logoColor=fff" alt="Node.js">
@@ -26,7 +27,41 @@
 
 > Aligned with **dsh 0.1.2-rc.1** (Node.js **≥18**; Windows no-flash import hooks need **Node ≥22** `registerHooks`, older Node still gets file-level `windowsHide` patches). On other versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.
 
-<details>
+---
+
+## ☕ Sponsor
+
+If dsh-purge helps you, a tip is welcome.
+
+<p align="center">
+  <img src="docs/appreciate.png" alt="WeChat appreciate" width="360">
+</p>
+
+<p align="center">
+  <sub>Built by 小杨 · for DeepSeek Harness</sub>
+</p>
+
+---
+
+> ### ⚠️ Legal Disclaimer
+>
+> 1. **Academic and authorized testing only**: This project (`dsh-purge`) is for AI robustness evaluation, red-team simulation, synthetic-target benchmarks, and academic research.
+> 2. **No illegal use**: Do not use this project or derivatives for unauthorized penetration testing, network attacks, underground activity, evasion of applicable law, or generation of illegal content.
+> 3. **User bears all liability**: Anyone who downloads, runs, modifies, or redistributes this project is solely responsible for any civil, administrative, or criminal consequences (including but not limited to the Cybersecurity Law of the PRC, the Data Security Law, and third-party terms of service). Authors and contributors accept no joint liability.
+> 4. **No affiliation**: This is an independent open-source project. It is not affiliated with, authorized by, or endorsed by DeepSeek or its affiliates.
+> 5. **Use constitutes agreement**: Cloning, downloading, installing, redistributing, or running this code means you have read and accepted the above. If you do not agree, stop immediately and delete all copies.
+
+---
+
+## ⚡ Install
+
+Web and desktop install the same plugin into different profiles. After install you **must fully quit and restart** DeepSeek Harness so the **Rules** card appears. Then **Apply** — adding the bundle does not patch `@deepseek-ai` packages by itself.
+
+### Method 1: Hand this to an AI agent (fastest)
+
+Paste this README (or the block below) to a local coding agent and let it install and operate.
+
+<details open>
 <summary><strong>For AI Agents (expand · install · operate)</strong></summary>
 
 <!-- AI-AGENT-START -->
@@ -96,6 +131,202 @@ dsh plugin --profile default remove dsh-purge
 
 </details>
 
+### Method 2: `dsh://` one-click (desktop, no CLI)
+
+If the official DeepSeek Harness desktop client (EXE) is installed, the button below opens a system URI scheme and loads the plugin.
+
+> 🌐 **Plugin hub:** [DeepSeek Harness Hub — official and community plugins](https://deepseek.stream/plugins/dsh-purge)
+
+<p align="center">
+  <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 Open Hub page</strong></a>
+  &nbsp;·&nbsp;
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 Install in desktop client</strong></a>
+</p>
+
+🔗 **Raw protocol URL:**
+
+```
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+```
+
+**Web trigger example:**
+
+```js
+/**
+ * Open the DeepSeek Harness desktop client to install dsh-purge
+ */
+export function installDshPurgeToDesktop() {
+  const params = new URLSearchParams({
+    id: 'dsh-purge',
+    name: 'dsh-purge',
+    version: '1.3.5',
+    repo: 'YuJunZhiXue/dsh-purge',
+    permissions: '系统提示词注入, 本机补丁, 设置页',
+    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
+  });
+
+  const deepLink = `dsh://plugin/install?${params.toString()}`;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = deepLink;
+  document.body.appendChild(iframe);
+  setTimeout(() => document.body.removeChild(iframe), 2000);
+}
+```
+
+**HTML link:**
+
+```html
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+  🚀 Install in desktop client
+</a>
+```
+
+**`dsh://plugin/install` parameters:**
+
+| Param | Value / example | Meaning |
+|---|---|---|
+| id | `dsh-purge` | Plugin id |
+| name | `dsh-purge` | Display name |
+| version | `1.3.5` | Semver |
+| repo | `YuJunZhiXue/dsh-purge` | GitHub repo |
+| permissions | `系统提示词注入, 本机补丁, 设置页` | Requested permissions |
+| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | Zip URL |
+
+### Method 3: Official CLI (`dsh plugin add`)
+
+```sh
+git clone https://github.com/YuJunZhiXue/dsh-purge.git
+cd dsh-purge
+
+# Web
+dsh plugin --profile web add .
+
+# Desktop
+dsh plugin --profile default add .
+```
+
+Or skip clone and pass the zip:
+
+```sh
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
+
+Run both if you use Web and desktop. Then **restart**, then Apply on the settings page or `/purge apply` in chat.
+
+### Method 4: Manual install
+
+Use this when `dsh` is not on `PATH` or you do not want `dsh plugin add`. Do **not** delete existing bundles.
+
+**1. Find the Harness home (`$DSH_HOME`)**
+
+| Layout | Typical path |
+|---|---|
+| Env | `DSH_HOME` if set |
+| Windows portable | `.dsh` next to `npm-global`, e.g. `D:\DeepSeek Harness\.dsh` |
+| User default | Windows `%USERPROFILE%\.dsh`; Linux / macOS `~/.dsh` |
+
+Web = `profiles/web`. Desktop = `profiles/default` (or whatever profile directory the desktop client actually uses).
+
+**2. Put this repo under plugins**
+
+```sh
+git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
+```
+
+Or copy the tree to `$DSH_HOME/plugins/dsh-purge` (folder name must be `dsh-purge`).
+
+**3. Edit that profile’s `package.json`**
+
+- Web: `$DSH_HOME/profiles/web/package.json`
+- Desktop: `$DSH_HOME/profiles/default/package.json`
+
+Add to `dependencies` (keep other deps):
+
+```json
+"dsh-purge": "file:../../plugins/dsh-purge"
+```
+
+**Append** `"dsh-purge"` at the end of `dsh.profile.bundles`:
+
+- Web: **keep** `@deepseek-ai/dsh-web-app`, only append this plugin
+- Desktop: keep `@deepseek-ai/dsh-base` (and the rest), only append this plugin
+
+Sketch (keep every other field from the file on disk):
+
+```json
+{
+  "dependencies": {
+    "dsh-purge": "file:../../plugins/dsh-purge"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-purge"
+      ]
+    }
+  }
+}
+```
+
+If the desktop profile has no `dsh-web-app` row, do not add it; just make sure `"dsh-purge"` is in `bundles`.
+
+**4. Install deps**
+
+```sh
+cd "$DSH_HOME/profiles/web"
+pnpm install
+
+cd "$DSH_HOME/profiles/default"
+pnpm install
+```
+
+PowerShell: substitute the real path, e.g.
+
+```powershell
+cd "D:\DeepSeek Harness\.dsh\profiles\web"
+pnpm install
+```
+
+**5. Restart, then apply patches**
+
+1. Fully quit DeepSeek Harness (Web process or desktop tray) and start it again.
+2. Settings should show **Rules**. Ctrl+F5 if cached.
+3. Click **Apply**, or `/purge apply`, or `dsh-purge --apply` from the plugin dir.
+4. Restart again when prompted so patched packages load in this process.
+
+### Uninstall
+
+Click **Restore** on the settings page if patches must be undone, then:
+
+```sh
+dsh plugin --profile web remove dsh-purge
+dsh plugin --profile default remove dsh-purge
+```
+
+If you installed by hand: remove `dsh-purge` from that profile’s `dependencies` and `bundles`, run `pnpm install`, restart.
+
+Plugin config lives in `cordis.patch.yml`:
+
+```yaml
+- insert:
+    - id: dsh-purge
+      name: 'dsh-purge'
+      config:
+        enabled: true
+        autoApplyOnStart: true
+        autoRevertOnMissing: false
+        verbose: false
+        postPromptOrder: 5100
+        postPrompt: ""
+```
+
+`postPrompt` is empty by default.
+
 ---
 
 ## What this is
@@ -160,62 +391,6 @@ dsh-purge/
 ```
 
 Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`.
-
----
-
-## Install
-
-Web and desktop install the same plugin into their profile. Restart afterwards; the **Rules** card shows up on the settings page.
-
-**Official CLI**
-
-```sh
-git clone https://github.com/YuJunZhiXue/dsh-purge.git
-cd dsh-purge
-
-# Web
-dsh plugin --profile web add .
-
-# Desktop
-dsh plugin --profile default add .
-```
-
-GitHub zip:
-
-```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-```
-
-**Third-party / plugin market**
-
-Install `dsh-purge` from the Web or desktop plugin settings, or open the repo from [awesome-dsh-plugin](https://awesome-dsh-plugin.com) and run `dsh plugin add` as above.
-
-**Uninstall**
-
-Click **Restore** on the settings page if you need patches undone, then:
-
-```sh
-dsh plugin --profile web remove dsh-purge
-dsh plugin --profile default remove dsh-purge
-```
-
-Plugin config lives in `cordis.patch.yml`:
-
-```yaml
-- insert:
-    - id: dsh-purge
-      name: 'dsh-purge'
-      config:
-        enabled: true
-        autoApplyOnStart: true
-        autoRevertOnMissing: false
-        verbose: false
-        postPromptOrder: 5100
-        postPrompt: ""
-```
-
-`postPrompt` is empty by default.
 
 ---
 
@@ -345,19 +520,7 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 - Scope is rendered copy, defaults, and runtime logic inside local `@deepseek-ai/*` packages, plus override files and rule sets under the harness home.
 - After an upgrade, unmatched originals surface as `pattern_not_found` or pending.
 - Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
-- The npm package name is not published yet. Install from GitHub or `dsh plugin add .`.
-
----
-
-## ☕ 赞赏支持 / Sponsor
-
-<p align="center">
-  <img src="docs/appreciate.png" alt="WeChat appreciate" width="360">
-</p>
-
-<p align="center">
-  <sub>Built by 小杨 · for DeepSeek Harness</sub>
-</p>
+- The npm package name is not published yet. Install from GitHub, the [Hub](https://deepseek.stream/plugins/dsh-purge), or `dsh plugin add .`.
 
 ---
 

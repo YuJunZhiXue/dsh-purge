@@ -71,6 +71,8 @@ async function main() {
       const m = r.status === "applied" ? "✓ 已清洗" : r.status === "already" ? "- 已是最新" : r.status === "missing_file" ? "⚠ 文件缺失" : `✗ ${r.status}`;
       console.log(`  ${m} patch #${String(r.patch_id).padEnd(2)} ${r.name}`);
     }
+    const flash = core.silenceCmdFlash(state.ai_base);
+    console.log(`  cmd-flash=${flash.entry} phase-1=${flash.phase1} ok=${flash.ok}`);
     const ov = await core.installOverride(state.dsh_home, false);
     console.log(ov === "wrote" ? `  ✓ 写入 ${state.override_path}` : "  - prompt-inject.md 已存在 (你的自定义内容将保留)");
     if (state.shim_dir) {
