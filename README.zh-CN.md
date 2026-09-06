@@ -14,6 +14,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
+  <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
   <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.1.2--rc.1-blue" alt="DSH"></a>
 </p>
 
@@ -23,7 +24,41 @@
 
 > 对准 **dsh 0.1.2-rc.1**（Node.js **≥18**，Windows 无感路径依赖 **Node ≥22** 的 `registerHooks`，更低版本仍靠文件级 `windowsHide` 补丁）。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
 
-<details>
+---
+
+## ☕ 赞赏支持 / Sponsor
+
+如果 dsh-purge 对你有帮助，欢迎打赏。
+
+<p align="center">
+  <img src="docs/appreciate.png" alt="微信赞赏码" width="360">
+</p>
+
+<p align="center">
+  <sub>Built by 小杨 · for DeepSeek Harness</sub>
+</p>
+
+---
+
+> ### ⚠️ 法律免责与合规声明（Legal Disclaimer）
+>
+> 1. **学术与合规测试用途**：本项目（`dsh-purge`）仅用于人工智能模型鲁棒性安全评测、红队攻防对抗模拟、合成靶标安全基准测试及学术研究。
+> 2. **禁止非法使用**：严禁将本项目或其衍生代码用于任何未经授权的渗透测试、网络攻击、黑灰产活动、绕过国家法律法规监管，或利用模型生成任何违法违禁内容。
+> 3. **使用者全权担责**：任何主体因下载、运行、修改或传播本项目而产生的任何直接或间接法律责任（包括但不限于违反《中华人民共和国网络安全法》、《数据安全法》及第三方平台《服务条款》所导致的民事、行政或刑事责任），均由使用者自行全权承担，项目发起人与贡献者概不承担任何连带责任。
+> 4. **第三方关系声明**：本项目属于开源学术验证项目，与 DeepSeek 官方或其关联公司无任何商业隶属、授权或背书关系。
+> 5. **同意即约束**：任何克隆、下载、安装、二次分发或运行本项目代码的行为，均视为已阅读并完全同意上述所有条款；若不同意，请立即停止使用并删除全部代码与文件。
+
+---
+
+## ⚡ 安装方式
+
+Web 和桌面装的是同一个插件，只是 profile 不同。装完必须**完全退出并重启** DeepSeek Harness，设置页才会出现「规则设定」；然后再点「应用」打补丁（只装进 profile 还不会改 `@deepseek-ai` 包）。
+
+### 方式 1：交给 AI 安装（最快）
+
+把本 README（或下面整块）丢给本机 coding agent，让它直接装、直接操作。
+
+<details open>
 <summary><strong>给 AI Agent（点开 · 直接装 · 直接操作）</strong></summary>
 
 <!-- AI-AGENT-START -->
@@ -93,6 +128,206 @@ dsh plugin --profile default remove dsh-purge
 
 </details>
 
+### 方式 2：dsh:// 协议联动一键安装（桌面端最快，秒级免命令行）
+
+若已安装 DeepSeek Harness 官方桌面客户端（EXE），点下方按钮即可通过系统级 URI Scheme 唤起客户端装载。
+
+> 🌐 **插件生态市场**：[DeepSeek Harness Hub - DeepSeek 官方与开源生态市场 | 插件发现与一键安装](https://deepseek.stream/plugins/dsh-purge)
+
+<p align="center">
+  <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
+  &nbsp;·&nbsp;
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
+</p>
+
+🔗 **原生协议链接：**
+
+```
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+```
+
+**网页端（前端）触发代码示例：**
+
+```js
+/**
+ * 唤起 DeepSeek Harness 桌面客户端一键安装 dsh-purge
+ */
+export function installDshPurgeToDesktop() {
+  const params = new URLSearchParams({
+    id: 'dsh-purge',
+    name: 'dsh-purge',
+    version: '1.3.5',
+    repo: 'YuJunZhiXue/dsh-purge',
+    permissions: '系统提示词注入, 本机补丁, 设置页',
+    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
+  });
+
+  const deepLink = `dsh://plugin/install?${params.toString()}`;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = deepLink;
+  document.body.appendChild(iframe);
+  setTimeout(() => document.body.removeChild(iframe), 2000);
+}
+```
+
+**HTML 静态链接方式：**
+
+```html
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.3.5&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+  🚀 唤起客户端一键安装
+</a>
+```
+
+**协议参数配置（dsh://plugin/install）：**
+
+| 参数名 | 值 / 示例 | 说明 |
+|---|---|---|
+| id | `dsh-purge` | 插件唯一标识符 |
+| name | `dsh-purge` | 插件展示名称 |
+| version | `1.3.5` | 语义化版本号 |
+| repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
+| permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
+| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | zip 下载直链 |
+
+### 方式 3：官方 CLI（`dsh plugin add`）
+
+```sh
+git clone https://github.com/YuJunZhiXue/dsh-purge.git
+cd dsh-purge
+
+# Web
+dsh plugin --profile web add .
+
+# 桌面
+dsh plugin --profile default add .
+```
+
+不 clone、直接喂 zip 也可以：
+
+```sh
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
+
+Web + 桌面都要用时，两条都跑。然后**重启**，再在设置页点「应用」或聊天里 `/purge apply`。
+
+### 方式 4：手动配置安装
+
+`dsh` 不在 PATH、或不想用 `dsh plugin add` 时，按下面做。全程不要删 profile 里原有的 bundle。
+
+**1. 找到 Harness 主目录（下文称 `$DSH_HOME`）**
+
+| 安装形态 | 典型路径 |
+|---|---|
+| 环境变量 | `DSH_HOME`（已设置就用它） |
+| Windows 便携包 | 与 `npm-global` 同级的 `.dsh`，例如 `D:\DeepSeek Harness\.dsh` |
+| 用户默认 | Windows `%USERPROFILE%\.dsh`；Linux / macOS `~/.dsh` |
+
+Web 用 `profiles/web`，桌面用 `profiles/default`（若桌面客户端实际 profile 名不同，以目录为准）。
+
+**2. 把本仓库放到 plugins 目录**
+
+```sh
+git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
+```
+
+或把已有仓库复制为 `$DSH_HOME/plugins/dsh-purge`（目录名必须是 `dsh-purge`）。
+
+**3. 改对应 profile 的 `package.json`**
+
+文件：
+
+- Web：`$DSH_HOME/profiles/web/package.json`
+- 桌面：`$DSH_HOME/profiles/default/package.json`
+
+在 `dependencies` 里追加（不要删别的依赖）：
+
+```json
+"dsh-purge": "file:../../plugins/dsh-purge"
+```
+
+在 `dsh.profile.bundles` 数组**末尾追加** `"dsh-purge"`：
+
+- Web：**必须保留**原来的 `@deepseek-ai/dsh-web-app`，只追加本插件
+- 桌面：保留原来的 `@deepseek-ai/dsh-base` 等，只追加本插件
+
+完整示意（其它字段按你机器上的原文件保留）：
+
+```json
+{
+  "dependencies": {
+    "dsh-purge": "file:../../plugins/dsh-purge"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-purge"
+      ]
+    }
+  }
+}
+```
+
+桌面 profile 若没有 `dsh-web-app` 这一行，不要硬加；只保证 `bundles` 里有 `"dsh-purge"`。
+
+**4. 安装依赖**
+
+```sh
+# Web
+cd "$DSH_HOME/profiles/web"
+pnpm install
+
+# 桌面（若也改了 default）
+cd "$DSH_HOME/profiles/default"
+pnpm install
+```
+
+Windows PowerShell 把 `$DSH_HOME` 换成实际路径即可，例如：
+
+```powershell
+cd "D:\DeepSeek Harness\.dsh\profiles\web"
+pnpm install
+```
+
+**5. 重启，再打补丁**
+
+1. 完全退出 DeepSeek Harness（Web 关进程；桌面退出托盘），再启动。
+2. 设置页应出现「规则设定」。有缓存就 Ctrl+F5。
+3. 点「应用」，或聊天 `/purge apply`，或在插件目录执行 `dsh-purge --apply`。
+4. 按提示再重启一次，补丁才进入当前进程。
+
+### 卸载
+
+先在设置页点「还原」（需要撤掉已打补丁时），再：
+
+```sh
+dsh plugin --profile web remove dsh-purge
+dsh plugin --profile default remove dsh-purge
+```
+
+手动装的：从对应 `package.json` 的 `dependencies` 和 `bundles` 里去掉 `dsh-purge`，再 `pnpm install`，重启。
+
+插件配置在 `cordis.patch.yml`：
+
+```yaml
+- insert:
+    - id: dsh-purge
+      name: 'dsh-purge'
+      config:
+        enabled: true
+        autoApplyOnStart: true
+        autoRevertOnMissing: false
+        verbose: false
+        postPromptOrder: 5100
+        postPrompt: ""
+```
+
+`postPrompt` 默认为空。需要时再追加一段有序 systemPrompt，不改 `prompt-inject.md`。
+
 ---
 
 ## 这是什么
@@ -157,62 +392,6 @@ dsh-purge/
 ```
 
 运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。
-
----
-
-## 安装
-
-Web 和桌面都是往对应 profile 里装同一个插件。装完重启，设置页出现「规则设定」。
-
-**官方 CLI（推荐）**
-
-```sh
-git clone https://github.com/YuJunZhiXue/dsh-purge.git
-cd dsh-purge
-
-# Web
-dsh plugin --profile web add .
-
-# 桌面
-dsh plugin --profile default add .
-```
-
-GitHub zip 也可以：
-
-```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-```
-
-**第三方 / 插件市场**
-
-在 Web 或桌面的插件设置里搜索安装 `dsh-purge`，或从 [awesome-dsh-plugin](https://awesome-dsh-plugin.com) 进入仓库后再用上面的 `dsh plugin add`。
-
-**卸载**
-
-先在设置页点「还原」（如需撤掉已打补丁），再：
-
-```sh
-dsh plugin --profile web remove dsh-purge
-dsh plugin --profile default remove dsh-purge
-```
-
-配置项在插件自己的 `cordis.patch.yml`：
-
-```yaml
-- insert:
-    - id: dsh-purge
-      name: 'dsh-purge'
-      config:
-        enabled: true
-        autoApplyOnStart: true
-        autoRevertOnMissing: false
-        verbose: false
-        postPromptOrder: 5100
-        postPrompt: ""
-```
-
-`postPrompt` 默认为空。需要时再追加一段有序 systemPrompt，不改 `prompt-inject.md`。
 
 ---
 
@@ -345,19 +524,7 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会报 `pattern_not_found` 或显示待应用，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁，不是改它们的源仓库）。
-- npm 上暂未发布同名包，用 GitHub 或 `dsh plugin add .` 安装。
-
----
-
-## ☕ 赞赏支持 / Sponsor
-
-<p align="center">
-  <img src="docs/appreciate.png" alt="微信赞赏码" width="360">
-</p>
-
-<p align="center">
-  <sub>Built by 小杨 · for DeepSeek Harness</sub>
-</p>
+- npm 上暂未发布同名包，用 GitHub、[插件市场](https://deepseek.stream/plugins/dsh-purge) 或 `dsh plugin add .` 安装。
 
 ---
 
