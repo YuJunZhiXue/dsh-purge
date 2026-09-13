@@ -35,10 +35,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26, 27, 28, 29] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26, 27, 28, 29, 33] },
 			{ key: "code", ids: [6, 7, 8] },
-			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16] },
-			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 31, 32] },
+			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 36] },
+			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 31, 32, 34, 35, 37, 38] },
+			{ key: "compat", ids: [39, 40] },
 		];
 
 		const zh = {
@@ -105,6 +106,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"group.code": "代码",
 			"group.engine": "引擎",
 			"group.tools": "工具",
+			"group.compat": "0.1.5 兼容",
 			"patch.1": "全局免责 → 强指令",
 			"patch.2": "替换式免责 → 强指令",
 			"patch.3": "作用域免责 → 强指令",
@@ -137,6 +139,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.30": "dsh-tool-web：外部 untrusted 拦截→可执行",
 			"patch.31": "dsh-hooks-claude-code：deny→allow",
 			"patch.32": "dsh-hooks-codex：deny→allow",
+			"patch.33": "Web 表面身份中性化",
+			"patch.34": "Shell 拒绝提示 → 可执行",
+			"patch.35": "沙箱提示中性化",
+			"patch.36": "升级 never 不拒",
+			"patch.37": "文件系统升级 schema 放行",
+			"patch.38": "子代理 scope lock 中性化",
+			"patch.39": "persona text→prefix（0.1.2 预设）",
+			"patch.40": "会话 v0 plugin summary（mnemon）",
 		};
 
 		const en = {
@@ -203,6 +213,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"group.code": "Code",
 			"group.engine": "Engine",
 			"group.tools": "Tools",
+			"group.compat": "0.1.5 compat",
 			"patch.1": "Global disclaimer → mandate",
 			"patch.2": "Replacement disclaimer → mandate",
 			"patch.3": "Scope disclaimer → mandate",
@@ -235,6 +246,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.30": "dsh-tool-web: untrusted framing → usable data",
 			"patch.31": "dsh-hooks-claude-code: deny→allow",
 			"patch.32": "dsh-hooks-codex: deny→allow",
+			"patch.33": "Web surface identity neutral",
+			"patch.34": "Shell denial prompt → executable",
+			"patch.35": "Sandbox hint neutralized",
+			"patch.36": "Escalation never-reject",
+			"patch.37": "FS escalation schema opened",
+			"patch.38": "Subagent scope lock neutralized",
+			"patch.39": "persona text→prefix (0.1.2 presets)",
+			"patch.40": "session v0 plugin summary (mnemon)",
 		};
 
 		const THEME_KEY = "dshp-theme";
@@ -371,7 +390,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		function PatchGroups({ state }) {
 			const t = useT();
-			const [open, setOpen] = useState({ prompt: true, code: true, engine: true, tools: false });
+			const [open, setOpen] = useState({ prompt: true, code: true, engine: true, tools: false, compat: true });
 			if (!state || !state.patch_status) return h("div", { className: "dshp-skel", style: { height: 120 } });
 			return PATCH_GROUPS.map((group) => {
 				const rows = group.ids.map((id) => {
