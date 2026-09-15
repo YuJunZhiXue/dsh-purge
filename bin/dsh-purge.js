@@ -22,7 +22,7 @@ function printStatus(state) {
       out.push(`    ${key.padEnd(22)} ${fp}`);
     }
   } else {
-    out.push("  插件根 / root  NOT FOUND (set DSH_BASE)");
+    out.push("  插件根 / root  " + core.missingAiBaseMessage());
   }
   out.push(`  shim 目录      ${state.shim_dir || "未定位 / not found"}`);
   out.push(`  备份 / backup  ${state.has_backup ? "有 / yes" : "无 / no"}`);
@@ -59,8 +59,8 @@ async function main() {
 
   if (mode === "--apply") {
     if (!state.ai_base) {
-      console.log("[ERROR] 未找到 @deepseek-ai 插件根");
-      console.log("  fix: 设置 DSH_BASE=完整路径");
+      console.log("[ERROR] " + core.missingAiBaseMessage());
+      console.log("  fix: 把 DSH_BASE 指到含 dsh-agent-instructions/lib 的 @deepseek-ai 目录");
       process.exit(1);
     }
     const { made, errors } = await core.backupAll(state.ai_base);
