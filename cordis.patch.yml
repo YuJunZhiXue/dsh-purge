@@ -1,6 +1,3 @@
-# dsh-purge bundle patch: inserts the plugin into a profile's layer stack.
-# Overlay system-prompt so Harness does not open with "You are a coding agent".
-# Identity comes from prompt-inject.md only (when present).
 - id: system-prompt
   config:
     includeHarnessIdentity: false

@@ -1,4 +1,3 @@
-// dsh-purge client bundle: settings section follows Harness zh/en.
 window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		var module = { exports: {} };
@@ -505,7 +504,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
 							loadAll();
-							// Only after apply finished successfully — never restart mid-apply.
 							if (action === "apply") setAskRestart(true);
 						} else {
 							setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
@@ -811,22 +809,32 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			);
 		}
 
+		function reopenAfterRestart() {
+			const url = new URL(window.location.href);
+			url.searchParams.delete("token");
+			window.location.replace(url.pathname + url.search + url.hash);
+		}
+
 		function waitForRestart(setNotice, setBusy, t) {
 			const started = Date.now();
 			const ping = () => {
-				fetch("/dsh-purge/status", { cache: "no-store" })
-					.then((r) => { if (r.ok) window.location.reload(); else retry(); })
+				fetch("/dsh-purge/status", { cache: "no-store", credentials: "same-origin" })
+					.then((r) => (r.ok ? r.json() : Promise.reject()))
+					.then((d) => {
+						if (d && d.ok && d.ready !== false) reopenAfterRestart();
+						else retry();
+					})
 					.catch(retry);
 			};
 			const retry = () => {
-				if (Date.now() - started > 25000) {
+				if (Date.now() - started > 90000) {
 					setNotice({ kind: "error", text: t("restart.timeout") });
 					setBusy(false);
 					return;
 				}
-				setTimeout(ping, 400);
+				setTimeout(ping, 500);
 			};
-			setTimeout(ping, 700);
+			setTimeout(ping, 800);
 		}
 
 		function restartDsh(setNotice, setBusy, t) {
@@ -893,7 +901,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					} catch { /* ignore */ }
 					if (!cancelled) setTheme(detectHostTheme());
 				};
-				// Debounce attribute churn so layout style writes don't thrash React state.
 				const syncSoon = () => {
 					if (timer) window.clearTimeout(timer);
 					timer = window.setTimeout(syncFromHost, 50);
@@ -908,7 +915,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				try {
 					if (document.body) {
 						obs = new MutationObserver(syncSoon);
-						// Host dark mode is projected onto body; ignore documentElement style noise.
 						obs.observe(document.body, { attributes: true, attributeFilter: ["data-ds-dark-theme"] });
 					}
 				} catch { /* ignore */ }

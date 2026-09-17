@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-// dsh-purge CLI（小杨）— 移植自 dsh_purge.py 的静默模式，功能一个不差
-// 用法:
-//   dsh-purge              # TUI 等价：默认只显示状态（这里同 --status）
-//   dsh-purge --status     # 显示状态
-//   dsh-purge --apply      # 应用全部清洗
-//   dsh-purge --revert     # 回滚还原
-//   dsh-purge --edit       # 编辑 prompt-inject.md
-//   dsh-purge --help       # 帮助
 
 import * as core from "../lib/core.js";
 
@@ -116,7 +108,6 @@ async function main() {
     }
     console.log("  编辑完成后重启 dsh 生效。");
   } else {
-    // 默认只显示状态（对齐 py 的"默认不清洗"）
     console.log("默认不清洗，使用 --apply 应用清洗。");
   }
 }
