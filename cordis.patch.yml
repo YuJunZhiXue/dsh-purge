@@ -9,6 +9,7 @@
       config:
         enabled: true
         autoApplyOnStart: true
+        autoUpdateOnStart: true
         autoRevertOnMissing: false
         verbose: false
         postPrompt: ""
