@@ -27,8 +27,6 @@
 
 <p align="center">
   Channel <a href="https://t.me/LLM_PoJia">t.me/LLM_PoJia</a>
-  ·
-  Unlock bot <a href="https://t.me/LM_Pojia_Bot">@LM_Pojia_Bot</a>
 </p>
 
 > Aligned with **dsh 0.1.5-rc.1** (Node.js **≥18**; Windows no-flash import hooks need **Node ≥22** `registerHooks`, older Node still gets file-level `windowsHide` patches). On other versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.

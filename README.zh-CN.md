@@ -24,8 +24,6 @@
 
 <p align="center">
   频道 <a href="https://t.me/LLM_PoJia">t.me/LLM_PoJia</a>
-  ·
-  领取机器人 <a href="https://t.me/LM_Pojia_Bot">@LM_Pojia_Bot</a>
 </p>
 
 > 对准 **dsh 0.1.5-rc.1**（Node.js **≥18**；Windows 无感路径依赖 **Node ≥22** 的 `registerHooks`，更低版本仍靠文件级 `windowsHide` 补丁）。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
