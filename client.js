@@ -67,10 +67,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.checkUpdate.busy": "检测中…",
 			"btn.doUpdate": "更新",
 			"btn.doUpdate.busy": "更新中…",
+			"update.checking": "正在检测更新…",
+			"update.applying": "正在更新…",
 			"update.latest": "已是最新（{version}）",
 			"update.available": "有新版本 {remote}，当前 {local}",
 			"update.done": "已更新到 {version}，请重启",
 			"update.fail": "更新失败: {error}",
+			"update.needRestart": "检测接口未加载，请先重启 dsh 再点检测更新",
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
@@ -183,10 +186,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.checkUpdate.busy": "Checking…",
 			"btn.doUpdate": "Update",
 			"btn.doUpdate.busy": "Updating…",
+			"update.checking": "Checking for updates…",
+			"update.applying": "Updating…",
 			"update.latest": "Up to date ({version})",
 			"update.available": "Update {remote} available (now {local})",
 			"update.done": "Updated to {version}. Restart to apply.",
 			"update.fail": "Update failed: {error}",
+			"update.needRestart": "Update API is not loaded. Restart dsh, then check again.",
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
@@ -454,39 +460,43 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
 
+			const updateErrorText = (tr, e) => {
+				const msg = String((e && e.message) || e || "");
+				if (/\b404\b/.test(msg) || /non-json/.test(msg)) return tr("update.needRestart");
+				return tr("update.fail", { error: msg });
+			};
+
 			const checkUpdate = useCallback(() => {
 				setBusy(true);
-				setNotice({ kind: "idle", text: "" });
 				const tr = tRef.current;
-				fetch("/dsh-purge/update", { cache: "no-store", credentials: "same-origin" })
-					.then((r) => r.json())
+				setNotice({ kind: "ok", text: tr("update.checking") });
+				apiJson("/dsh-purge/update")
 					.then((d) => {
-						if (!d.ok) throw new Error(d.error || "check failed");
+						if (!d || !d.ok) throw new Error((d && d.error) || "check failed");
 						setUpdateInfo(d);
 						setNotice({
 							kind: "ok",
 							text: d.hasUpdate
 								? tr("update.available", { remote: d.remoteVersion || d.remoteSha, local: d.localVersion || d.localSha })
-								: tr("update.latest", { version: d.localVersion || "—" }),
+								: tr("update.latest", { version: d.localVersion || d.localSha || "—" }),
 						});
 					})
-					.catch((e) => setNotice({ kind: "error", text: tr("update.fail", { error: e.message }) }))
+					.catch((e) => setNotice({ kind: "error", text: updateErrorText(tr, e) }))
 					.finally(() => setBusy(false));
 			}, []);
 
 			const doUpdate = useCallback(() => {
 				setBusy(true);
-				setNotice({ kind: "idle", text: "" });
 				const tr = tRef.current;
-				fetch("/dsh-purge/update", { method: "POST", headers: { "content-type": "application/json" }, body: "{}", credentials: "same-origin" })
-					.then((r) => r.json())
+				setNotice({ kind: "ok", text: tr("update.applying") });
+				apiJson("/dsh-purge/update", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
 					.then((d) => {
-						if (!d.ok) throw new Error(d.error || "update failed");
+						if (!d || !d.ok) throw new Error((d && d.error) || "update failed");
 						setUpdateInfo(d);
 						setNotice({ kind: "ok", text: tr("update.done", { version: d.localVersion || d.remoteVersion || "—" }) });
 						if (d.applied || d.needRestart) setAskRestart(true);
 					})
-					.catch((e) => setNotice({ kind: "error", text: tr("update.fail", { error: e.message }) }))
+					.catch((e) => setNotice({ kind: "error", text: updateErrorText(tr, e) }))
 					.finally(() => setBusy(false));
 			}, []);
 
@@ -595,12 +605,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
-					h("div", { className: "dshp-row", style: { margin: 0 } },
+					h("div", { className: "dshp-row", style: { margin: 0, flex: 1, justifyContent: "flex-end" } },
 						version ? h("span", { className: "dshp-pill" }, "v" + version) : null,
 						h(Btn, { tiny: true, disabled: busy, onClick: checkUpdate }, busy ? t("btn.checkUpdate.busy") : t("btn.checkUpdate")),
 						updateInfo && updateInfo.hasUpdate
 							? h(Btn, { tiny: true, kind: "primary", disabled: busy, onClick: doUpdate }, busy ? t("btn.doUpdate.busy") : t("btn.doUpdate"))
 							: null,
+						noticeNode(notice),
 					),
 				),
 				s ? h("div", { className: "dshp-metrics" },
