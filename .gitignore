@@ -3,4 +3,6 @@ node_modules/
 npm-debug.log*
 .DS_Store
 _archive/
-频道推广手册/
+频道推广手册/bot/.env
+频道推广手册/bot/node_modules/
+频道推广手册/bot/data/
