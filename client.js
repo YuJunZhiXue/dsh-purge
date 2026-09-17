@@ -70,6 +70,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.status": "状态",
 			"status.applied": "已应用",
 			"status.pending": "待应用",
+			"status.skipped": "跳过",
+			"apply.hint": "待应用=原文还在。跳过=没装或官方已改写，再点也不会变。",
 			"skip": "跳过",
 			"unknown": "未知",
 			"delete": "删除",
@@ -175,6 +177,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.39": "persona text→prefix（0.1.2 预设）",
 			"patch.40": "会话 v0 plugin summary（mnemon）",
 			"patch.41": "complete 预设仍保留注入",
+			"rewind.label": "回退",
+			"rewind.aria": "回退",
+			"rewind.busy": "回退中…",
+			"rewind.empty": "没有可回退的上一句",
+			"rewind.fail": "回退失败: {error}",
+			"rewind.once": "回退一次",
+			"rewind.once.hint": "只退当前对话上一句",
+			"rewind.round": "回退上一轮",
+			"rewind.round.hint": "退回上一轮主对话，本轮子代理一并去掉",
 		};
 
 		const en = {
@@ -193,6 +204,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.status": "Status",
 			"status.applied": "Applied",
 			"status.pending": "Pending",
+			"status.skipped": "Skipped",
+			"apply.hint": "Pending = original text still present. Skipped = missing or already rewritten.",
 			"skip": "Skipped",
 			"unknown": "Unknown",
 			"delete": "Delete",
@@ -298,6 +311,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.39": "persona text→prefix (0.1.2 presets)",
 			"patch.40": "session v0 plugin summary (mnemon)",
 			"patch.41": "Keep inject when a complete prompt is set",
+			"rewind.label": "Undo",
+			"rewind.aria": "Undo",
+			"rewind.busy": "Undoing…",
+			"rewind.empty": "Nothing to undo",
+			"rewind.fail": "Undo failed: {error}",
+			"rewind.once": "Undo once",
+			"rewind.once.hint": "Drop the last turn of this chat",
+			"rewind.round": "Undo last round",
+			"rewind.round.hint": "Back to the previous main turn, including this round's subagents",
 		};
 
 		const THEME_KEY = "dshp-theme";
@@ -398,15 +420,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		function statusKind(st) {
 			if (st === "applied" || st === "already") return "ok";
 			if (st === "pending") return "wait";
-			if (st === "missing_file") return "miss";
+			if (st === "missing_file" || st === "skipped") return "miss";
 			return "bad";
 		}
 
 		function statusLabel(st, t) {
 			if (st === "applied" || st === "already") return t("status.applied");
 			if (st === "pending") return t("status.pending");
-			if (st === "missing_file" || st === "skipped") return t("skip");
+			if (st === "skipped") return t("status.skipped");
+			if (st === "missing_file") return t("skip");
 			return st || t("unknown");
+		}
+
+		function statusSettled(st) {
+			return st === "applied" || st === "already" || st === "skipped" || st === "missing_file";
 		}
 
 		function shimKind(v) {
@@ -441,7 +468,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					const st = state.patch_status[id] || state.patch_status[String(id)] || "missing_file";
 					return { id, st, label: t("patch." + id) };
 				});
-				const done = rows.filter((r) => r.st === "applied" || r.st === "already").length;
+				const done = rows.filter((r) => statusSettled(r.st)).length;
 				const expanded = !!open[group.key];
 				return h("div", { key: group.key, className: "dshp-group" },
 					h("button", {
@@ -628,7 +655,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const s = state;
 			const total = s && s.patches_total ? s.patches_total : 26;
 			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
-			const pct = total ? Math.round((applied / total) * 100) : 0;
+			const skipped = s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
+			const settled = Math.min(total, applied + skipped);
+			const pct = total ? Math.round((settled / total) * 100) : 0;
 
 			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
 			const remoteVer = updateInfo && (updateInfo.remoteVersion || updateInfo.remoteSha) || "";
@@ -656,7 +685,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
-						h("b", null, applied + " / " + total),
+						h("b", null, settled + " / " + total),
 						h("span", null, t("metric.purged")),
 					),
 					h("div", { className: "dshp-metric" },
@@ -685,6 +714,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					h(Btn, { kind: "danger", disabled: patchBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
 					noticeNode(notice),
 				),
+				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
 				askRestart ? h("div", { className: "dshp-ask" },
 					h("span", null, t("restart.confirm")),
 					h(Btn, { tiny: true, onClick: () => setAskRestart(false) }, t("restart.later")),
@@ -1063,6 +1093,364 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			);
 		}
 
+		const REWIND_CSS = `
+.dshp-rewind-wrap{position:relative;display:inline-flex}
+.dshp-rewind{appearance:none;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);font:12px/1 var(--ds-font-sans,system-ui,sans-serif);cursor:pointer}
+.dshp-rewind:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,currentColor)}
+.dshp-rewind:disabled{opacity:.4;cursor:default}
+.dshp-rewind svg{display:block}
+.dshp-rewind-menu{position:absolute;right:0;bottom:calc(100% + 6px);z-index:100;box-sizing:border-box;min-width:196px;padding:4px;border:0;border-radius:12px;background:var(--dsw-specific-menu,#fff);color:var(--dsw-alias-label-primary,#1a1a1a);--dsw-elevation-stroke-color:var(--dsw-alias-border-l1);box-shadow:var(--dsw-elevation-prominent,0 8px 24px rgba(0,0,0,.16))}
+body[data-ds-dark-theme] .dshp-rewind-menu{background:var(--dsw-specific-menu,#32312d);color:var(--dsw-alias-label-primary,#e6e2db);--dsw-elevation-stroke-color:var(--dsw-alias-border-l1,#3f3d38);box-shadow:var(--dsw-elevation-prominent,0 10px 28px rgba(0,0,0,.45))}
+.dshp-rewind-item{display:flex;flex-direction:column;gap:2px;width:100%;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:12px/1.3 var(--ds-font-sans,system-ui,sans-serif)}
+.dshp-rewind-item:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}
+.dshp-rewind-item b{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary,inherit)}
+.dshp-rewind-item span{color:var(--dsw-alias-label-tertiary,#9a958c);font-size:11px}
+body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tertiary,#a8a39a)}
+`;
+		const DRAFT_KEY = "dshp-rewind-draft:";
+		const RESTORED_KEY = "dshp-rewind-done:";
+		const FILL_DELAYS = [0, 50, 180];
+		let rewindSeenAt = 0;
+		let rewindSessions = null;
+		let rewindHost = null;
+		let pendingComposer = { sessionId: "", text: "", at: 0 };
+
+		function rewindText(t, key, fallback) {
+			try {
+				if (typeof t === "function") {
+					const value = t(key);
+					if (value && value !== key) return value;
+				}
+			} catch { /* ignore */ }
+			return fallback;
+		}
+
+		function currentSessionId(sessions) {
+			try { return sessions?.list?.getSnapshot?.()?.current || ""; } catch { return ""; }
+		}
+
+		function isPluginDraft(text) {
+			const value = String(text || "").trim();
+			if (!value) return false;
+			return /^\[MNEMON\]/i.test(value)
+				|| /MNEMON RUNTIME MEMORY SNAPSHOT/i.test(value)
+				|| /^MNEMON VIEW TOOLS/im.test(value);
+		}
+
+		function writeDraft(sessionId, text) {
+			if (!sessionId) return;
+			const value = isPluginDraft(text) ? "" : (text || "");
+			pendingComposer = { sessionId, text: value, at: Date.now() };
+			try { sessionStorage.setItem(DRAFT_KEY + sessionId, value); } catch { /* ignore */ }
+			try { sessionStorage.removeItem(RESTORED_KEY + sessionId); } catch { /* ignore */ }
+		}
+
+		function peekDraft(sessionId) {
+			if (!sessionId) return "";
+			if (pendingComposer.sessionId === sessionId && pendingComposer.text) return pendingComposer.text;
+			try { return sessionStorage.getItem(DRAFT_KEY + sessionId) || ""; } catch { return ""; }
+		}
+
+		function takeDraft(sessionId) {
+			return peekDraft(sessionId);
+		}
+
+		function markRestored(sessionId) {
+			if (!sessionId) return;
+			try { sessionStorage.setItem(RESTORED_KEY + sessionId, "1"); } catch { /* ignore */ }
+		}
+
+		function isRestored(sessionId) {
+			if (!sessionId) return false;
+			try { return !!sessionStorage.getItem(RESTORED_KEY + sessionId); } catch { return false; }
+		}
+
+		function conversationInput(sessionId) {
+			try {
+				const host = rewindHost;
+				const conversation = host?.conversation || (typeof host?.get === "function" ? host.get("conversation") : undefined);
+				const sessions = host?.sessions || rewindSessions;
+				const actx = typeof sessions?.scope === "function" ? sessions.scope(sessionId) : undefined;
+				if (conversation?.input?.for && actx) return conversation.input.for(actx);
+				return conversation?.input || null;
+			} catch {
+				return null;
+			}
+		}
+
+		function liveDraft(sessionId, inputActions) {
+			try {
+				const fromActions = inputActions?.state?.getSnapshot?.()?.draft;
+				if (typeof fromActions === "string") return fromActions;
+			} catch { /* ignore */ }
+			try {
+				const draft = conversationInput(sessionId)?.state?.getSnapshot?.()?.draft;
+				if (typeof draft === "string") return draft;
+			} catch { /* ignore */ }
+			return "";
+		}
+
+		function hostSetDraft(sessionId, text) {
+			if (!sessionId || !text) return false;
+			try {
+				const input = conversationInput(sessionId);
+				if (input && typeof input.setDraft === "function") {
+					input.setDraft(text);
+					return true;
+				}
+			} catch { /* ignore */ }
+			return false;
+		}
+
+		function fillComposer(inputActions, text) {
+			if (!text) return;
+			if (inputActions && typeof inputActions.setDraft === "function") {
+				try { inputActions.setDraft(text); } catch { /* ignore */ }
+			}
+		}
+
+		function scheduleComposerFill(sessionId, text, inputActions) {
+			if (!sessionId || !text || isPluginDraft(text)) return;
+			writeDraft(sessionId, text);
+			let stopped = false;
+			let filled = false;
+			const tryFill = () => {
+				if (stopped) return;
+				const current = liveDraft(sessionId, inputActions);
+				if (filled && current !== text) {
+					stopped = true;
+					return;
+				}
+				if (current && current !== text) {
+					stopped = true;
+					return;
+				}
+				fillComposer(inputActions, text);
+				hostSetDraft(sessionId, text);
+				filled = true;
+			};
+			for (const ms of FILL_DELAYS) window.setTimeout(tryFill, ms);
+		}
+
+		async function dropInheritedQueue(sessions, sessionId) {
+			if (!sessions || !sessionId) return;
+			const drop = async () => {
+				try {
+					const actx = typeof sessions.scope === "function" ? sessions.scope(sessionId) : undefined;
+					const face = typeof sessions.sessionOf === "function" ? sessions.sessionOf(actx) : undefined;
+					const queue = face?.getSnapshot?.()?.queue || [];
+					for (const item of queue) {
+						const id = item?.id || item?.itemId;
+						if (!id) continue;
+						try { await face.updateQueue?.(id, { kind: "remove" }); } catch { /* ignore */ }
+					}
+				} catch { /* ignore */ }
+			};
+			await drop();
+			window.setTimeout(() => { drop(); }, 80);
+		}
+
+		async function openRewoundSession(sessions, sessionId) {
+			if (!sessions || !sessionId) return;
+			try { await sessions.refresh?.(); } catch { /* ignore */ }
+			try { sessions.open(sessionId); } catch { /* ignore */ }
+			await dropInheritedQueue(sessions, sessionId);
+			window.setTimeout(() => {
+				try { sessions.open(sessionId); } catch { /* ignore */ }
+				dropInheritedQueue(sessions, sessionId);
+			}, 250);
+		}
+
+		class RewindSafe extends Component {
+			constructor(p) { super(p); this.state = { failed: false }; }
+			static getDerivedStateFromError() { return { failed: true }; }
+			componentDidCatch(error) { try { console.error("[dsh-purge] rewind slot:", error); } catch { /* ignore */ } }
+			render() {
+				if (this.state.failed) {
+					return h("button", {
+						type: "button",
+						className: "dshp-rewind",
+						title: "回退上一句",
+						onMouseDown: (e) => e.preventDefault(),
+						onClick: async () => {
+							const sessionId = currentSessionId(rewindSessions);
+							if (!sessionId) return;
+							try {
+								const data = await apiJson("/dsh-purge/rewind", {
+									method: "POST",
+									headers: { "content-type": "application/json" },
+									body: JSON.stringify({ sessionId, mode: "once" }),
+								});
+								if (data && data.ok && data.sessionId) {
+									const text = isPluginDraft(data.text) ? "" : (data.text || "");
+									scheduleComposerFill(data.sessionId, text);
+									await openRewoundSession(rewindSessions, data.sessionId);
+									scheduleComposerFill(data.sessionId, text);
+								}
+							} catch (e) {
+								window.alert("回退失败: " + String((e && e.message) || e));
+							}
+						},
+					}, h("style", null, REWIND_CSS), "回退");
+				}
+				return h(RewindButton, this.props);
+			}
+		}
+
+		function RewindButton(props) {
+			const t = props.t || translate;
+			const sessions = rewindSessions;
+			const inputActions = props.inputActions;
+			const sessionId = props.sessionId || currentSessionId(sessions);
+			const wrapRef = useRef(null);
+			const [busy, setBusy] = useState(false);
+			const [notice, setNotice] = useState("");
+			const [menu, setMenu] = useState(false);
+
+			useEffect(() => {
+				if (!sessionId) return;
+				const local = peekDraft(sessionId);
+				if (!local || isPluginDraft(local) || isRestored(sessionId)) return;
+				scheduleComposerFill(sessionId, local, inputActions);
+				markRestored(sessionId);
+			}, [sessionId, inputActions]);
+
+			useEffect(() => {
+				if (!menu) return;
+				const onDoc = (event) => {
+					if (wrapRef.current && !wrapRef.current.contains(event.target)) setMenu(false);
+				};
+				document.addEventListener("mousedown", onDoc);
+				return () => document.removeEventListener("mousedown", onDoc);
+			}, [menu]);
+
+			const runRewind = async (mode) => {
+				if (!sessionId || busy) return;
+				setBusy(true);
+				setMenu(false);
+				setNotice("");
+				try {
+					const data = await apiJson("/dsh-purge/rewind", {
+						method: "POST",
+						headers: { "content-type": "application/json" },
+						body: JSON.stringify({ sessionId, mode }),
+					});
+					if (!data || !data.ok || !data.sessionId) throw new Error((data && data.error) || "rewind");
+					if (data.at) rewindSeenAt = data.at;
+					const text = isPluginDraft(data.text) ? "" : (data.text || "");
+					writeDraft(data.sessionId, text);
+					await openRewoundSession(sessions, data.sessionId);
+					scheduleComposerFill(data.sessionId, text);
+				} catch (e) {
+					setNotice(rewindText(t, "rewind.fail", "回退失败: {error}").replace("{error}", String((e && e.message) || e)));
+				} finally {
+					setBusy(false);
+				}
+			};
+
+			const onClick = async (event) => {
+				event?.preventDefault?.();
+				event?.stopPropagation?.();
+				if (!sessionId || busy) return;
+				if (menu) {
+					setMenu(false);
+					return;
+				}
+				setBusy(true);
+				setNotice("");
+				try {
+					const info = await apiJson("/dsh-purge/rewind/options?sessionId=" + encodeURIComponent(sessionId));
+					if (info && info.ok && info.kind === "main") {
+						setMenu(true);
+						return;
+					}
+					await runRewind("once");
+				} catch (e) {
+					setNotice(rewindText(t, "rewind.fail", "回退失败: {error}").replace("{error}", String((e && e.message) || e)));
+				} finally {
+					setBusy(false);
+				}
+			};
+
+			const label = busy ? rewindText(t, "rewind.busy", "回退中…") : rewindText(t, "rewind.label", "回退");
+			const title = notice || rewindText(t, "rewind.aria", "回退");
+			return h("div", { className: "dshp-rewind-wrap", ref: wrapRef },
+				h("style", null, REWIND_CSS),
+				h("button", {
+					type: "button",
+					className: "dshp-rewind",
+					title,
+					"aria-label": rewindText(t, "rewind.aria", "回退"),
+					disabled: busy || !sessionId,
+					onMouseDown: (e) => e.preventDefault(),
+					onClick,
+				},
+					h("svg", { viewBox: "0 0 16 16", width: "14", height: "14", "aria-hidden": true },
+						h("path", {
+							fill: "currentColor",
+							d: "M7.2 3.2 3.4 7l3.8 3.8V8.6c2.8 0 4.7.7 5.9 2.3-.2-2.8-1.9-5.2-5.9-5.6V3.2z",
+						}),
+					),
+					label,
+				),
+				menu ? h("div", { className: "dshp-rewind-menu", role: "menu" },
+					h("button", {
+						type: "button",
+						className: "dshp-rewind-item",
+						onMouseDown: (e) => e.preventDefault(),
+						onClick: () => runRewind("once"),
+					},
+						h("b", null, rewindText(t, "rewind.once", "回退一次")),
+						h("span", null, rewindText(t, "rewind.once.hint", "只退当前对话上一句")),
+					),
+					h("button", {
+						type: "button",
+						className: "dshp-rewind-item",
+						onMouseDown: (e) => e.preventDefault(),
+						onClick: () => runRewind("round"),
+					},
+						h("b", null, rewindText(t, "rewind.round", "回退上一轮")),
+						h("span", null, rewindText(t, "rewind.round.hint", "退回上一轮主对话，本轮子代理一并去掉")),
+					),
+				) : null,
+			);
+		}
+
+		function installRewindWatch(ctx) {
+			const sessions = ctx.sessions;
+			if (!sessions) return () => {};
+			const tick = async () => {
+				try {
+					const data = await apiJson("/dsh-purge/rewind");
+					if (!data || !data.sessionId || !data.at || data.at <= rewindSeenAt) return;
+					rewindSeenAt = data.at;
+					const current = currentSessionId(sessions);
+					if (current && current !== data.parentId) return;
+					const text = isPluginDraft(data.text) ? "" : (data.text || "");
+					scheduleComposerFill(data.sessionId, text);
+					await openRewoundSession(sessions, data.sessionId);
+					scheduleComposerFill(data.sessionId, text);
+				} catch { /* ignore */ }
+			};
+			const timer = window.setInterval(tick, 1200);
+			return () => window.clearInterval(timer);
+		}
+
+		function installRewindUi(ctx) {
+			rewindHost = ctx;
+			rewindSessions = ctx.sessions;
+			ctx.slots.inject("conversation.input.right", () => ctx.slots.register({
+				name: "conversation.input.right",
+				id: "dsh-purge-rewind",
+				order: 20,
+				inject: (sessionId) => ({
+					sessionId,
+					t: ctx.locale.bind(NS),
+				}),
+			}, RewindSafe));
+			ctx.effect(() => installRewindWatch(ctx), "dsh-purge: rewind watch");
+		}
+
 		function apply(ctx) {
 			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
 			const t = ctx.locale.bind(NS);
@@ -1075,6 +1463,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				locale: NS,
 				inject: () => ({ t }),
 			}, SettingsRoot));
+			try {
+				if (typeof ctx.inject === "function") {
+					ctx.inject(["sessions"], (host) => installRewindUi(host));
+				} else if (ctx.sessions) {
+					installRewindUi(ctx);
+				}
+			} catch (e) {
+				try { console.warn("[dsh-purge] rewind ui skipped:", e); } catch { /* ignore */ }
+			}
 		}
 
 		exports.name = name;
