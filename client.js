@@ -63,6 +63,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.apply": "应用",
 			"btn.apply.busy": "处理中…",
 			"btn.revert": "还原",
+			"btn.checkUpdate": "检测更新",
+			"btn.checkUpdate.busy": "检测中…",
+			"btn.doUpdate": "更新",
+			"btn.doUpdate.busy": "更新中…",
+			"update.latest": "已是最新（{version}）",
+			"update.available": "有新版本 {remote}，当前 {local}",
+			"update.done": "已更新到 {version}，请重启",
+			"update.fail": "更新失败: {error}",
+			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
 			"ok.done": "已完成",
@@ -170,6 +179,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.apply": "Apply",
 			"btn.apply.busy": "Working…",
 			"btn.revert": "Restore",
+			"btn.checkUpdate": "Check update",
+			"btn.checkUpdate.busy": "Checking…",
+			"btn.doUpdate": "Update",
+			"btn.doUpdate.busy": "Updating…",
+			"update.latest": "Up to date ({version})",
+			"update.available": "Update {remote} available (now {local})",
+			"update.done": "Updated to {version}. Restart to apply.",
+			"update.fail": "Update failed: {error}",
+			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
 			"ok.done": "Done",
@@ -269,7 +287,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-panel{border:1px solid var(--dshp-line);background:var(--dshp-paper);border-radius:10px;padding:18px 18px 16px}
 .dshp-kicker{font-family:var(--dshp-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dshp-mute);margin:0 0 4px}
 .dshp-title{font-family:var(--dshp-display);font-size:20px;font-weight:500;letter-spacing:.02em;line-height:1.3;margin:0;color:var(--dshp-ink)}
-.dshp-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dshp-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .dshp-sub{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 10px}
 .dshp-sub h4{margin:0;font-family:var(--dshp-display);font-size:15px;font-weight:500}
 .dshp-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
@@ -434,6 +452,43 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [busy, setBusy] = useState(false);
 			const [askRestart, setAskRestart] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const [updateInfo, setUpdateInfo] = useState(null);
+
+			const checkUpdate = useCallback(() => {
+				setBusy(true);
+				setNotice({ kind: "idle", text: "" });
+				const tr = tRef.current;
+				fetch("/dsh-purge/update", { cache: "no-store", credentials: "same-origin" })
+					.then((r) => r.json())
+					.then((d) => {
+						if (!d.ok) throw new Error(d.error || "check failed");
+						setUpdateInfo(d);
+						setNotice({
+							kind: "ok",
+							text: d.hasUpdate
+								? tr("update.available", { remote: d.remoteVersion || d.remoteSha, local: d.localVersion || d.localSha })
+								: tr("update.latest", { version: d.localVersion || "—" }),
+						});
+					})
+					.catch((e) => setNotice({ kind: "error", text: tr("update.fail", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			}, []);
+
+			const doUpdate = useCallback(() => {
+				setBusy(true);
+				setNotice({ kind: "idle", text: "" });
+				const tr = tRef.current;
+				fetch("/dsh-purge/update", { method: "POST", headers: { "content-type": "application/json" }, body: "{}", credentials: "same-origin" })
+					.then((r) => r.json())
+					.then((d) => {
+						if (!d.ok) throw new Error(d.error || "update failed");
+						setUpdateInfo(d);
+						setNotice({ kind: "ok", text: tr("update.done", { version: d.localVersion || d.remoteVersion || "—" }) });
+						if (d.applied || d.needRestart) setAskRestart(true);
+					})
+					.catch((e) => setNotice({ kind: "error", text: tr("update.fail", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			}, []);
 
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
@@ -536,8 +591,18 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
 			const pct = total ? Math.round((applied / total) * 100) : 0;
 
+			const version = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
-				h("h3", { className: "dshp-title", style: { marginBottom: 14 } }, t("purge.title")),
+				h("div", { className: "dshp-head" },
+					h("h3", { className: "dshp-title" }, t("purge.title")),
+					h("div", { className: "dshp-row", style: { margin: 0 } },
+						version ? h("span", { className: "dshp-pill" }, "v" + version) : null,
+						h(Btn, { tiny: true, disabled: busy, onClick: checkUpdate }, busy ? t("btn.checkUpdate.busy") : t("btn.checkUpdate")),
+						updateInfo && updateInfo.hasUpdate
+							? h(Btn, { tiny: true, kind: "primary", disabled: busy, onClick: doUpdate }, busy ? t("btn.doUpdate.busy") : t("btn.doUpdate"))
+							: null,
+					),
+				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
 						h("b", null, applied + " / " + total),
