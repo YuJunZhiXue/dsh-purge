@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.6</strong></p>
+<p align="center"><strong>Version 1.1.7</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -77,11 +77,75 @@
 
 ## ⚡ 安装方式
 
-Web 和桌面装的是同一个插件，只是 profile 不同。装完必须**完全退出并重启** DeepSeek Harness，设置页才会出现「规则设定」；然后再点「应用」打补丁（只装进 profile 还不会改 `@deepseek-ai` 包）。
+Web 端和桌面端**分开装、分开清洗**，互不影响。
+
+| 宿主 | profile | 默认怎么装 |
+|---|---|---|
+| **Web 端**（官方 `dsh web`） | `web` | PATH 上的官方 `dsh` |
+| **桌面端**（社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop)） | `desktop` | 桌面应用自带终端里的 `dsh`（不要用 PATH 上的官方 `dsh`） |
+| 官方 Harness 桌面 EXE | `default` | 官方 `dsh`，或下面的 `dsh://` |
+
+装完后都要：
+
+1. 完全退出并重启**刚装的那个宿主**（Web 关 `dsh web`；桌面端退出托盘再打开 `DSH Desktop.exe`）
+2. 在**这个宿主**的设置页出现「规则设定」后点「应用」（只写入 profile 还不会改 `@deepseek-ai`）
+3. 启动后会自动清洗当前宿主；没有 `prompt-inject.md` 时写入默认注入（已有文件不覆盖，空文件表示不注入）
+
+Web 的「应用 / 重启 / 卸载」只动 Web。桌面端的「应用 / 重启 / 卸载」只动桌面应用，不会去拉 `dsh web`。
 
 > 🌐 **插件生态市场**：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)（只看介绍；**不要**用 `deepseek.stream/api/plugins/download?...`，那个地址不是 pnpm 能解的 tar，会报 `ERR_PNPM_TARBALL_EXTRACT`）
 
-### 方式 1：交给 AI 安装（只装插件）
+### Web 端（默认）
+
+```sh
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
+
+当前目录已是本仓库时：
+
+```sh
+dsh plugin --profile web add .
+```
+
+然后关掉 `dsh web` 再开，在 Web 设置页点「应用」。`dsh` 不在 PATH 就先装好官方 CLI，或走下面「手动配置」。
+
+### 桌面端（默认）
+
+打开社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop)，在**自带终端**里执行（这里的 `dsh` 是桌面包装脚本，默认 profile 就是 `desktop`）：
+
+```sh
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
+
+不要用 PATH 上的官方 `dsh plugin --profile desktop`（会被拒绝）。不要用 `dsh://`（那是官方 EXE）。
+
+然后退出托盘，重新打开 `DSH Desktop.exe`，在**桌面端**设置页点「应用」。
+
+从系统终端安装时，用桌面端自带 CLI。按正在运行的进程、默认安装位置定位 `DSH Desktop.exe`：
+
+```powershell
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
+if (-not $exe) {
+  $exe = @(
+    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
+    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
+    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
+  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+}
+if (-not $exe) { throw "未找到 DSH Desktop.exe，请先打开桌面端，或把 `$exe` 设成安装目录里的 exe" }
+$cli = @(
+  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
+  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+$env:ELECTRON_RUN_AS_NODE = "1"
+$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
+& $exe --expose-internals $cli plugin add $zip
+```
+
+自定义安装目录时，把 `$exe` 换成该目录下的 `DSH Desktop.exe`。默认用 zip，避免本地路径空格把命令拆开。
+
+### 交给 AI 安装（只装插件）
 
 把下面这一块发给本机助手，让它只执行安装命令。
 
@@ -90,48 +154,82 @@ Web 和桌面装的是同一个插件，只是 profile 不同。装完必须**�
 
 <!-- AI-AGENT-START -->
 
-用官方 CLI 安装 DeepSeek Harness 插件 `dsh-purge`。只跑下面的命令。不要搜索磁盘，不要读或改其它文件，不要应用设置，也不要重启应用。
+安装 DeepSeek Harness 插件 `dsh-purge`。先确认宿主，只装正在用的那一个。不要全盘搜索，不要读或改其它文件，不要应用设置，也不要重启应用。
 
-如果 `dsh` 不在 `PATH` 里，告诉用户后停止。
+**Web 端（官方 `dsh web`）**
 
-Web profile：
+`dsh` 不在 PATH 就告诉用户后停止。
 
 ```sh
 dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
 ```
 
-用户如果也用桌面端，再跑这一条：
+当前目录已是本仓库时改用 `dsh plugin --profile web add .`。
+
+**桌面端（社区 DSH Desktop）**
+
+不要用 PATH 上的官方 `dsh plugin --profile desktop`。不要用 `dsh://`。
+
+默认：已在桌面端自带终端里时直接跑：
+
+```sh
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
+
+从系统终端安装时：用正在运行的 `DSH Desktop` 进程 Path，或默认位置 `%LOCALAPPDATA%\Programs\DSH Desktop\DSH Desktop.exe`、`%ProgramFiles%\DSH Desktop\DSH Desktop.exe`。不要全盘扫描。然后：
+
+```powershell
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
+if (-not $exe) {
+  $exe = @(
+    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
+    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
+    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
+  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+}
+if (-not $exe) { Write-Host "未找到 DSH Desktop.exe，请先打开桌面端或给出安装目录"; return }
+$cli = @(
+  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
+  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+$env:ELECTRON_RUN_AS_NODE = "1"
+$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
+& $exe --expose-internals $cli plugin add $zip
+```
+
+**官方 Harness 桌面 EXE**
 
 ```sh
 dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
 ```
 
-如果当前目录已经是本仓库的克隆，用这条即可，不必下 zip：
-
-```sh
-dsh plugin --profile web add .
-```
-
-命令结束后，提醒用户自己退出并重新打开 DeepSeek Harness。然后停止。
+命令结束后，提醒：完全退出并重启刚装的那个宿主，再在该宿主设置页点「应用」。Web 和桌面端不要交叉点应用。然后停止。
 
 <!-- AI-AGENT-END -->
 
 </details>
 
-### 方式 2：dsh:// 协议联动一键安装（桌面端最快，秒级免命令行）
+### 官方桌面 EXE（`dsh://`）
 
-若已安装 DeepSeek Harness 官方桌面客户端（EXE），点下方按钮即可通过系统级 URI Scheme 唤起客户端装载。
+已安装 **DeepSeek Harness 官方桌面客户端（EXE）** 时，点下方按钮走系统 URI。社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) **不认** `dsh://`，走上面「桌面端」默认命令。
+
+命令行等价：
+
+```sh
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+```
 
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.3&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.3&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
 ```
 
 **网页端（前端）触发代码示例：**
@@ -144,7 +242,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.3',
+    version: '1.1.7',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
@@ -163,7 +261,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.3&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -174,46 +272,28 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | 插件唯一标识符 |
 | name | `dsh-purge` | 插件展示名称 |
-| version | `1.1.3` | 语义化版本号 |
+| version | `1.1.7` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | zip 下载直链 |
 
-### 方式 3：官方 CLI（`dsh plugin add`）
+### 手动配置安装
 
-```sh
-git clone https://github.com/YuJunZhiXue/dsh-purge.git
-cd dsh-purge
-
-# Web
-dsh plugin --profile web add .
-
-# 桌面
-dsh plugin --profile default add .
-```
-
-不 clone、直接喂 zip 也可以：
-
-```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
-```
-
-Web + 桌面都要用时，两条都跑。然后**重启**，再在设置页点「应用」或聊天里 `/purge apply`。
-
-### 方式 4：手动配置安装
-
-`dsh` 不在 PATH、或不想用 `dsh plugin add` 时，按下面做。全程不要删 profile 里原有的 bundle。
+`dsh` 不在 PATH、或不想用 `dsh plugin add` 时，按宿主改对应 profile。不要删原有 bundle。
 
 **1. 找到 Harness 主目录（下文称 `$DSH_HOME`）**
 
 | 安装形态 | 典型路径 |
 |---|---|
 | 环境变量 | `DSH_HOME`（已设置就用它） |
-| Windows 便携包 | 与 `npm-global` 同级的 `.dsh`，例如 `D:\DeepSeek Harness\.dsh` |
+| Windows 便携包 | 与 `npm-global` 同级的 `.dsh` |
 | 用户默认 | Windows `%USERPROFILE%\.dsh`；Linux / macOS `~/.dsh` |
 
-Web 用 `profiles/web`，桌面用 `profiles/default`（若桌面客户端实际 profile 名不同，以目录为准）。
+| 宿主 | profile 目录 |
+|---|---|
+| Web 端 | `$DSH_HOME/profiles/web` |
+| 社区桌面端 | `$DSH_HOME/profiles/desktop` |
+| 官方桌面 EXE | `$DSH_HOME/profiles/default` |
 
 **2. 把本仓库放到 plugins 目录**
 
@@ -221,14 +301,13 @@ Web 用 `profiles/web`，桌面用 `profiles/default`（若桌面客户端实际
 git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-或把已有仓库复制为 `$DSH_HOME/plugins/dsh-purge`（目录名必须是 `dsh-purge`）。
+或把已有仓库复制为 `$DSH_HOME/plugins/dsh-purge`（目录名必须是 `dsh-purge`）。用 `file:../../plugins/dsh-purge` 相对路径即可。
 
 **3. 改对应 profile 的 `package.json`**
 
-文件：
-
 - Web：`$DSH_HOME/profiles/web/package.json`
-- 桌面：`$DSH_HOME/profiles/default/package.json`
+- 社区桌面端：`$DSH_HOME/profiles/desktop/package.json`
+- 官方桌面 EXE：`$DSH_HOME/profiles/default/package.json`
 
 在 `dependencies` 里追加（不要删别的依赖）：
 
@@ -239,9 +318,9 @@ git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-pu
 在 `dsh.profile.bundles` 数组**末尾追加** `"dsh-purge"`：
 
 - Web：**必须保留**原来的 `@deepseek-ai/dsh-web-app`，只追加本插件
-- 桌面：保留原来的 `@deepseek-ai/dsh-base` 等，只追加本插件
+- 桌面端：保留原来的 `@deepseek-ai/dsh-base` 等，只追加本插件
 
-完整示意（其它字段按你机器上的原文件保留）：
+完整示意（其它字段按原文件保留）：
 
 ```json
 {
@@ -265,32 +344,36 @@ git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-pu
 **4. 安装依赖**
 
 ```sh
-# Web
-cd "$DSH_HOME/profiles/web"
+cd "$DSH_HOME/profiles/web"       # Web
 pnpm install
 
-# 桌面（若也改了 default）
-cd "$DSH_HOME/profiles/default"
+cd "$DSH_HOME/profiles/desktop"   # 社区桌面端
+pnpm install
+
+cd "$DSH_HOME/profiles/default"   # 官方 EXE
 pnpm install
 ```
 
-Windows PowerShell 把 `$DSH_HOME` 换成实际路径即可，例如：
+Windows PowerShell：
 
 ```powershell
-cd "D:\DeepSeek Harness\.dsh\profiles\web"
+cd "$env:USERPROFILE\.dsh\profiles\web"
+# cd "$env:USERPROFILE\.dsh\profiles\desktop"
+# cd "$env:USERPROFILE\.dsh\profiles\default"
+# 便携包：<安装根>\.dsh\profiles\<web|desktop|default>
 pnpm install
 ```
 
 **5. 重启，再打补丁**
 
-1. 完全退出 DeepSeek Harness（Web 关进程；桌面退出托盘），再启动。
+1. 完全退出刚装的那个宿主（Web 关进程；桌面端退出托盘），再启动。
 2. 设置页应出现「规则设定」。有缓存就 Ctrl+F5。
-3. 点「应用」，或聊天 `/purge apply`，或在插件目录执行 `dsh-purge --apply`。
-4. 按提示再重启一次，补丁才进入当前进程。
+3. 在**这个宿主**点「应用」，或聊天 `/purge apply`。
+4. 按提示再重启一次。桌面端的「重启 / 卸载」会重启桌面应用。
 
 ### 卸载
 
-设置页 →「规则设定」→「卸载」。弹窗确认：卸载将还原回原版并清除本插件。如果已经点过「应用」，会先还原补丁，再删插件文件，然后重启。
+设置页 →「规则设定」→「卸载」。弹窗确认：卸载将还原回原版并清除本插件。如果已经点过「应用」，会先还原补丁，再删插件文件，然后重启当前宿主（Web 重启 `dsh web`；桌面端重启 `DSH Desktop.exe`）。
 
 ```sh
 # 也可以用命令行
@@ -496,26 +579,37 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ## 路径探测
 
-1. `DSH_HOME` / `DSH_BASE`（显式指定）
-2. dsh 启动器旁的 `.dsh`（便携安装，任意盘符）
-3. DSH Desktop → `process.resourcesPath/app.asar.unpacked/node_modules/@deepseek-ai`
-4. `npm prefix -g` / `npm root -g`
-5. 嵌套 `@deepseek-ai/dsh/node_modules/@deepseek-ai`
-6. 系统默认 `~/.dsh`
+宿主面先判断 `web` / `desktop`（预留 `gui` / `tui`，尚未单独适配时回退 web）。
 
-npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑在 `dsh-sandbox/lib/index.js`。找不到目标时提示设置 `DSH_BASE`，不改文件。
+**Web：**
+
+1. `DSH_HOME` / `DSH_BASE`
+2. dsh 启动器旁的 `.dsh`
+3. `npm prefix -g` / `npm root -g`
+4. 嵌套 `@deepseek-ai/dsh/node_modules/@deepseek-ai`
+5. 系统默认 `~/.dsh`
+
+**桌面端：** 只打当前桌面进程安装包树（`resources/app` 或 `app.asar.unpacked` 下的 `@deepseek-ai`）。顺序：运行中的 `DSH Desktop.exe` / `resourcesPath` / `host-process-entry.js`，其次默认安装位置，或 `DSH_DESKTOP_INSTALL` / `DSH_BASE`。不打官方 npm-global。密封的 `host-commands` / `runtime-commands` 只清理、不注入。
+
+找不到目标时提示设置 `DSH_BASE`，不改文件。
 
 ---
 
 ## 更新记录
 
+### 1.1.7
+
+- 安装文档按 **Web 端 / 桌面端** 分开写默认命令：Web 用官方 `dsh --profile web`；桌面端默认在自带终端 `dsh plugin add <zip>`。
+- 桌面端清洗、重启、卸载只针对当前桌面进程的安装树，不碰官方 Web / npm-global。
+- 桌面端安装目录按运行中的 `DSH Desktop.exe` 定位，默认位置或自定义目录都可以。
+
+<details>
+<summary>更早版本</summary>
+
 ### 1.1.6
 
 - 设置页「卸载」会弹窗确认；若已应用补丁则先还原回原版，再清除插件并重启。
 - 给 AI 的安装块只跑官方 `dsh plugin add`，不扫盘、不应用。
-
-<details>
-<summary>更早版本</summary>
 
 ### 1.1.5
 

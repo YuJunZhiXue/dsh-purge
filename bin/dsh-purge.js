@@ -7,7 +7,9 @@ const args = process.argv.slice(2);
 function printStatus(state) {
   const out = [];
   out.push("dsh-purge 状态 / Status");
+  out.push("  宿主 / surface " + (state.surface || "web"));
   out.push("  DSH_HOME      " + state.dsh_home);
+  if (state.desktop_install) out.push("  桌面安装       " + state.desktop_install);
   if (state.ai_base) {
     out.push("  插件根 / root  " + state.ai_base);
     for (const [key, fp] of Object.entries(state.files)) {

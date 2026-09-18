@@ -14,6 +14,29 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		function useT() {
 			return translate;
 		}
+		function clientGuessSurface() {
+			try {
+				if (typeof navigator !== "undefined" && /electron/i.test(navigator.userAgent || "")) return "desktop";
+				if (typeof location !== "undefined") {
+					const port = String(location.port || "");
+					if (port === "43120") return "desktop";
+					const host = String(location.hostname || "");
+					if (host && host !== "127.0.0.1" && host !== "localhost" && /dsh desktop/i.test(String(location.href || ""))) return "desktop";
+				}
+			} catch { /* ignore */ }
+			return "";
+		}
+		function hostSurfaceOf(s) {
+			return (s && s.surface) || clientGuessSurface() || "web";
+		}
+		function hostText(t, key, surface) {
+			if (surface && surface !== "web") {
+				const specific = key + "." + surface;
+				const hit = t(specific);
+				if (hit && hit !== specific) return hit;
+			}
+			return t(key);
+		}
 		function apiUrl(p) {
 			try { return new URL(p, window.location.origin).toString(); } catch { return p; }
 		}
@@ -85,6 +108,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.pending": "待应用",
 			"status.skipped": "跳过",
 			"apply.hint": "待应用=原文还在。跳过=没装或官方已改写，再点也不会变。",
+			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
+			"warn.noRoot.desktop": "未定位到当前桌面应用里的 @deepseek-ai。请退出托盘后重新打开 DSH Desktop.exe，再在桌面端设置页点「应用」。安装目录不限盘符。",
+			"warn.noInject": "注入文件还不存在。重启后会写入默认提示词；空文件表示不注入。",
 			"skip": "跳过",
 			"unknown": "未知",
 			"delete": "删除",
@@ -99,6 +125,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.cancel": "取消",
 			"uninstall.applying": "正在卸载并还原…",
 			"uninstall.done": "已卸载并还原，正在重启…",
+			"uninstall.done.desktop": "已卸载并还原，正在重启桌面应用…",
 			"uninstall.fail": "卸载失败: {error}",
 			"btn.checkUpdate": "检测更新",
 			"btn.checkUpdate.busy": "检测中…",
@@ -147,9 +174,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.restart": "重启",
 			"btn.restart.busy": "重启中…",
 			"restarting": "重启中…",
+			"restarting.desktop": "正在重启桌面应用…",
 			"restart.timeout": "超时，请刷新",
 			"restart.fail": "失败: {error}",
 			"restart.confirm": "清洗已完成，重启后生效。",
+			"restart.confirm.desktop": "清洗已完成，重启桌面应用后生效。",
+			"surface.web": "Web",
+			"surface.desktop": "桌面端",
+			"surface.gui": "GUI",
+			"surface.tui": "TUI",
 			"restart.incomplete": "清洗未完成：{detail}",
 			"restart.incomplete.patches": "必需补丁失败 {failed} 项（#{ids}）",
 			"restart.incomplete.flash": "CMD 无感未钉入（{entry}）",
@@ -229,6 +262,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.pending": "Pending",
 			"status.skipped": "Skipped",
 			"apply.hint": "Pending = original text still present. Skipped = missing or already rewritten.",
+			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
+			"warn.noRoot.desktop": "Could not find @deepseek-ai inside this desktop app. Quit the tray, reopen DSH Desktop.exe, then Apply on the desktop Settings page. The install folder can be on any drive.",
+			"warn.noInject": "The inject file is missing. A restart writes the default prompt; an empty file means inject nothing.",
 			"skip": "Skipped",
 			"unknown": "Unknown",
 			"delete": "Delete",
@@ -243,6 +279,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.cancel": "Cancel",
 			"uninstall.applying": "Uninstalling and restoring…",
 			"uninstall.done": "Uninstalled and restored. Restarting…",
+			"uninstall.done.desktop": "Uninstalled and restored. Restarting the desktop app…",
 			"uninstall.fail": "Uninstall failed: {error}",
 			"btn.checkUpdate": "Check update",
 			"btn.checkUpdate.busy": "Checking…",
@@ -291,9 +328,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.restart": "Restart",
 			"btn.restart.busy": "Restarting…",
 			"restarting": "Restarting…",
+			"restarting.desktop": "Restarting the desktop app…",
 			"restart.timeout": "Timed out; refresh",
 			"restart.fail": "Failed: {error}",
 			"restart.confirm": "Apply finished. Restart to take effect.",
+			"restart.confirm.desktop": "Apply finished. Restart the desktop app to take effect.",
+			"surface.web": "Web",
+			"surface.desktop": "Desktop",
+			"surface.gui": "GUI",
+			"surface.tui": "TUI",
 			"restart.incomplete": "Apply incomplete: {detail}",
 			"restart.incomplete.patches": "{failed} required patch(es) failed (#{ids})",
 			"restart.incomplete.flash": "CMD silence not pinned ({entry})",
@@ -729,20 +772,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				apiJson("/dsh-purge/uninstall", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
 					.then((d) => {
 						if (!d || !d.ok) throw new Error((d && d.error) || "uninstall failed");
-						setNotice({ kind: "ok", text: tr("uninstall.done") });
+						setNotice({ kind: "ok", text: (d && d.note) || hostText(tr, "uninstall.done", d.surface || hostSurfaceOf(state)) });
+						if ((d && d.surface) === "desktop" || (d && d.fullApp) || hostSurfaceOf(state) === "desktop") return;
 						waitHostAfterUninstall(tr);
 					})
 					.catch((e) => {
 						const msg = String((e && e.message) || e || "");
 						if (/failed to fetch|networkerror|load failed/i.test(msg)) {
-							setNotice({ kind: "ok", text: tr("uninstall.done") });
+							setNotice({ kind: "ok", text: hostText(tr, "uninstall.done", hostSurfaceOf(state)) });
+							if (hostSurfaceOf(state) === "desktop" || clientGuessSurface() === "desktop") return;
 							waitHostAfterUninstall(tr);
 							return;
 						}
 						setNotice({ kind: "error", text: tr("uninstall.fail", { error: msg }) });
 						setUninstallBusy(false);
 					});
-			}, [waitHostAfterUninstall]);
+			}, [state, waitHostAfterUninstall]);
 
 			const s = state;
 			const total = s && s.patches_total ? s.patches_total : 26;
@@ -751,6 +796,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const settled = Math.min(total, applied + skipped);
 			const pct = total ? Math.round((settled / total) * 100) : 0;
 
+			const hostSurface = hostSurfaceOf(s);
 			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
 			const remoteVer = updateInfo && (updateInfo.remoteVersion || updateInfo.remoteSha) || "";
 			const remoteSha = updateInfo && updateInfo.remoteSha || "";
@@ -765,6 +811,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
 					h("div", { className: "dshp-row", style: { margin: 0, flex: 1, justifyContent: "flex-end" } },
+						h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
 						versionText ? h("span", { className: "dshp-pill" + (canApplyUpdate ? " is-wait" : "") }, versionText) : null,
 						h(Btn, {
 							tiny: true,
@@ -824,15 +871,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					),
 				) : null,
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
+				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
+				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
 				askRestart ? h("div", { className: "dshp-ask" },
-					h("span", null, t("restart.confirm")),
+					h("span", null, hostText(t, "restart.confirm", hostSurface)),
 					h(Btn, { tiny: true, onClick: () => setAskRestart(false) }, t("restart.later")),
 					h(Btn, {
 						tiny: true,
 						kind: "primary",
 						onClick: () => {
 							setAskRestart(false);
-							restartDsh(setNotice, function () {}, t);
+							restartDsh(setNotice, function () {}, t, hostSurface);
 						},
 					}, t("btn.restart")),
 				) : null,
@@ -1087,16 +1136,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			setTimeout(ping, 800);
 		}
 
-		function restartDsh(setNotice, setBusy, t) {
+		function restartDsh(setNotice, setBusy, t, surface) {
+			const surf = surface || clientGuessSurface() || "web";
 			setBusy(true);
-			setNotice({ kind: "ok", text: t("restarting") });
+			setNotice({ kind: "ok", text: hostText(t, "restarting", surf) });
 			fetch("/dsh-purge/restart", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
 				.then((r) => r.json())
 				.then((d) => {
 					if (!d.ok) throw new Error(d.error || "restart failed");
+					const next = (d && d.surface) || surf;
+					setNotice({ kind: "ok", text: hostText(t, "restarting", next) });
+					// 桌面端整应用会退出重开。先刷新内嵌 web 会单独重启 Host。
+					if (next === "desktop" || (d && d.fullApp) || clientGuessSurface() === "desktop") return;
 					waitForRestart(setNotice, setBusy, t);
 				})
 				.catch((e) => {
+					if (surf === "desktop" || clientGuessSurface() === "desktop") return;
 					if (String(e.message || e).includes("Failed to fetch") || e.name === "TypeError") {
 						waitForRestart(setNotice, setBusy, t);
 						return;
