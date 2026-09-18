@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.1</strong></p>
+<p align="center"><strong>Version 1.1.2</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -164,13 +164,13 @@ dsh plugin --profile default remove dsh-purge
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.1&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.2&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.1&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.2&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
 ```
 
 **网页端（前端）触发代码示例：**
@@ -183,7 +183,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.1',
+    version: '1.1.2',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
@@ -202,7 +202,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.1&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.2&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -213,7 +213,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | 插件唯一标识符 |
 | name | `dsh-purge` | 插件展示名称 |
-| version | `1.1.1` | 语义化版本号 |
+| version | `1.1.2` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | zip 下载直链 |
@@ -541,6 +541,11 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 
 ## 更新记录
 
+### 1.1.2
+
+- 自定义 OpenAI 兼容接口不再因 `developer` 角色 400：`#42` 改回 `system`。
+- 设置页规则集：读 / 删 / 存走同一个 POST，不再报 `Failed to fetch`。
+
 ### 1.1.1
 
 - 输入框旁「回退」/ `/rewind`：主代理可选回退一次或上一轮（丢掉本轮子代理）；子代理直接回退一次。
@@ -559,25 +564,6 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 
 - 版本号从头计数。
 - 设置页增加 **检测更新**：对照 GitHub `master`。
-
-### 1.3.6（适配 dsh 0.1.5-rc.1）
-
-- **persona schema**：0.1.5 只要 `prefix`；`#39` 把社区预设的 `text` 收成别名，选工作区 / 开新对话不再被清空。
-- **历史会话**：`#40` 放行 mnemon 的 v0 `summary`（`form` 不是 `notice` 也能过迁移）。
-- **身份**：取消插件身份卡；`dsh-purge` 段只贴 `prompt-inject.md`。
-- **声明**：补全零容忍、受控范围、违约终止授权与第三方独立性条款。
-- **设置页**：补丁分组补上 `#33`–`#40`。
-
-### 1.3.5（适配 dsh 0.1.2-rc.1 / Node 24 Windows）
-
-- **CMD 闪窗**：修复 Node 24 ESM `spawn` 补丁无效；subprocess-local / doctor / dshmarket / 梁神 bash / doctor stub 全路径无感。
-- **首轮注入**：梁神 phase-1 保留 persona 与 inject。
-- **重启**：`/dsh-purge/restart` 只走 `node + bin.js`，等待端口释放后再拉起，不弹 cmd。
-- **补丁标记**：#21 等兼容 `^0.1.2-rc.1` 依赖写法，减少假 pending。
-
-### 1.3.4
-
-- Desktop 密封 `host-commands/**/bin` 只清理不注入，避免 `dsh.cmd.dshpurge.bak` 触发恢复模式。
 
 ## 说明
 

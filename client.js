@@ -41,8 +41,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				return data;
 			} catch (e) {
 				if (isAbortError(e)) throw new Error("timeout");
+				const msg = String((e && e.message) || e || "");
+				if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+					throw new Error("连不上接口，请确认 dsh 还在跑后 Ctrl+F5");
+				}
 				throw e;
 			} finally { clearTimeout(timer); }
+		}
+
+		function rulesApi(op, extra) {
+			return apiJson("/dsh-purge/rules", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify(Object.assign({ op: op }, extra || {})),
+			});
 		}
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
@@ -766,7 +778,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const loadStatus = useCallback(() => {
 				const tr = tRef.current;
-				apiJson("/dsh-purge/rules/status")
+				rulesApi("status")
 					.then((d) => {
 						if (d && d.ok) setSt(d);
 						else {
@@ -785,19 +797,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const doPost = useCallback((action, payload, after) => {
 				setBusy(true);
 				setNotice({ kind: "idle", text: "" });
-				fetch("/dsh-purge/rules/" + action, {
-					method: "POST",
-					headers: { "content-type": "application/json" },
-					body: JSON.stringify(payload || {}),
-				})
-					.then((r) => r.json())
+				rulesApi(action, payload)
 					.then((d) => {
-						if (d.ok) {
+						if (d && d.ok) {
 							setNotice({ kind: "ok", text: t("ok.done") });
 							loadStatus();
 							if (after) after();
 						} else {
-							setNotice({ kind: "error", text: t("err.action", { error: d.error || "" }) });
+							setNotice({ kind: "error", text: t("err.action", { error: (d && d.error) || "" }) });
 						}
 					})
 					.catch((e) => setNotice({ kind: "error", text: t("err.action", { error: e.message }) }))
@@ -806,7 +813,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const openRule = useCallback((id) => {
 				setBusy(true);
-				apiJson("/dsh-purge/rules/read?id=" + encodeURIComponent(id))
+				rulesApi("read", { id: id })
 					.then((d) => {
 						if (d.ok) {
 							setEditId(id);
