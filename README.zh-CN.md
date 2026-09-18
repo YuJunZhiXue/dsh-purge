@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.4</strong></p>
+<p align="center"><strong>Version 1.1.5</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -540,6 +540,10 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 ---
 
 ## 更新记录
+
+### 1.1.5
+
+- 点「更新」时：git 快进失败会 `fetch + reset`，再不行改用 zip 覆盖，不再整次失败。
 
 ### 1.1.4
 

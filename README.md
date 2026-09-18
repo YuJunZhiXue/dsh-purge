@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.4</strong></p>
+<p align="center"><strong>Version 1.1.5</strong></p>
 
 <p align="center">
     <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -536,6 +536,10 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 ---
 
 ## Changelog
+
+### 1.1.5
+
+- Manual Update: if `git pull --ff-only` fails, fetch + reset to `origin/master`, then zip overlay.
 
 ### 1.1.4
 
