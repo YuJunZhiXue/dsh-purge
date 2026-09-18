@@ -110,7 +110,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "待应用=原文还在。跳过=没装或官方已改写，再点也不会变。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
 			"warn.noRoot.desktop": "未定位到当前桌面应用里的 @deepseek-ai。请退出托盘后重新打开 DSH Desktop.exe，再在桌面端设置页点「应用」。安装目录不限盘符。",
-			"warn.noInject": "注入文件还不存在。重启后会写入默认提示词；空文件表示不注入。",
+			"warn.noInject": "未自行改过时始终使用插件内置默认提示词。保存不同内容后才会换成你的；恢复默认可改回去。",
+			"btn.restoreInject": "恢复默认",
+			"saved.restoreInject": "已填入默认提示词，点保存写入",
 			"skip": "跳过",
 			"unknown": "未知",
 			"delete": "删除",
@@ -242,6 +244,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.once.hint": "只退当前对话上一句",
 			"rewind.round": "回退上一轮",
 			"rewind.round.hint": "退回上一轮主对话，本轮子代理一并去掉",
+			"continue.title": "失败重试 / 继续",
+			"continue.hint": "请求失败会自动重试；异常停止或中断可点「继续」或自动续跑。自己点停止不会自动继续。次数用完后需新开一轮。",
+			"continue.autoRetry": "失败自动重试",
+			"continue.retryMax": "重试次数",
+			"continue.autoContinue": "中断后自动继续",
+			"continue.continueMax": "继续次数",
+			"continue.text": "继续用语",
+			"saved.continue": "已保存",
+			"continue.label": "继续",
+			"continue.aria": "异常停止后继续",
+			"continue.busy": "继续中…",
+			"continue.ready": "继续（还可 {left} 次）",
+			"continue.limit": "已达继续上限",
+			"continue.fail": "继续失败: {error}",
 		};
 
 		const en = {
@@ -264,7 +280,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "Pending = original text still present. Skipped = missing or already rewritten.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
 			"warn.noRoot.desktop": "Could not find @deepseek-ai inside this desktop app. Quit the tray, reopen DSH Desktop.exe, then Apply on the desktop Settings page. The install folder can be on any drive.",
-			"warn.noInject": "The inject file is missing. A restart writes the default prompt; an empty file means inject nothing.",
+			"warn.noInject": "Until you save a different prompt, the plugin keeps its built-in default. Restore default to go back.",
+			"btn.restoreInject": "Reset default",
+			"saved.restoreInject": "Default prompt loaded. Save to write.",
 			"skip": "Skipped",
 			"unknown": "Unknown",
 			"delete": "Delete",
@@ -396,6 +414,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.once.hint": "Drop the last turn of this chat",
 			"rewind.round": "Undo last round",
 			"rewind.round.hint": "Back to the previous main turn, including this round's subagents",
+			"continue.title": "Retry / Continue",
+			"continue.hint": "Failed requests auto-retry. After an abnormal stop or interrupt, use Continue or auto-resume. A manual stop never auto-continues. Counts reset after a completed turn.",
+			"continue.autoRetry": "Auto-retry on failure",
+			"continue.retryMax": "Retry count",
+			"continue.autoContinue": "Auto-continue after interrupt",
+			"continue.continueMax": "Continue count",
+			"continue.text": "Continue text",
+			"saved.continue": "Saved",
+			"continue.label": "Continue",
+			"continue.aria": "Continue after an abnormal stop",
+			"continue.busy": "Continuing…",
+			"continue.ready": "Continue ({left} left)",
+			"continue.limit": "Continue limit reached",
+			"continue.fail": "Continue failed: {error}",
 		};
 
 		const THEME_KEY = "dshp-theme";
@@ -454,6 +486,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-btn-tiny{min-height:28px;padding:0 10px;font-size:12px}
 .dshp-field,.dshp-area{width:100%;box-sizing:border-box;font:13px/1.55 var(--dshp-mono);padding:8px 10px;background:var(--dshp-bg);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:8px}
 .dshp-field{width:auto;min-width:140px}
+.dshp-cr-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0;font-size:13px}
+.dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
+.dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
+.dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
 .dshp-area{min-height:220px;resize:vertical}
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
@@ -577,12 +613,115 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			});
 		}
 
+		function ContinueRetrySection() {
+			const t = useT();
+			const [cfg, setCfg] = useState(null);
+			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const [busy, setBusy] = useState(false);
+
+			useEffect(() => {
+				apiJson("/dsh-purge/continue/settings")
+					.then((d) => { if (d && d.ok) setCfg(d); })
+					.catch(() => {});
+			}, []);
+
+			const save = (patch) => {
+				if (!cfg || busy) return;
+				const next = { ...cfg, ...patch };
+				if (next.autoRetry && !(Number(next.retryMax) > 0)) next.retryMax = 3;
+				if (next.autoContinue && !(Number(next.continueMax) > 0)) next.continueMax = 3;
+				setCfg(next);
+				setBusy(true);
+				apiJson("/dsh-purge/continue/settings", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify(next),
+				})
+					.then((d) => {
+						if (d && d.ok) {
+							setCfg(d);
+							setNotice({ kind: "ok", text: t("saved.continue") });
+						} else {
+							setNotice({ kind: "error", text: t("err.save", { error: (d && d.error) || "" }) });
+						}
+					})
+					.catch((e) => setNotice({ kind: "error", text: t("err.save", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			};
+
+			if (!cfg) return null;
+			return h("div", { className: "dshp-cr" },
+				h("div", { className: "dshp-sub" },
+					h("h4", null, t("continue.title")),
+					noticeNode(notice),
+				),
+				h("p", { className: "dshp-hint", style: { margin: "0 0 4px", color: "var(--dshp-mute)", fontSize: 12 } }, t("continue.hint")),
+				h("div", { className: "dshp-cr-row" },
+					h("label", null,
+						h("input", {
+							type: "checkbox",
+							checked: Boolean(cfg.autoRetry),
+							disabled: busy,
+							onChange: (e) => save({ autoRetry: e.target.checked }),
+						}),
+						t("continue.autoRetry"),
+					),
+					h("label", null,
+						t("continue.retryMax"),
+						h("input", {
+							className: "dshp-field dshp-cr-num",
+							type: "number",
+							min: 0,
+							max: 20,
+							value: cfg.retryMax,
+							disabled: busy,
+							onChange: (e) => save({ retryMax: Number(e.target.value) }),
+						}),
+					),
+				),
+				h("div", { className: "dshp-cr-row" },
+					h("label", null,
+						h("input", {
+							type: "checkbox",
+							checked: Boolean(cfg.autoContinue),
+							disabled: busy,
+							onChange: (e) => save({ autoContinue: e.target.checked }),
+						}),
+						t("continue.autoContinue"),
+					),
+					h("label", null,
+						t("continue.continueMax"),
+						h("input", {
+							className: "dshp-field dshp-cr-num",
+							type: "number",
+							min: 0,
+							max: 20,
+							value: cfg.continueMax,
+							disabled: busy,
+							onChange: (e) => save({ continueMax: Number(e.target.value) }),
+						}),
+					),
+					h("label", null,
+						t("continue.text"),
+						h("input", {
+							className: "dshp-field dshp-cr-text",
+							type: "text",
+							value: cfg.continueText || "",
+							disabled: busy,
+							onChange: (e) => save({ continueText: e.target.value }),
+						}),
+					),
+				),
+			);
+		}
+
 		function PurgifySection() {
 			const t = useT();
 			const tRef = useRef(t);
 			tRef.current = t;
 			const [state, setState] = useState(null);
 			const [override, setOverride] = useState("");
+			const [defaultOverride, setDefaultOverride] = useState("");
 			const [overrideLoaded, setOverrideLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
 			const [updateBusy, setUpdateBusy] = useState(false);
@@ -655,7 +794,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					});
 				apiJson("/dsh-purge/override")
 					.then((d) => {
-						if (d && d.ok) { setOverride(d.content || ""); setOverrideLoaded(true); }
+						if (d && d.ok) {
+							if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
+							setOverride(d.content || d.defaultContent || "");
+							setOverrideLoaded(true);
+						}
 						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
 					})
 					.catch((e) => setNotice({ kind: "error", text: tr("err.override", { error: e.message }) }));
@@ -673,9 +816,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.then((r) => r.json())
 					.then((d) => {
 						if (d.ok) {
-							if (action === "apply" && typeof d.override_content === "string") {
-								setOverride(d.override_content);
-								setOverrideLoaded(true);
+							if (action === "apply") {
+								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
+								if (typeof d.override_content === "string") {
+									setOverride(d.override_content);
+									setOverrideLoaded(true);
+								}
 							}
 							if (action === "apply" && d.complete === false) {
 								const parts = [];
@@ -727,6 +873,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				})
 					.then((r) => r.json())
 					.then((d) => {
+						if (d.ok && typeof d.content === "string") setOverride(d.content);
 						setNotice(d.ok
 							? { kind: "ok", text: t("saved.override") }
 							: { kind: "error", text: t("err.save", { error: d.error || "" }) });
@@ -734,6 +881,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.catch((e) => setNotice({ kind: "error", text: t("err.save", { error: e.message }) }))
 					.finally(() => setPatchBusy(false));
 			}, [override, t]);
+
+			const restoreOverride = useCallback(() => {
+				if (!defaultOverride) return;
+				setOverride(defaultOverride);
+				setNotice({ kind: "ok", text: t("saved.restoreInject") });
+			}, [defaultOverride, t]);
 
 			const waitHostAfterUninstall = useCallback((tr) => {
 				const started = Date.now();
@@ -885,10 +1038,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						},
 					}, t("btn.restart")),
 				) : null,
+				// h(ContinueRetrySection, null),
 				h("div", { className: "dshp-sub" },
 					h("h4", null, t("override.title")),
 					h("div", { className: "dshp-row", style: { margin: 0 } },
 						h(Btn, { kind: "primary", tiny: true, disabled: patchBusy || !overrideLoaded, onClick: saveOverride }, t("btn.saveInject")),
+						h(Btn, { tiny: true, disabled: patchBusy || !overrideLoaded || !defaultOverride, onClick: restoreOverride }, t("btn.restoreInject")),
 					),
 				),
 				h("textarea", {
@@ -1265,6 +1420,11 @@ body[data-ds-dark-theme] .dshp-rewind-menu{background:var(--dsw-specific-menu,#3
 .dshp-rewind-item b{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary,inherit)}
 .dshp-rewind-item span{color:var(--dsw-alias-label-tertiary,#9a958c);font-size:11px}
 body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tertiary,#a8a39a)}
+.dshp-continue{appearance:none;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);font:12px/1 var(--ds-font-sans,system-ui,sans-serif);cursor:pointer}
+.dshp-continue:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,currentColor)}
+.dshp-continue:disabled{opacity:.4;cursor:default}
+.dshp-continue.is-ready{color:var(--dsw-alias-label-primary,currentColor)}
+.dshp-continue svg{display:block}
 `;
 		const DRAFT_KEY = "dshp-rewind-draft:";
 		const ARM_KEY = "dshp-rewind-arm:";
@@ -1502,6 +1662,114 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			}
 		}
 
+		class ContinueSafe extends Component {
+			constructor(p) { super(p); this.state = { failed: false }; }
+			static getDerivedStateFromError() { return { failed: true }; }
+			componentDidCatch(error) { try { console.error("[dsh-purge] continue slot:", error); } catch { /* ignore */ } }
+			render() {
+				if (this.state.failed) {
+					return h("button", {
+						type: "button",
+						className: "dshp-continue",
+						title: rewindText(translate, "continue.label", "继续"),
+						onMouseDown: (e) => e.preventDefault(),
+						onClick: async () => {
+							const sessionId = currentSessionId(rewindSessions);
+							if (!sessionId) return;
+							try {
+								const data = await apiJson("/dsh-purge/continue", {
+									method: "POST",
+									headers: { "content-type": "application/json" },
+									body: JSON.stringify({ sessionId, force: true }),
+								});
+								if (!data || !data.ok) throw new Error((data && data.error) || "continue");
+							} catch (e) {
+								window.alert(rewindText(translate, "continue.fail", "继续失败: {error}").replace("{error}", String((e && e.message) || e)));
+							}
+						},
+					}, rewindText(translate, "continue.label", "继续"));
+				}
+				return h(ContinueButton, this.props);
+			}
+		}
+
+		function ContinueButton(props) {
+			const t = props.t || translate;
+			const sessions = rewindSessions;
+			const sessionId = props.sessionId || currentSessionId(sessions);
+			const [busy, setBusy] = useState(false);
+			const [notice, setNotice] = useState("");
+			const [info, setInfo] = useState(null);
+
+			useEffect(() => {
+				if (!sessionId) {
+					setInfo(null);
+					return;
+				}
+				let cancelled = false;
+				const tick = () => {
+					apiJson("/dsh-purge/continue?sessionId=" + encodeURIComponent(sessionId))
+						.then((data) => { if (!cancelled && data && data.ok) setInfo(data); })
+						.catch(() => {});
+				};
+				tick();
+				const timer = window.setInterval(tick, 1200);
+				return () => {
+					cancelled = true;
+					window.clearInterval(timer);
+				};
+			}, [sessionId]);
+
+			const canContinue = Boolean(info && info.canContinue);
+			const left = info ? Math.max(0, (info.continueMax || 0) - (info.continueUsed || 0)) : 0;
+			const runContinue = async () => {
+				if (!sessionId || busy || !canContinue) return;
+				setBusy(true);
+				setNotice("");
+				try {
+					const data = await apiJson("/dsh-purge/continue", {
+						method: "POST",
+						headers: { "content-type": "application/json" },
+						body: JSON.stringify({ sessionId }),
+					});
+					if (!data || !data.ok) throw new Error((data && data.error) || "continue");
+					setInfo((prev) => prev ? { ...prev, ...data, canContinue: false, continueUsed: data.used } : data);
+				} catch (e) {
+					setNotice(rewindText(t, "continue.fail", "继续失败: {error}").replace("{error}", String((e && e.message) || e)));
+				} finally {
+					setBusy(false);
+				}
+			};
+
+			const label = busy
+				? rewindText(t, "continue.busy", "继续中…")
+				: rewindText(t, "continue.label", "继续");
+			const title = notice
+				|| (canContinue
+					? rewindText(t, "continue.ready", "继续（还可 {left} 次）").replace("{left}", String(left))
+					: (info && info.reason && left <= 0
+						? rewindText(t, "continue.limit", "已达继续上限")
+						: rewindText(t, "continue.aria", "异常停止后继续")));
+			return h("button", {
+				type: "button",
+				className: "dshp-continue" + (canContinue ? " is-ready" : ""),
+				title,
+				"aria-label": rewindText(t, "continue.aria", "异常停止后继续"),
+				disabled: busy || !sessionId || !canContinue,
+				onMouseDown: (e) => e.preventDefault(),
+				onClick: (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					runContinue();
+				},
+			},
+				h("svg", { viewBox: "0 0 16 16", width: "14", height: "14", "aria-hidden": true },
+					h("path", { fill: "currentColor", d: "M4.2 2.8v10.4L13 8 4.2 2.8z" }),
+				),
+				label,
+			);
+		}
+
 		function RewindButton(props) {
 			const t = props.t || translate;
 			const sessions = rewindSessions;
@@ -1656,6 +1924,15 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					t: ctx.locale.bind(NS),
 				}),
 			}, RewindSafe));
+			// ctx.slots.inject("conversation.input.right", () => ctx.slots.register({
+			// 	name: "conversation.input.right",
+			// 	id: "dsh-purge-continue",
+			// 	order: 21,
+			// 	inject: (sessionId) => ({
+			// 		sessionId,
+			// 		t: ctx.locale.bind(NS),
+			// 	}),
+			// }, ContinueSafe));
 			ctx.effect(() => installRewindWatch(ctx), "dsh-purge: rewind watch");
 		}
 

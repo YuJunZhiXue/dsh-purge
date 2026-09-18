@@ -4,3 +4,4 @@ npm-debug.log*
 .DS_Store
 _archive/
 频道推广手册/
+lib/default-prompt-inject.md

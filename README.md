@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.7</strong></p>
+<p align="center"><strong>Version 1.1.8</strong></p>
 
 <p align="center">
     <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -92,7 +92,7 @@ After install:
 
 1. Fully quit and restart **the host you just installed into** (stop `dsh web`, or quit the Desktop tray and open `DSH Desktop.exe`)
 2. When **Rules** appears on that host’s Settings page, click **Apply** (adding the bundle does not patch `@deepseek-ai` by itself)
-3. On start the plugin auto-applies the current host and writes a default `prompt-inject.md` only if it is missing (an existing empty file means inject nothing)
+3. On start the plugin auto-applies the current host and uses the built-in default prompt unless the user has saved a different one
 
 Web **Apply / Restart / Uninstall** affect Web only. Desktop **Apply / Restart / Uninstall** affect the desktop app only — they do not launch `dsh web`.
 
@@ -228,13 +228,13 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 Open Hub page</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
 </p>
 
 🔗 **Raw protocol URL:**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **Web trigger example:**
@@ -247,7 +247,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.7',
+    version: '1.1.8',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -266,7 +266,7 @@ export function installDshPurgeToDesktop() {
 **HTML link:**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 Install in desktop client
 </a>
 ```
@@ -277,7 +277,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | Plugin id |
 | name | `dsh-purge` | Display name |
-| version | `1.1.7` | Semver |
+| version | `1.1.8` | Semver |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub repo |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | Requested permissions |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub tarball (not `.zip`) |
@@ -469,7 +469,7 @@ dsh-purge/
 ├── lib/
 │   ├── child-process-hide.mjs
 │   ├── core.js
-│   ├── default-prompt-inject.md
+│   ├── default-prompt-data.js
 │   ├── hide-console.js
 │   ├── identity.js
 │   ├── index.js
@@ -494,7 +494,7 @@ Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`. If `DSH_HO
 
 - After restart, the **Rules** card is on the settings page. Hard-refresh (Ctrl+F5) if the client bundle is cached.
 - Click **Apply**, then **Restart** when prompted. Optional packages (liangshen / web-fetch) show as missing/skipped and do not block complete → restart.
-- First Apply writes the built-in default into `prompt-inject.md` when the file is missing; an already-empty file is left empty.
+- Until the user saves a different prompt, `prompt-inject.md` stays the built-in default.
 - `/purge status` prints `DSH_HOME` and the patch list.
 - On 0.1.5, selecting an existing workspace should restore the session — not wipe to an empty workspace.
 - Skipped items are expected when a target file is absent (for example #20 / #21 without `dsh-web-fetch-http`).
@@ -552,7 +552,7 @@ patch not applied? ──no──> skip
     ├─> override shim (dsh.cmd / dsh.ps1 / unix dsh; **skip Desktop sealed host-commands bins**)
     ├─> scrub illegal sibling `*.dshpurge.bak` inside sealed bins (Desktop validates before plugins load)
     ├─> Windows: pin hide-console + child_process import hook; patch subprocess-local / doctor / market / liangshen bash
-    └─> if `prompt-inject.md` is missing, write the default (do not refill an empty file)
+    └─> if the user has not replaced the prompt, write/refresh the built-in default
 ```
 
 **Override (each session):**
@@ -613,6 +613,14 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ## Changelog
 
+### 1.1.8
+
+- Default prompt is embedded in the plugin (`default-prompt-data.js`). The source `default-prompt-inject.md` is not in the repo or the package.
+- Until the user saves a different prompt, the built-in default is used. Settings can restore the default.
+
+<details>
+<summary>Earlier versions</summary>
+
 ### 1.1.7
 
 - **#25:** After the first turn, do not pin the previous full system prompt. Inject `prompt-inject.md` once; later turns leave this turn’s other sections as assembled.
@@ -620,9 +628,6 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 - Install docs split **Web / Desktop** defaults: Web uses official `dsh --profile web`; Desktop uses the built-in terminal `dsh plugin add <tar.gz>`.
 - Desktop Apply / Restart / Uninstall only touch the running desktop install tree, not official Web / npm-global.
 - Desktop package root follows the running `DSH Desktop.exe` (default or custom install folder).
-
-<details>
-<summary>Earlier versions</summary>
 
 ### 1.1.6
 
@@ -661,7 +666,7 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 - Check update and download share one button: after a check, it becomes **Update** and the pill shows the remote version.
 - Startup auto-checks GitHub `master` and downloads. `dsh plugin add` (zip / github) uses the official CLI; machines without git overlay `master.zip`. Uncommitted files in a git checkout are not auto-overwritten.
 - **#16:** `#26` no longer applies bare identity replacements to YAML; apply rewrites `prefix`/`text` fold indent so the cordis preset mounts.
-- **#15:** Empty prompt-inject still injects nothing. If there is text but it never reaches the model, 0.1.5 `complete:true` was dropping every section after assemble; `#41` folds inject back into the complete prompt.
+- **#15:** If there is text but it never reaches the model, 0.1.5 `complete:true` was dropping every section after assemble; `#41` folds inject back into the complete prompt.
 - **#14:** Hub `api/plugins/download` is not a tarball; install from GitHub `master.zip` only.
 
 ### 1.0.0

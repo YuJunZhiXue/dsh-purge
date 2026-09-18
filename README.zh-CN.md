@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.7</strong></p>
+<p align="center"><strong>Version 1.1.8</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -89,7 +89,7 @@ Web 端和桌面端**分开装、分开清洗**，互不影响。
 
 1. 完全退出并重启**刚装的那个宿主**（Web 关 `dsh web`；桌面端退出托盘再打开 `DSH Desktop.exe`）
 2. 在**这个宿主**的设置页出现「规则设定」后点「应用」（只写入 profile 还不会改 `@deepseek-ai`）
-3. 启动后会自动清洗当前宿主；没有 `prompt-inject.md` 时写入默认注入（已有文件不覆盖，空文件表示不注入）
+3. 启动后会自动清洗当前宿主；未自行改过提示词时使用插件内置默认，只有用户自己保存过不同内容才保留
 
 Web 的「应用 / 重启 / 卸载」只动 Web。桌面端的「应用 / 重启 / 卸载」只动桌面应用，不会去拉 `dsh web`。
 
@@ -225,13 +225,13 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **网页端（前端）触发代码示例：**
@@ -244,7 +244,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.7',
+    version: '1.1.8',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -263,7 +263,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.8&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -274,7 +274,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | 插件唯一标识符 |
 | name | `dsh-purge` | 插件展示名称 |
-| version | `1.1.7` | 语义化版本号 |
+| version | `1.1.8` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub tarball（不要用 `.zip`） |
@@ -466,7 +466,7 @@ dsh-purge/
 ├── lib/
 │   ├── child-process-hide.mjs
 │   ├── core.js
-│   ├── default-prompt-inject.md
+│   ├── default-prompt-data.js
 │   ├── hide-console.js
 │   ├── identity.js
 │   ├── index.js
@@ -491,7 +491,7 @@ dsh-purge/
 
 - 重启后设置页出现「规则设定」卡片（客户端半体加载成功）。有缓存时 Ctrl+F5。
 - 点「应用」，进度里已应用项增加；再按提示重启，补丁进入当前进程。缺可选包（如梁神、web-fetch）时对应项显示跳过/缺失，不影响「完成 → 重启」。
-- 首次应用若尚无 `prompt-inject.md`，会写入内置默认提示词；已清空的文件不会再自动填回。
+- 未自行改过时，`prompt-inject.md` 使用插件内置默认提示词。设置页保存不同内容后才换成用户自己的。
 - 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表。
 - 0.1.5 上选已有工作区应能恢复会话，不应被清空成空工作区。
 - 个别项显示跳过是正常的：例如没装 `dsh-web-fetch-http` 时 #20 / #21 会跳过。
@@ -547,7 +547,7 @@ node --test test/update-spec.test.js
     ├─> 覆盖 shim（dsh.cmd / dsh.ps1 / unix dsh；**跳过 Desktop host-commands 密封目录**）
     ├─> 清掉密封目录里误放的 sibling `*.dshpurge.bak`（Desktop 启动前校验，残留会进恢复模式）
     ├─> Windows：钉 hide-console + child_process 导入钩子，并修补 subprocess-local / doctor / market / 梁神 bash
-    └─> 若 `prompt-inject.md` 尚不存在则写入默认覆盖文本（已存在的空文件不覆盖）
+    └─> 未自行改过则写入/刷新内置默认提示词
 ```
 
 **覆盖（每次会话）：**
@@ -600,17 +600,21 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ## 更新记录
 
+### 1.1.8
+
+- 默认提示词打进插件（`default-prompt-data.js`），源 `default-prompt-inject.md` 不进仓库、不发包。
+- 未自行改过提示词时使用内置默认；设置页保存不同内容后才换成用户自己的，可「恢复默认」。
+
+<details>
+<summary>更早版本</summary>
+
 ### 1.1.7
 
 - **#25：** 第一轮注入 `prompt-inject.md` 之后不再把上一轮整段系统提示钉回去；后续只保留本轮组装结果。
 - **#26：** `dsh plugin add` / 插件内更新改用 GitHub `master.tar.gz`。`.zip` 不是 pnpm tarball，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`。本地覆盖安装仍下载 zip 给 `tar` / Expand-Archive。
-
 - 安装文档按 **Web 端 / 桌面端** 分开写默认命令：Web 用官方 `dsh --profile web`；桌面端默认在自带终端 `dsh plugin add <zip>`。
 - 桌面端清洗、重启、卸载只针对当前桌面进程的安装树，不碰官方 Web / npm-global。
 - 桌面端安装目录按运行中的 `DSH Desktop.exe` 定位，默认位置或自定义目录都可以。
-
-<details>
-<summary>更早版本</summary>
 
 ### 1.1.6
 
@@ -648,7 +652,7 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 - 检测更新与下载分开：先查，有新版本按钮变成「更新」，版本号显示远端。
 - 开机自动对照 GitHub `master` 并下载。`dsh plugin add`（zip / github）走官方 CLI；没 git 下 `master.zip` 覆盖。git 仓库本地有未提交改动时不自动覆盖。
 - **#16**：`#26` 不再对 YAML 用无缩进 identity 替换；apply 重写 `prefix`/`text` 缩进，cordis 预设能挂载。
-- **#15**：空提示词仍不注入。有内容却进不了会话，是 0.1.5 `complete:true` 丢掉 section；`#41` 把注入补回 complete 段。
+- **#15**：有内容却进不了会话，是 0.1.5 `complete:true` 丢掉 section；`#41` 把注入补回 complete 段。
 - **#14**：Hub `api/plugins/download` 不是 tar，安装只用 GitHub `master.zip`。
 
 ### 1.0.0

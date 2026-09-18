@@ -16,3 +16,8 @@
         verbose: false
         postPrompt: ""
         postPromptOrder: 5100
+        autoRetry: true
+        retryMax: 3
+        autoContinue: true
+        continueMax: 3
+        continueText: "继续"
