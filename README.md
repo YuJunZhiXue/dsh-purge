@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.1.3</strong></p>
+<p align="center"><strong>Version 1.1.4</strong></p>
 
 <p align="center">
     <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -536,6 +536,10 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 ---
 
 ## Changelog
+
+### 1.1.4
+
+- Update check reads `package.json` at the GitHub commit SHA, instead of the stale jsDelivr `@master` cache or falling back to the local version.
 
 ### 1.1.3
 
