@@ -368,28 +368,33 @@ The **Rules** card appears on the dsh web settings page. Switch **Light / Ink**.
 
 ```
 dsh-purge/
-├── lib/
-│   ├── core.js               # path detect, patches, backup/restore, shim, override file
-│   ├── hide-console.js       # Windows hide-console pin into bin.js
-│   ├── identity.js           # fold inject into persona-prefix; no identity card
-│   ├── index.js              # plugin: commands, tools, systemPrompt, HTTP
-│   ├── rules.js
-│   ├── restart-web.js
-│   ├── uninstall.js          # uninstall: restore patches, then remove the plugin
-│   └── default-prompt-inject.md
-├── client.js                 # settings UI
 ├── bin/dsh-purge.js
-├── docs/
-│   ├── banner.svg
-│   ├── appreciate.png
-│   └── preview/
-│       ├── settings.png
-│       └── rules.png
+├── client.js
 ├── cordis.patch.yml
+├── docs/
+│   ├── appreciate.png
+│   ├── banner.svg
+│   └── preview/
+│       ├── rules.png
+│       └── settings.png
+├── lib/
+│   ├── child-process-hide.mjs
+│   ├── core.js
+│   ├── default-prompt-inject.md
+│   ├── hide-console.js
+│   ├── identity.js
+│   ├── index.js
+│   ├── restart-web.js
+│   ├── rewind.js
+│   ├── rules.js
+│   ├── uninstall-restart.js
+│   ├── uninstall.js
+│   └── update.js
 ├── package.json
+├── screenshots.json
+├── LICENSE
 ├── README.md
-├── README.zh-CN.md
-└── LICENSE
+└── README.zh-CN.md
 ```
 
 Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`.
@@ -413,9 +418,10 @@ Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`. If `DSH_HO
 dsh-purge --status
 dsh-purge --apply
 dsh-purge --revert
+dsh-purge --uninstall
 dsh-purge --edit
 
-/purge status | apply | revert | edit | help
+/purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
 /rewind
 

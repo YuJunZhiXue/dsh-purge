@@ -369,28 +369,33 @@ dsh-purge --uninstall
 
 ```
 dsh-purge/
-├── lib/
-│   ├── core.js               # 路径探测、补丁、备份还原、shim、覆盖文件
-│   ├── hide-console.js       # Windows 隐藏子进程控制台（写入 bin.js）
-│   ├── identity.js           # 把 inject 折进 persona-prefix，不另写身份卡
-│   ├── index.js              # 插件入口：命令、工具、systemPrompt、HTTP
-│   ├── rules.js              # 规则集
-│   ├── restart-web.js        # Web 配置下的重启
-│   ├── uninstall.js          # 卸载：还原补丁并清除插件
-│   └── default-prompt-inject.md
-├── client.js                 # 设置页
-├── bin/dsh-purge.js          # CLI
-├── docs/
-│   ├── banner.svg
-│   ├── appreciate.png
-│   └── preview/
-│       ├── settings.png
-│       └── rules.png
+├── bin/dsh-purge.js
+├── client.js
 ├── cordis.patch.yml
+├── docs/
+│   ├── appreciate.png
+│   ├── banner.svg
+│   └── preview/
+│       ├── rules.png
+│       └── settings.png
+├── lib/
+│   ├── child-process-hide.mjs
+│   ├── core.js
+│   ├── default-prompt-inject.md
+│   ├── hide-console.js
+│   ├── identity.js
+│   ├── index.js
+│   ├── restart-web.js
+│   ├── rewind.js
+│   ├── rules.js
+│   ├── uninstall-restart.js
+│   ├── uninstall.js
+│   └── update.js
 ├── package.json
+├── screenshots.json
+├── LICENSE
 ├── README.md
-├── README.zh-CN.md
-└── LICENSE
+└── README.zh-CN.md
 ```
 
 运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。
@@ -415,10 +420,11 @@ dsh-purge/
 dsh-purge --status
 dsh-purge --apply
 dsh-purge --revert
+dsh-purge --uninstall
 dsh-purge --edit
 
 # 聊天
-/purge status | apply | revert | edit | help
+/purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
 /rewind
 
