@@ -504,6 +504,9 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 - Settings **Uninstall** asks for confirmation, restores applied patches, then removes the plugin and restarts.
 - The AI-assistant install block is install-only: official `dsh plugin add`, no disk scan, no apply.
 
+<details>
+<summary>Earlier versions</summary>
+
 ### 1.1.5
 
 - Manual Update: if `git pull --ff-only` fails, fetch + reset to `origin/master`, then zip overlay.
@@ -542,6 +545,8 @@ If nothing is found, set `DSH_BASE`. No files are changed.
 
 - Version numbering reset.
 - Settings: **Check update** reads GitHub `master`.
+
+</details>
 
 ## Notes
 

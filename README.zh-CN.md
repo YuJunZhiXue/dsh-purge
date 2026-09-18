@@ -508,6 +508,9 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 - 设置页「卸载」会弹窗确认；若已应用补丁则先还原回原版，再清除插件并重启。
 - 给 AI 的安装块只跑官方 `dsh plugin add`，不扫盘、不应用。
 
+<details>
+<summary>更早版本</summary>
+
 ### 1.1.5
 
 - 点「更新」时：git 快进失败会 `fetch + reset`，再不行改用 zip 覆盖，不再整次失败。
@@ -546,6 +549,8 @@ npm 嵌套布局下，审批在 `dsh-user-approval/lib/index.js`，升级逻辑�
 
 - 版本号从头计数。
 - 设置页增加 **检测更新**：对照 GitHub `master`。
+
+</details>
 
 ## 说明
 
