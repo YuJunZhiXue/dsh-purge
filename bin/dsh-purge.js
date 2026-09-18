@@ -33,13 +33,14 @@ function printStatus(state) {
 }
 
 async function main() {
-  const mode = args.find((a) => ["--apply", "--revert", "--status", "--edit", "--help"].includes(a));
+  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--help"].includes(a));
 
   if (mode === "--help" || args.includes("-h")) {
     console.log(`dsh-purge 用法:
   dsh-purge --status     显示状态
   dsh-purge --apply      应用全部清洗（提示词+代码+shim+override）
   dsh-purge --revert     回滚还原
+  dsh-purge --uninstall  卸载插件（已应用则先还原）
   dsh-purge --edit       编辑注入文件 prompt-inject.md
   dsh-purge --help       帮助`);
     return;
@@ -97,6 +98,20 @@ async function main() {
     console.log("");
     console.log("回滚完成 / Revert done。重启 dsh 后恢复 / restart to restore.");
     console.log("注: prompt-inject.md 保留（用户文件）/ prompt-inject.md kept (user file)");
+  } else if (mode === "--uninstall") {
+    const { uninstallPurge } = await import("../lib/uninstall.js");
+    const result = await uninstallPurge();
+    if (result.applied) console.log("  已检测到补丁，已还原回原版。");
+    else console.log("  未检测到已应用补丁，仍会清除插件文件。");
+    if (result.override?.removed) console.log(`  已删除 ${result.override.path}`);
+    if (result.stripped?.length) console.log(`  已从 profile 移除: ${result.stripped.join(", ")}`);
+    for (const e of result.errors || []) console.log(`  ⚠ ${e}`);
+    if (!result.ok) {
+      console.log("  卸载中止：还原失败，插件文件未删除。");
+      process.exit(1);
+    }
+    console.log("");
+    console.log("卸载完成。请重启 dsh。");
   } else if (mode === "--edit") {
     const r = core.editOverride(state.dsh_home);
     if (!r.ok && r.needCreate) {

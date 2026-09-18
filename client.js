@@ -21,6 +21,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const path = String(p || "");
 			const method = String((init && init.method) || "GET").toUpperCase();
 			if (path.indexOf("/dsh-purge/update") !== -1) return method === "POST" ? 180000 : 45000;
+			if (path.indexOf("/dsh-purge/uninstall") !== -1) return 90000;
 			return 20000;
 		}
 		function isAbortError(e) {
@@ -90,6 +91,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.apply": "应用",
 			"btn.apply.busy": "处理中…",
 			"btn.revert": "还原",
+			"btn.uninstall": "卸载",
+			"btn.uninstall.busy": "卸载中…",
+			"uninstall.title": "卸载 dsh-purge",
+			"uninstall.body": "是否卸载？卸载将还原回原版，并清除本插件的全部文件与补丁。",
+			"uninstall.confirm": "确认卸载",
+			"uninstall.cancel": "取消",
+			"uninstall.applying": "正在卸载并还原…",
+			"uninstall.done": "已卸载并还原，正在重启…",
+			"uninstall.fail": "卸载失败: {error}",
 			"btn.checkUpdate": "检测更新",
 			"btn.checkUpdate.busy": "检测中…",
 			"btn.doUpdate": "更新",
@@ -107,6 +117,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
+			"action.uninstall": "卸载",
 			"ok.done": "已完成",
 			"err.action": "失败: {error}",
 			"err.status": "读取失败: {error}",
@@ -224,6 +235,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.apply": "Apply",
 			"btn.apply.busy": "Working…",
 			"btn.revert": "Restore",
+			"btn.uninstall": "Uninstall",
+			"btn.uninstall.busy": "Uninstalling…",
+			"uninstall.title": "Uninstall dsh-purge",
+			"uninstall.body": "Uninstall? This restores the original Harness and removes this plugin completely.",
+			"uninstall.confirm": "Uninstall",
+			"uninstall.cancel": "Cancel",
+			"uninstall.applying": "Uninstalling and restoring…",
+			"uninstall.done": "Uninstalled and restored. Restarting…",
+			"uninstall.fail": "Uninstall failed: {error}",
 			"btn.checkUpdate": "Check update",
 			"btn.checkUpdate.busy": "Checking…",
 			"btn.doUpdate": "Update",
@@ -241,6 +261,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
+			"action.uninstall": "Uninstall",
 			"ok.done": "Done",
 			"err.action": "Failed: {error}",
 			"err.status": "Read failed: {error}",
@@ -394,6 +415,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
 .dshp-ask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);font-size:13px}
+.dshp-modal-bg{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:color-mix(in srgb,var(--dshp-ink) 28%,transparent)}
+.dshp-modal{width:min(420px,100%);background:var(--dshp-paper);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:12px;padding:20px 20px 16px;box-shadow:0 16px 40px color-mix(in srgb,var(--dshp-ink) 18%,transparent)}
+.dshp-modal h4{margin:0 0 8px;font-family:var(--dshp-display);font-size:18px;font-weight:500}
+.dshp-modal p{margin:0 0 16px;font-size:13.5px;line-height:1.55}
+.dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
 .dshp-notice{font-size:12.5px;line-height:1.4}
 .dshp-notice.is-ok{color:var(--dshp-ok)}
 .dshp-notice.is-bad{color:var(--dshp-bad)}
@@ -518,6 +544,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [patchBusy, setPatchBusy] = useState(false);
 			const [updateBusy, setUpdateBusy] = useState(false);
 			const [askRestart, setAskRestart] = useState(false);
+			const [askUninstall, setAskUninstall] = useState(false);
+			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
 			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
@@ -664,6 +692,58 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.finally(() => setPatchBusy(false));
 			}, [override, t]);
 
+			const waitHostAfterUninstall = useCallback((tr) => {
+				const started = Date.now();
+				const ping = () => {
+					fetch("/", { cache: "no-store", credentials: "same-origin" })
+						.then((r) => {
+							if (r.ok) {
+								try {
+									window.localStorage.removeItem("dshp-theme");
+									window.localStorage.removeItem("dshp-theme-mode");
+								} catch { /* ignore */ }
+								window.location.reload();
+								return;
+							}
+							retry();
+						})
+						.catch(retry);
+				};
+				const retry = () => {
+					if (Date.now() - started > 90000) {
+						setNotice({ kind: "error", text: tr("restart.timeout") });
+						setUninstallBusy(false);
+						return;
+					}
+					setTimeout(ping, 500);
+				};
+				setTimeout(ping, 800);
+			}, []);
+
+			const doUninstall = useCallback(() => {
+				setUninstallBusy(true);
+				setAskUninstall(false);
+				setAskRestart(false);
+				const tr = tRef.current;
+				setNotice({ kind: "ok", text: tr("uninstall.applying") });
+				apiJson("/dsh-purge/uninstall", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
+					.then((d) => {
+						if (!d || !d.ok) throw new Error((d && d.error) || "uninstall failed");
+						setNotice({ kind: "ok", text: tr("uninstall.done") });
+						waitHostAfterUninstall(tr);
+					})
+					.catch((e) => {
+						const msg = String((e && e.message) || e || "");
+						if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+							setNotice({ kind: "ok", text: tr("uninstall.done") });
+							waitHostAfterUninstall(tr);
+							return;
+						}
+						setNotice({ kind: "error", text: tr("uninstall.fail", { error: msg }) });
+						setUninstallBusy(false);
+					});
+			}, [waitHostAfterUninstall]);
+
 			const s = state;
 			const total = s && s.patches_total ? s.patches_total : 26;
 			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
@@ -722,10 +802,27 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				h("div", { className: "dshp-bar", "aria-hidden": "true" }, h("i", { style: { width: pct + "%" } })),
 				h(PatchGroups, { state: s }),
 				h("div", { className: "dshp-row", style: { marginTop: 14 } },
-					h(Btn, { kind: "primary", disabled: patchBusy, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
-					h(Btn, { kind: "danger", disabled: patchBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
+					h(Btn, { kind: "primary", disabled: patchBusy || uninstallBusy, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
+					h(Btn, { kind: "danger", disabled: patchBusy || uninstallBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
+					h(Btn, { kind: "solid-danger", disabled: patchBusy || uninstallBusy, onClick: () => setAskUninstall(true) }, uninstallBusy ? t("btn.uninstall.busy") : t("btn.uninstall")),
 					noticeNode(notice),
 				),
+				askUninstall ? h("div", {
+					className: "dshp-modal-bg",
+					role: "dialog",
+					"aria-modal": "true",
+					"aria-labelledby": "dshp-uninstall-title",
+					onClick: (e) => { if (e.target === e.currentTarget && !uninstallBusy) setAskUninstall(false); },
+				},
+					h("div", { className: "dshp-modal" },
+						h("h4", { id: "dshp-uninstall-title" }, t("uninstall.title")),
+						h("p", null, t("uninstall.body")),
+						h("div", { className: "dshp-modal-ops" },
+							h(Btn, { disabled: uninstallBusy, onClick: () => setAskUninstall(false) }, t("uninstall.cancel")),
+							h(Btn, { kind: "solid-danger", disabled: uninstallBusy, onClick: doUninstall }, t("uninstall.confirm")),
+						),
+					),
+				) : null,
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
 				askRestart ? h("div", { className: "dshp-ask" },
 					h("span", null, t("restart.confirm")),
