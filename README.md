@@ -615,7 +615,6 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ### 1.1.8
 
-- Default prompt is embedded in the plugin (`default-prompt-data.js`). The source `default-prompt-inject.md` is not in the repo or the package.
 - Until the user saves a different prompt, the built-in default is used. Settings can restore the default.
 
 <details>

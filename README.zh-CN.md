@@ -602,7 +602,6 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ### 1.1.8
 
-- 默认提示词打进插件（`default-prompt-data.js`），源 `default-prompt-inject.md` 不进仓库、不发包。
 - 未自行改过提示词时使用内置默认；设置页保存不同内容后才换成用户自己的，可「恢复默认」。
 
 <details>
