@@ -5,5 +5,4 @@ npm-debug.log*
 _archive/
 频道推广手册/
 lib/default-prompt-inject.md
-lib/default-prompt-data.js
 default-prompt-inject.md

@@ -795,8 +795,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				apiJson("/dsh-purge/override")
 					.then((d) => {
 						if (d && d.ok) {
-							if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
-							setOverride(d.content || d.defaultContent || "");
+							const packed = typeof d.defaultContent === "string" ? d.defaultContent : "";
+							if (packed) setDefaultOverride(packed);
+							const shown = String(d.content || packed || "").trim() ? (d.content || packed) : packed;
+							setOverride(shown);
 							setOverrideLoaded(true);
 						}
 						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
@@ -818,8 +820,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						if (d.ok) {
 							if (action === "apply") {
 								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
-								if (typeof d.override_content === "string") {
-									setOverride(d.override_content);
+								const shown = d.override_content || d.defaultContent;
+								if (typeof shown === "string" && shown) {
+									setOverride(shown);
 									setOverrideLoaded(true);
 								}
 							}
