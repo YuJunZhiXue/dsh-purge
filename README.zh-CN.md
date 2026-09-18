@@ -94,11 +94,13 @@ Web 端和桌面端**分开装、分开清洗**，互不影响。
 Web 的「应用 / 重启 / 卸载」只动 Web。桌面端的「应用 / 重启 / 卸载」只动桌面应用，不会去拉 `dsh web`。
 
 > 🌐 **插件生态市场**：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)（只看介绍；**不要**用 `deepseek.stream/api/plugins/download?...`，那个地址不是 pnpm 能解的 tar，会报 `ERR_PNPM_TARBALL_EXTRACT`）
+>
+> `dsh plugin add <url>` 会把地址交给 pnpm 当 **远程 tarball**。请用 GitHub 的 `master.tar.gz`。`.zip` 是 ZIP 不是 gzip，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`（[#26](https://github.com/YuJunZhiXue/dsh-purge/issues/26)）。
 
 ### Web 端（默认）
 
 ```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 当前目录已是本仓库时：
@@ -114,7 +116,7 @@ dsh plugin --profile web add .
 打开社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop)，在**自带终端**里执行（这里的 `dsh` 是桌面包装脚本，默认 profile 就是 `desktop`）：
 
 ```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 不要用 PATH 上的官方 `dsh plugin --profile desktop`（会被拒绝）。不要用 `dsh://`（那是官方 EXE）。
@@ -124,7 +126,7 @@ dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/maste
 从系统终端安装时，用桌面端自带 CLI。按正在运行的进程、默认安装位置定位 `DSH Desktop.exe`：
 
 ```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
 $exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
 if (-not $exe) {
   $exe = @(
@@ -143,7 +145,7 @@ $env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
 & $exe --expose-internals $cli plugin add $zip
 ```
 
-自定义安装目录时，把 `$exe` 换成该目录下的 `DSH Desktop.exe`。默认用 zip，避免本地路径空格把命令拆开。
+自定义安装目录时，把 `$exe` 换成该目录下的 `DSH Desktop.exe`。默认用 tar.gz 地址，避免本地路径空格把命令拆开。
 
 ### 交给 AI 安装（只装插件）
 
@@ -161,7 +163,7 @@ $env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
 `dsh` 不在 PATH 就告诉用户后停止。
 
 ```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 当前目录已是本仓库时改用 `dsh plugin --profile web add .`。
@@ -173,13 +175,13 @@ dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/re
 默认：已在桌面端自带终端里时直接跑：
 
 ```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 从系统终端安装时：用正在运行的 `DSH Desktop` 进程 Path，或默认位置 `%LOCALAPPDATA%\Programs\DSH Desktop\DSH Desktop.exe`、`%ProgramFiles%\DSH Desktop\DSH Desktop.exe`。不要全盘扫描。然后：
 
 ```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
 $exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
 if (-not $exe) {
   $exe = @(
@@ -201,7 +203,7 @@ $env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
 **官方 Harness 桌面 EXE**
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 命令结束后，提醒：完全退出并重启刚装的那个宿主，再在该宿主设置页点「应用」。Web 和桌面端不要交叉点应用。然后停止。
@@ -217,19 +219,19 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 命令行等价：
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **网页端（前端）触发代码示例：**
@@ -245,7 +247,7 @@ export function installDshPurgeToDesktop() {
     version: '1.1.7',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
-    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
+    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
   });
 
   const deepLink = `dsh://plugin/install?${params.toString()}`;
@@ -261,7 +263,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -275,7 +277,7 @@ export function installDshPurgeToDesktop() {
 | version | `1.1.7` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
-| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | zip 下载直链 |
+| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub tarball（不要用 `.zip`） |
 
 ### 手动配置安装
 
@@ -528,6 +530,7 @@ node --check lib/index.js
 node --check lib/core.js
 node --check lib/rewind.js
 node --check client.js
+node --test test/update-spec.test.js
 ```
 
 ---
@@ -598,6 +601,8 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 ## 更新记录
 
 ### 1.1.7
+
+- **#26：** `dsh plugin add` / 插件内更新改用 GitHub `master.tar.gz`。`.zip` 不是 pnpm tarball，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`。本地覆盖安装仍下载 zip 给 `tar` / Expand-Archive。
 
 - 安装文档按 **Web 端 / 桌面端** 分开写默认命令：Web 用官方 `dsh --profile web`；桌面端默认在自带终端 `dsh plugin add <zip>`。
 - 桌面端清洗、重启、卸载只针对当前桌面进程的安装树，不碰官方 Web / npm-global。

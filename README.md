@@ -97,11 +97,13 @@ After install:
 Web **Apply / Restart / Uninstall** affect Web only. Desktop **Apply / Restart / Uninstall** affect the desktop app only — they do not launch `dsh web`.
 
 > 🌐 **Plugin hub:** [DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge) (docs only — **do not** install via `deepseek.stream/api/plugins/download?...`; that URL is not a pnpm tarball and fails with `ERR_PNPM_TARBALL_EXTRACT`)
+>
+> `dsh plugin add <url>` hands the URL to pnpm as a **remote tarball**. Use GitHub `master.tar.gz`. A `.zip` archive is ZIP, not gzip, and fails with `ERR_PNPM_TARBALL_DECODE_GZIP` ([#26](https://github.com/YuJunZhiXue/dsh-purge/issues/26)).
 
 ### Web (default)
 
 ```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 If this directory is already a clone:
@@ -117,7 +119,7 @@ Then stop `dsh web`, start it again, and **Apply** on the Web Settings page. If 
 Open community [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) and run this in the **built-in terminal** (`dsh` is the desktop wrapper; default profile is `desktop`):
 
 ```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 Do not use official `dsh plugin --profile desktop` on PATH (it is rejected). Do not use `dsh://` (that is the official EXE).
@@ -127,7 +129,7 @@ Then quit the tray, reopen `DSH Desktop.exe`, and **Apply** on the **desktop** S
 From a system terminal, use the app’s own CLI. Locate `DSH Desktop.exe` from the running process or the default install locations:
 
 ```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
 $exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
 if (-not $exe) {
   $exe = @(
@@ -146,7 +148,7 @@ $env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
 & $exe --expose-internals $cli plugin add $zip
 ```
 
-For a custom install folder, set `$exe` to `DSH Desktop.exe` in that folder. The zip is the default source so a local path with spaces cannot split the command.
+For a custom install folder, set `$exe` to `DSH Desktop.exe` in that folder. The tarball URL is the default source so a local path with spaces cannot split the command.
 
 ### Hand this to an AI (install only)
 
@@ -164,7 +166,7 @@ Install the DeepSeek Harness plugin `dsh-purge`. Confirm the host first and inst
 If `dsh` is not on PATH, tell the user and stop.
 
 ```sh
-dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 If this directory is already a clone, use `dsh plugin --profile web add .`.
@@ -176,13 +178,13 @@ Do not use official `dsh plugin --profile desktop` on PATH. Do not use `dsh://`.
 Default: already inside Desktop’s built-in terminal:
 
 ```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 From a system terminal: use the running `DSH Desktop` process Path, or the default locations `%LOCALAPPDATA%\Programs\DSH Desktop\DSH Desktop.exe`, `%ProgramFiles%\DSH Desktop\DSH Desktop.exe`. Do not scan the whole disk. Then:
 
 ```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip"
+$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
 $exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
 if (-not $exe) {
   $exe = @(
@@ -204,7 +206,7 @@ $env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
 **Official Harness desktop EXE**
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 After the command finishes, tell the user to fully quit and restart the host they just installed into, then **Apply** on that host’s Settings page. Do not Apply Web from Desktop or Desktop from Web. Then stop.
@@ -220,19 +222,19 @@ If the **official DeepSeek Harness desktop client (EXE)** is installed, the butt
 CLI equivalent:
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip
+dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
 
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 Open Hub page</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip"><strong>🚀 Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
 </p>
 
 🔗 **Raw protocol URL:**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **Web trigger example:**
@@ -248,7 +250,7 @@ export function installDshPurgeToDesktop() {
     version: '1.1.7',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
-    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip',
+    downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
   });
 
   const deepLink = `dsh://plugin/install?${params.toString()}`;
@@ -264,7 +266,7 @@ export function installDshPurgeToDesktop() {
 **HTML link:**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.zip">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.7&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 Install in desktop client
 </a>
 ```
@@ -278,7 +280,7 @@ export function installDshPurgeToDesktop() {
 | version | `1.1.7` | Semver |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub repo |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | Requested permissions |
-| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip` | Zip URL |
+| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub tarball (not `.zip`) |
 
 ### Manual install
 
@@ -533,6 +535,7 @@ node --check lib/host.js
 node --check lib/rewind.js
 node --check client.js
 node --test test/surface.test.js
+node --test test/update-spec.test.js
 ```
 
 ---
@@ -612,7 +615,8 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ### 1.1.7
 
-- Install docs split **Web / Desktop** defaults: Web uses official `dsh --profile web`; Desktop uses the built-in terminal `dsh plugin add <zip>`.
+- **#26:** `dsh plugin add` / in-app update use GitHub `master.tar.gz`. A `.zip` URL is not a pnpm tarball (`ERR_PNPM_TARBALL_DECODE_GZIP`). Local overlay still downloads the zip for `tar` / Expand-Archive.
+- Install docs split **Web / Desktop** defaults: Web uses official `dsh --profile web`; Desktop uses the built-in terminal `dsh plugin add <tar.gz>`.
 - Desktop Apply / Restart / Uninstall only touch the running desktop install tree, not official Web / npm-global.
 - Desktop package root follows the running `DSH Desktop.exe` (default or custom install folder).
 
