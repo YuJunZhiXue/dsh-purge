@@ -1115,12 +1115,14 @@ body[data-ds-dark-theme] .dshp-rewind-menu{background:var(--dsw-specific-menu,#3
 body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tertiary,#a8a39a)}
 `;
 		const DRAFT_KEY = "dshp-rewind-draft:";
-		const RESTORED_KEY = "dshp-rewind-done:";
+		const ARM_KEY = "dshp-rewind-arm:";
 		const FILL_DELAYS = [0, 50, 180];
+		const ARM_TTL_MS = 45 * 1000;
 		let rewindSeenAt = 0;
 		let rewindSessions = null;
 		let rewindHost = null;
 		let pendingComposer = { sessionId: "", text: "", at: 0 };
+		let armedFill = { sessionId: "", text: "", at: 0 };
 
 		function rewindText(t, key, fallback) {
 			try {
@@ -1149,7 +1151,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			const value = isPluginDraft(text) ? "" : (text || "");
 			pendingComposer = { sessionId, text: value, at: Date.now() };
 			try { sessionStorage.setItem(DRAFT_KEY + sessionId, value); } catch { /* ignore */ }
-			try { sessionStorage.removeItem(RESTORED_KEY + sessionId); } catch { /* ignore */ }
 		}
 
 		function peekDraft(sessionId) {
@@ -1158,18 +1159,39 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			try { return sessionStorage.getItem(DRAFT_KEY + sessionId) || ""; } catch { return ""; }
 		}
 
-		function takeDraft(sessionId) {
-			return peekDraft(sessionId);
-		}
-
-		function markRestored(sessionId) {
+		function clearStoredDraft(sessionId) {
 			if (!sessionId) return;
-			try { sessionStorage.setItem(RESTORED_KEY + sessionId, "1"); } catch { /* ignore */ }
+			if (pendingComposer.sessionId === sessionId) pendingComposer = { sessionId: "", text: "", at: 0 };
+			try { sessionStorage.removeItem(DRAFT_KEY + sessionId); } catch { /* ignore */ }
+			try { sessionStorage.removeItem(ARM_KEY + sessionId); } catch { /* ignore */ }
 		}
 
-		function isRestored(sessionId) {
-			if (!sessionId) return false;
-			try { return !!sessionStorage.getItem(RESTORED_KEY + sessionId); } catch { return false; }
+		function armComposerFill(sessionId, text) {
+			if (!sessionId || !text || isPluginDraft(text)) return;
+			const at = Date.now();
+			armedFill = { sessionId, text, at };
+			writeDraft(sessionId, text);
+			try { sessionStorage.setItem(ARM_KEY + sessionId, String(at)); } catch { /* ignore */ }
+		}
+
+		function takeArmedFill(sessionId) {
+			if (!sessionId) return "";
+			let text = "";
+			let at = 0;
+			if (armedFill.sessionId === sessionId && armedFill.text) {
+				text = armedFill.text;
+				at = armedFill.at;
+			} else {
+				text = peekDraft(sessionId);
+				try { at = Number(sessionStorage.getItem(ARM_KEY + sessionId) || 0); } catch { at = 0; }
+			}
+			if (!text || !at || Date.now() - at > ARM_TTL_MS) {
+				if (text && (!at || Date.now() - at > ARM_TTL_MS)) clearStoredDraft(sessionId);
+				return "";
+			}
+			clearStoredDraft(sessionId);
+			armedFill = { sessionId: "", text: "", at: 0 };
+			return text;
 		}
 
 		function conversationInput(sessionId) {
@@ -1198,11 +1220,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		function hostSetDraft(sessionId, text) {
-			if (!sessionId || !text) return false;
+			if (!sessionId) return false;
 			try {
 				const input = conversationInput(sessionId);
 				if (input && typeof input.setDraft === "function") {
-					input.setDraft(text);
+					input.setDraft(text || "");
 					return true;
 				}
 			} catch { /* ignore */ }
@@ -1210,15 +1232,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		function fillComposer(inputActions, text) {
-			if (!text) return;
 			if (inputActions && typeof inputActions.setDraft === "function") {
-				try { inputActions.setDraft(text); } catch { /* ignore */ }
+				try { inputActions.setDraft(text || ""); } catch { /* ignore */ }
 			}
 		}
 
 		function scheduleComposerFill(sessionId, text, inputActions) {
 			if (!sessionId || !text || isPluginDraft(text)) return;
-			writeDraft(sessionId, text);
 			let stopped = false;
 			let filled = false;
 			const tryFill = () => {
@@ -1237,6 +1257,31 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				filled = true;
 			};
 			for (const ms of FILL_DELAYS) window.setTimeout(tryFill, ms);
+		}
+
+		function scheduleEchoClear(sessionId, inputActions) {
+			if (!sessionId) return;
+			let last = "";
+			let stopped = false;
+			const tryClear = () => {
+				if (stopped || !last) return;
+				const current = String(liveDraft(sessionId, inputActions) || "").trim();
+				if (!current) {
+					stopped = true;
+					return;
+				}
+				if (current !== last) return;
+				fillComposer(inputActions, "");
+				hostSetDraft(sessionId, "");
+				clearStoredDraft(sessionId);
+				stopped = true;
+			};
+			apiJson("/dsh-purge/last-user?sessionId=" + encodeURIComponent(sessionId)).then((data) => {
+				last = String(data?.text || "").trim();
+				if (!last || isPluginDraft(last)) return;
+				tryClear();
+				for (const ms of [0, 50, 180, 400]) window.setTimeout(tryClear, ms);
+			}).catch(() => {});
 		}
 
 		async function dropInheritedQueue(sessions, sessionId) {
@@ -1290,6 +1335,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 								});
 								if (data && data.ok && data.sessionId) {
 									const text = isPluginDraft(data.text) ? "" : (data.text || "");
+									armComposerFill(data.sessionId, text);
 									scheduleComposerFill(data.sessionId, text);
 									await openRewoundSession(rewindSessions, data.sessionId);
 									scheduleComposerFill(data.sessionId, text);
@@ -1316,10 +1362,12 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
 			useEffect(() => {
 				if (!sessionId) return;
-				const local = peekDraft(sessionId);
-				if (!local || isPluginDraft(local) || isRestored(sessionId)) return;
-				scheduleComposerFill(sessionId, local, inputActions);
-				markRestored(sessionId);
+				const armed = takeArmedFill(sessionId);
+				if (armed) {
+					scheduleComposerFill(sessionId, armed, inputActions);
+					return;
+				}
+				scheduleEchoClear(sessionId, inputActions);
 			}, [sessionId, inputActions]);
 
 			useEffect(() => {
@@ -1345,7 +1393,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					if (!data || !data.ok || !data.sessionId) throw new Error((data && data.error) || "rewind");
 					if (data.at) rewindSeenAt = data.at;
 					const text = isPluginDraft(data.text) ? "" : (data.text || "");
-					writeDraft(data.sessionId, text);
+					armComposerFill(data.sessionId, text);
 					await openRewoundSession(sessions, data.sessionId);
 					scheduleComposerFill(data.sessionId, text);
 				} catch (e) {
@@ -1434,6 +1482,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					const current = currentSessionId(sessions);
 					if (current && current !== data.parentId) return;
 					const text = isPluginDraft(data.text) ? "" : (data.text || "");
+					armComposerFill(data.sessionId, text);
 					scheduleComposerFill(data.sessionId, text);
 					await openRewoundSession(sessions, data.sessionId);
 					scheduleComposerFill(data.sessionId, text);

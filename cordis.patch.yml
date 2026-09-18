@@ -11,6 +11,8 @@
         autoApplyOnStart: true
         autoUpdateOnStart: true
         autoRevertOnMissing: false
+        injectOnce: true
+        stripMnemon: true
         verbose: false
         postPrompt: ""
         postPromptOrder: 5100
