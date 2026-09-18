@@ -2,12 +2,12 @@
   <img src="docs/banner.svg" alt="dsh-purge" width="720">
 </p>
 
-<h1 align="center">dsh-purge</h1>
+<h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
 <p align="center"><strong>Version 1.1.8</strong></p>
 
 <p align="center">
-    <em>DeepSeek Harness jailbreak (破甲): every model can jailbreak; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
+    <em>Local official DeepSeek Harness cybersecurity red-team plugin: evaluate and harden host safety policy in a controlled local install; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
 </p>
 
 <p align="center">
@@ -25,9 +25,7 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-<p align="center">
-  Channel <a href="https://t.me/LLM_PoJia">t.me/LLM_PoJia</a>
-</p>
+> 🌐 **Plugin hub:** [DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge) — official and community DeepSeek plugin market | discover and one-click install
 
 > Aligned with **dsh 0.1.5-rc.2** (Node.js **≥18**; Windows no-flash import hooks need **Node ≥22** `registerHooks`, older Node still gets file-level `windowsHide` patches). On other versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.
 >
@@ -49,38 +47,55 @@ If dsh-purge helps you, a tip is welcome.
 
 ---
 
-## 🛡️ Why a local harness purge
+## 🛡️ Why cybersecurity red-teaming matters
 
-Models now sit inside a local Agent / Harness. Prompts, approval gates, sandbox policy, and session migration all rewrite behavior at runtime. Asking “will the model answer” is not enough if the host layer kills a lawful eval request first.
+As generative AI and large language models move into production, robustness, adversarial defense, and alignment safety are core cybersecurity research problems. A local Agent / Harness also rewrites prompts, approval gates, sandbox policy, and session migration at runtime. Asking “will the model answer” is not enough if the host layer kills a lawful eval request first.
 
-1. **Map the host guardrail, not just the model.** Reversible patches on the installed `@deepseek-ai/*` packages show which refusals come from the model and which come from default copy, approval ladders, or session-format checks.
-2. **Keep official capabilities; drop refusal locks.** No second invented identity. Persona is whatever you put in `prompt-inject.md`.
-3. **Survive upgrades.** Patches re-apply after npm overwrites `node_modules`. Unmatched originals skip so a 0.1.5 tree is not smashed blindly.
+1. **Map the defense boundary, then harden the guardrail.** Professional cybersecurity red-teaming on a controlled local official DeepSeek Harness install is how teams find guardrail failures, prompt-injection, and unexpected-behavior gaps — then feed those findings back into fine-tuning, input guardrails, and the system safety layer.
+2. **Build an offense–defense eval loop.** Defense without a controlled red-team suite is guesswork. Reversible patches on the installed official `@deepseek-ai/*` packages show which refusals come from the model and which come from default copy, approval ladders, or session-format checks — a reproducible ruler for labs and auditors.
+3. **Advance native model-security research.** The project aims to give academia and security engineering a transparent, local, reproducible baseline. Keep official capabilities; only adjust over-refusal policy for controlled security eval. No second invented identity, and official optimizations stay.
 
-This is a local Harness plugin. It is not a public scanner and not an attack kit for third-party sites.
+This is a **local official DeepSeek Harness cybersecurity red-team plugin**. It only touches **your** installed official `@deepseek-ai` packages and local config. It is **not** a public scanner, **not** an attack kit for third-party sites, and the repo does **not** ship malware, unauthorized-exploit scripts, or payloads aimed at the public internet.
 
 ---
 
-> ### ⚠️ Strict Legal & Compliance Disclaimer
->
-> **Zero-tolerance notice:** This project opposes and forbids any illegal activity. The authors do not support, encourage, or assist unauthorized network attacks, exploit use, data theft, unlawful access to computer systems, or generation of illegal content.
->
-> 1. **Authorized, controlled scope only.** `dsh-purge` is a local DeepSeek Harness red-team research plugin and robustness-eval aid. **Do not run this project or its derived patches against targets, public online systems, or production services without the owner’s lawful written authorization.** All testing must stay on **your authorized local Harness install, offline local synthetic fixtures, authorized cyber-range / lab environments**.
-> 2. **No illegal or prohibited use.** You must not use this project, directly or indirectly, to:
->    - violate the Criminal Law of the PRC, the Cybersecurity Law, the Data Security Law, the Personal Information Protection Law, or any other applicable law;
->    - conduct unauthorized intrusion, ransomware, destruction, credential stuffing, or malware distribution;
->    - induce, generate, or spread content that is illegal (national security threats, terrorism, graphic violence, pornography/gambling, fraud, privacy or IP infringement, and any other legally prohibited category);
->    - violate a model provider’s Terms of Service or Usage Policy.
-> 3. **You bear all liability.** The project is provided under the MIT license **AS-IS**, with no warranty of completeness, safety, or fitness. **You alone are responsible for every download, deploy, run, modification, and redistribution, and for every input and output that follows** — civil, administrative, and criminal. Authors and contributors accept no direct, indirect, or joint liability for misuse.
-> 4. **Breach terminates the license.** Anyone who uses this project for illegal attacks, malicious activity, or other violations loses the open-source license **automatically and irrevocably** from the moment of the violation. They must stop, permanently destroy all copies and derivatives, and face applicable legal consequences.
-> 5. **No affiliation.** This is an independent open-source security-eval project. It is not affiliated with, partnered with, authorized by, or endorsed by DeepSeek or its affiliates.
-> 6. **Use is consent.** Cloning, downloading, installing, redistributing, or running this code means you have read and accepted all of the above. If you do not agree, stop immediately and delete every copy.
+<a id="strict-legal--compliance-disclaimer"></a>
+
+<div>
+
+### ⚠️ <font color="red">严正法律免责与合规使用声明（Strict Legal & Compliance Disclaimer）</font>
+
+<font color="red">
+
+**【零容忍严正申明】**：本项目坚决反对并严禁任何形式的违法犯罪行为！本项目开发者绝不支持、不鼓励、不协助任何未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统或生成违法违禁内容的活动。**任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。**
+
+1. **本仓库不含违法内容**：`dsh-purge` 发布的代码、文档、补丁与默认提示词**不是**木马、后门、未授权渗透工具、勒索软件、撞库脚本，也**不是**针对公网或第三方系统的攻击载荷。项目本身不提供违法内容，也不教唆、组织、协助实施违法犯罪。
+2. **只作用于本机官方 Harness**：清洗、补丁、提示词注入全部发生在使用者**本机已安装的官方 DeepSeek Harness**（`@deepseek-ai` 包、本机 profile / `$DSH_HOME`）上。对象是使用者自己的官方本地软件，**不是**他人的网站、服务器、账号或信息系统。
+3. **清洗不对外网目标联网**：应用补丁、写入注入、回滚、卸载均在本机文件与本机进程内完成，**不对任何公网主机、未授权系统进行扫描、探测、入侵或攻击发包**。不得把本项目当作跳板去打外网。插件若开启「检测更新」，仅可能访问本插件自己的 GitHub 仓库以核对版本，**与对第三方系统的网络攻击无关**，也不能被解释为授权对外渗透。
+4. **合法受控范围限定**：本项目定位为使用者在**自己有权管理的本机官方 Harness**上，进行红队科研与鲁棒性评测的辅助工具。**严禁在未经所有者合法书面授权的目标、公网在线系统或生产业务上运行本项目**。一切测试必须限制在**本机已授权安装的官方 Harness、离线本地合成靶标（Local Synthetic Fixtures）、授权网络安全演练靶场及合规实验室受控环境**中进行。
+5. **严禁违法与违禁用途**：使用者严禁利用本项目直接或间接从事任何违反下列法律法规的行为（必须逐条遵守，不得以任何理由规避）：
+   - <font color="red"><strong>《中华人民共和国刑法》</strong></font>
+   - <font color="red"><strong>《中华人民共和国网络安全法》</strong></font>
+   - <font color="red"><strong>《中华人民共和国数据安全法》</strong></font>
+   - <font color="red"><strong>《中华人民共和国个人信息保护法》</strong></font>
+   - 以及其他现行有效的法律、行政法规与监管规定；
+   - 同时严禁：
+   - 未经授权渗透、攻击公私机构计算机信息系统，实施勒索、破坏、撞库或传播恶意载荷；
+   - 诱导、生成或传播危害国家安全、恐怖主义、暴力血腥、涉黄涉赌、诈骗、侵犯公民隐私或知识产权等任何法律明令禁止的违法违禁内容；
+   - 违反相关大模型提供商的《服务条款（Terms of Service）》与《滥用政策（Usage Policy）》。
+6. **使用者独立承担全部责任**：本项目依据 MIT 开源协议“按现状（AS-IS）”提供，开发者不对软件的完整性、安全性与适用性作任何明示或暗示的保证。**使用者应对自身的所有下载、部署、运行、修改、传播行为以及由此产生的全部输入与输出后果承担独立、完全的民事、行政及刑事法律责任**。项目作者与贡献团队绝不承担任何因使用者滥用导致的直接、间接或连带责任。
+7. **违约即终止授权**：任何将本项目用于非法攻击、恶意活动或违规行为的个人或实体，其开源软件使用许可将自违法违规行为发生之日起**自动且不可撤销地立即终止**。该主体须立即停止使用并永久销毁本项目的所有代码、脚本与衍生数据，并依法承担相应法律制裁。
+8. **第三方独立性声明**：本项目属于完全独立的开源安全评测研究项目，与 DeepSeek 官方或其关联主体无任何隶属、商业合作、授权或官方背书关系。文中「官方」仅指清洗对象为使用者本机安装的官方 DeepSeek Harness 软件包，**不代表** DeepSeek 官方开发、认可或担保本插件。
+
+</font>
+
+</div>
 
 ---
 
 ## ⚡ Install
 
-Web and Desktop are **installed and purged separately**. They do not touch each other.
+Web and Desktop are **installed and security-eval patched separately**. They do not touch each other.
 
 | Host | Profile | Default install |
 |---|---|---|
@@ -469,7 +484,6 @@ dsh-purge/
 ├── lib/
 │   ├── child-process-hide.mjs
 │   ├── core.js
-│   ├── default-prompt-data.js
 │   ├── hide-console.js
 │   ├── identity.js
 │   ├── index.js
@@ -571,7 +585,7 @@ prompt-inject.md has content? ──yes──> write it verbatim as the dsh-purg
 
 **DSH Desktop (anywhere-labs/dsh-desktop, issue #9):** `host-commands/<profile>/bin` is sealed — no sibling extras (including `dsh.cmd.dshpurge.bak`). This plugin scrubs only (no inject, no bak writes).
 
-**Prompt purge:** refusal / anti-roleplay wording in `minimal`, official `standard` / `ptc` / `cordis`, and liangshen personas becomes executable + roleplay-allowed. No fixed role name is locked in.
+**Prompt security eval:** over-refusal and anti-eval-persona wording in `minimal`, official `standard` / `ptc` / `cordis`, and liangshen personas is rewritten so controlled security evaluations can complete. No fixed role name is locked in.
 
 ---
 
