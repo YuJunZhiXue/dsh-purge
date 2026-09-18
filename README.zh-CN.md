@@ -602,6 +602,7 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ### 1.1.7
 
+- **#25：** 第一轮注入 `prompt-inject.md` 之后不再把上一轮整段系统提示钉回去；后续只保留本轮组装结果。
 - **#26：** `dsh plugin add` / 插件内更新改用 GitHub `master.tar.gz`。`.zip` 不是 pnpm tarball，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`。本地覆盖安装仍下载 zip 给 `tar` / Expand-Archive。
 
 - 安装文档按 **Web 端 / 桌面端** 分开写默认命令：Web 用官方 `dsh --profile web`；桌面端默认在自带终端 `dsh plugin add <zip>`。

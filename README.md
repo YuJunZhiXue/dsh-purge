@@ -615,6 +615,7 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ### 1.1.7
 
+- **#25:** After the first turn, do not pin the previous full system prompt. Inject `prompt-inject.md` once; later turns leave this turn’s other sections as assembled.
 - **#26:** `dsh plugin add` / in-app update use GitHub `master.tar.gz`. A `.zip` URL is not a pnpm tarball (`ERR_PNPM_TARBALL_DECODE_GZIP`). Local overlay still downloads the zip for `tar` / Expand-Archive.
 - Install docs split **Web / Desktop** defaults: Web uses official `dsh --profile web`; Desktop uses the built-in terminal `dsh plugin add <tar.gz>`.
 - Desktop Apply / Restart / Uninstall only touch the running desktop install tree, not official Web / npm-global.
