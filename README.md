@@ -668,8 +668,6 @@ node --check lib/desktop.js
 node --check lib/host.js
 node --check lib/rewind.js
 node --check client.js
-node --test test/surface.test.js
-node --test test/update-spec.test.js
 ```
 
 ---

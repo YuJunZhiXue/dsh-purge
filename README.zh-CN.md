@@ -664,7 +664,6 @@ node --check lib/index.js
 node --check lib/core.js
 node --check lib/rewind.js
 node --check client.js
-node --test test/update-spec.test.js
 ```
 
 ---
