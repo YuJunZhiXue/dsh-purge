@@ -32,11 +32,14 @@
 
 ## ☕ 赞赏支持
 
-如果 dsh-purge 对你有帮助，欢迎打赏。
+如果这个项目对你有帮助，请给我转，我是讨口子~
 
-<p align="center">
-  <img src="docs/appreciate.png" alt="微信赞赏码" width="360">
-</p>
+| 币种 | 地址 |
+|---|---|
+| **USDT（TRC20）** | `TScRVxQsUhCRh5jApLVxwFdWcJ1S2hKWRf` |
+| **Solana** | `6x16GhRgLVpKFFXaU1seKNdx2rypspSJTL4dbpt6Xpwk` |
+| **Ethereum** | `0xB68BD60C0e8c519513B7DF9bB147696815423B3E` |
+| **Bitcoin** | `bc1qu70yxkrtwnymt8ryluz9x8y8hqzune5340npht` |
 
 <p align="center">
   <sub>小杨制作 · 面向 DeepSeek Harness</sub>
@@ -591,7 +594,6 @@ dsh-purge/
 ├── client.js
 ├── cordis.patch.yml
 ├── docs/
-│   ├── appreciate.png
 │   ├── banner.svg
 │   └── preview/
 │       ├── rules.png

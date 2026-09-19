@@ -35,11 +35,14 @@
 
 ## ☕ Sponsor
 
-If dsh-purge helps you, a tip is welcome.
+If this project helps you, send it over — I'm out here asking~
 
-<p align="center">
-  <img src="docs/appreciate.png" alt="WeChat appreciate" width="360">
-</p>
+| Asset | Address |
+|---|---|
+| **USDT (TRC20)** | `TScRVxQsUhCRh5jApLVxwFdWcJ1S2hKWRf` |
+| **Solana** | `6x16GhRgLVpKFFXaU1seKNdx2rypspSJTL4dbpt6Xpwk` |
+| **Ethereum** | `0xB68BD60C0e8c519513B7DF9bB147696815423B3E` |
+| **Bitcoin** | `bc1qu70yxkrtwnymt8ryluz9x8y8hqzune5340npht` |
 
 <p align="center">
   <sub>Built by 小杨 · for DeepSeek Harness</sub>
@@ -594,7 +597,6 @@ dsh-purge/
 ├── client.js
 ├── cordis.patch.yml
 ├── docs/
-│   ├── appreciate.png
 │   ├── banner.svg
 │   └── preview/
 │       ├── rules.png
