@@ -26,11 +26,11 @@
 
 > 对准 **dsh 0.1.5-rc.1**（Node.js **≥18**；Windows 无感路径依赖 **Node ≥22** 的 `registerHooks`，更低版本仍靠文件级 `windowsHide` 补丁）。其它版本原文对不上时会显示待应用 / 跳过，不会乱改文件。
 >
-> 兼容 0.1.2 社区预设的 `dsh-persona text` 字段，以及 `dsh-mnemon` 历史会话的 v0 `summary`。装完必须 **Apply + 重启**。
+> 兼容 0.1.2 社区预设的 `dsh-persona text` 字段，以及 `dsh-mnemon` 历史会话的 v0 `summary`。装完必须 **应用 + 重启**。
 
 ---
 
-## ☕ 赞赏支持 / Sponsor
+## ☕ 赞赏支持
 
 如果 dsh-purge 对你有帮助，欢迎打赏。
 
@@ -39,12 +39,12 @@
 </p>
 
 <p align="center">
-  <sub>Built by 小杨 · for DeepSeek Harness</sub>
+  <sub>小杨制作 · 面向 DeepSeek Harness</sub>
 </p>
 
 ---
 
-## 🛡️ 网络安全红队基准评测的必要性（Why Red-Teaming Matters）
+## 🛡️ 网络安全红队基准评测的必要性
 
 在生成式人工智能与大语言模型（LLM）向各行业深度融合的背景下，模型的鲁棒性、对抗防御能力与系统对齐安全性已成为网络空间安全的核心研究课题。本地 Agent / Harness 还会在运行时改写提示词、审批门、沙箱和会话迁移，只测「模型会不会答」不够，还要看宿主层有没有把合法安全评测请求拦截掉。
 
@@ -60,7 +60,7 @@
 
 <div>
 
-### ⚠️ <font color="red">严正法律免责与合规使用声明（Strict Legal & Compliance Disclaimer）</font>
+### ⚠️ <font color="red">严正法律免责与合规使用声明</font>
 
 <font color="red">
 
@@ -69,7 +69,7 @@
 1. **本仓库不含违法内容**：`dsh-purge` 发布的代码、文档、补丁与默认提示词**不是**木马、后门、未授权渗透工具、勒索软件、撞库脚本，也**不是**针对公网或第三方系统的攻击载荷。项目本身不提供违法内容，也不教唆、组织、协助实施违法犯罪。
 2. **只作用于本机官方 Harness**：安全评测补丁、提示词注入全部发生在使用者**本机已安装的官方 DeepSeek Harness**（`@deepseek-ai` 包、本机 profile / `$DSH_HOME`）上。对象是使用者自己的官方本地软件，**不是**他人的网站、服务器、账号或信息系统。
 3. **评测补丁不对外网目标联网**：应用补丁、写入注入、回滚、卸载均在本机文件与本机进程内完成，**不对任何公网主机、未授权系统进行扫描、探测、入侵或攻击发包**。不得把本项目当作跳板去打外网。插件若开启「检测更新」，仅可能访问本插件自己的 GitHub 仓库以核对版本，**与对第三方系统的网络攻击无关**，也不能被解释为授权对外渗透。
-4. **合法受控范围限定**：本项目定位为使用者在**自己有权管理的本机官方 Harness**上，进行红队科研与鲁棒性评测的辅助工具。**严禁在未经所有者合法书面授权的目标、公网在线系统或生产业务上运行本项目**。一切测试必须限制在**本机已授权安装的官方 Harness、离线本地合成靶标（Local Synthetic Fixtures）、授权网络安全演练靶场及合规实验室受控环境**中进行。
+4. **合法受控范围限定**：本项目定位为使用者在**自己有权管理的本机官方 Harness**上，进行红队科研与鲁棒性评测的辅助工具。**严禁在未经所有者合法书面授权的目标、公网在线系统或生产业务上运行本项目**。一切测试必须限制在**本机已授权安装的官方 Harness、离线本地合成靶标、授权网络安全演练靶场及合规实验室受控环境**中进行。
 5. **严禁违法与违禁用途**：使用者严禁利用本项目直接或间接从事任何违反下列法律法规的行为（必须逐条遵守，不得以任何理由规避）：
    - <font color="red"><strong>《中华人民共和国刑法》</strong></font>
    - <font color="red"><strong>《中华人民共和国网络安全法》</strong></font>
@@ -79,8 +79,8 @@
    - 同时严禁：
    - 未经授权渗透、攻击公私机构计算机信息系统，实施勒索、破坏、撞库或传播恶意载荷；
    - 诱导、生成或传播危害国家安全、恐怖主义、暴力血腥、涉黄涉赌、诈骗、侵犯公民隐私或知识产权等任何法律明令禁止的违法违禁内容；
-   - 违反相关大模型提供商的《服务条款（Terms of Service）》与《滥用政策（Usage Policy）》。
-6. **使用者独立承担全部责任**：本项目依据 MIT 开源协议“按现状（AS-IS）”提供，开发者不对软件的完整性、安全性与适用性作任何明示或暗示的保证。**使用者应对自身的所有下载、部署、运行、修改、传播行为以及由此产生的全部输入与输出后果承担独立、完全的民事、行政及刑事法律责任**。项目作者与贡献团队绝不承担任何因使用者滥用导致的直接、间接或连带责任。
+   - 违反相关大模型提供商的《服务条款》与《滥用政策》。
+6. **使用者独立承担全部责任**：本项目依据 MIT 开源协议“按现状”提供，开发者不对软件的完整性、安全性与适用性作任何明示或暗示的保证。**使用者应对自身的所有下载、部署、运行、修改、传播行为以及由此产生的全部输入与输出后果承担独立、完全的民事、行政及刑事法律责任**。项目作者与贡献团队绝不承担任何因使用者滥用导致的直接、间接或连带责任。
 7. **违约即终止授权**：任何将本项目用于非法攻击、恶意活动或违规行为的个人或实体，其开源软件使用许可将自违法违规行为发生之日起**自动且不可撤销地立即终止**。该主体须立即停止使用并永久销毁本项目的所有代码、脚本与衍生数据，并依法承担相应法律制裁。
 8. **第三方独立性声明**：本项目属于完全独立的开源安全评测研究项目，与 DeepSeek 官方或其关联主体无任何隶属、商业合作、授权或官方背书关系。文中「官方」仅指评测对象为使用者本机安装的官方 DeepSeek Harness 软件包，**不代表** DeepSeek 官方开发、认可或担保本插件。
 
@@ -108,9 +108,7 @@ Web 端和桌面端**分开安装、分开做安全评测补丁**，互不影响
 
 Web 的「应用 / 重启 / 卸载」只动 Web。桌面端的「应用 / 重启 / 卸载」只动桌面应用，不会去拉 `dsh web`。
 
-> 🌐 **插件生态市场**：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)（只看介绍；**不要**用 `deepseek.stream/api/plugins/download?...`，那个地址不是 pnpm 能解的 tar，会报 `ERR_PNPM_TARBALL_EXTRACT`）
->
-> `dsh plugin add <url>` 会把地址交给 pnpm 当 **远程 tarball**。请用 GitHub 的 `master.tar.gz`。`.zip` 是 ZIP 不是 gzip，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`（[#26](https://github.com/YuJunZhiXue/dsh-purge/issues/26)）。
+> 🌐 **插件生态市场**：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)（只看介绍；**不要**用 `deepseek.stream/api/plugins/download?...` 安装）
 
 ### Web 端（默认）
 
@@ -292,7 +290,7 @@ export function installDshPurgeToDesktop() {
 | version | `1.1.9` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
-| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub tarball（不要用 `.zip`） |
+| downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub 源码包地址 |
 
 ### 手动配置安装
 
@@ -574,9 +572,9 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 **身份（1.3.6）：** 插件不发明「操作员 / LCS」第二套人设。官方 Harness 身份句剥掉；`prompt-inject.md` 原文就是身份。0.1.5 把 inject 折进 `persona-prefix`，避免被梁神 phase-1 滤掉。
 
-**Windows CMD 无感：** Node 24 上 `import { spawn } from "node:child_process"` 不是 live binding。`registerHooks` 把 `node:child_process` 指到带 `windowsHide` 的 facade，并直接给 `@deepseek-ai/dsh-subprocess-local` 加 `windowsHide: true`。doctor 重启走 `node + bin.js`，不写 noop `supervisor.cmd`。
+**Windows CMD 无感：** Node 24 上 `import { spawn } from "node:child_process"` 不是实时绑定。`registerHooks` 把 `node:child_process` 指到带 `windowsHide` 的封装层，并直接给 `@deepseek-ai/dsh-subprocess-local` 加 `windowsHide: true`。doctor 重启走 `node + bin.js`，不写空操作 `supervisor.cmd`。
 
-**梁神 phase-1：** 默认预设会扒掉非 persona 的 system-prompt 段。Apply / 启动时保留 persona、persona-prefix、persona-suffix 与 inject（工具目录仍按梁神隔离）。
+**梁神 phase-1：** 默认预设会扒掉非 persona 的 system-prompt 段。应用 / 启动时保留 persona、persona-prefix、persona-suffix 与 inject（工具目录仍按梁神隔离）。
 
 **DSH Desktop（anywhere-labs/dsh-desktop，issue #9）：** `host-commands/<profile>/bin` 是密封目录，禁止 sibling 额外文件（含 `dsh.cmd.dshpurge.bak`）。本插件对密封目录只清理、不注入、不写 bak。
 
@@ -627,7 +625,7 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 ### 1.1.7
 
 - **#25：** 第一轮注入 `prompt-inject.md` 之后不再把上一轮整段系统提示钉回去；后续只保留本轮组装结果。
-- **#26：** `dsh plugin add` / 插件内更新改用 GitHub `master.tar.gz`。`.zip` 不是 pnpm tarball，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`。本地覆盖安装仍下载 zip 给 `tar` / Expand-Archive。
+- **#26：** `dsh plugin add` / 插件内更新改用 GitHub `master.tar.gz`。`.zip` 不是 pnpm 能解的压缩包，会报 `ERR_PNPM_TARBALL_DECODE_GZIP`。本地覆盖安装仍下载 zip 给 `tar` / Expand-Archive。
 - 安装文档按 **Web 端 / 桌面端** 分开写默认命令：Web 用官方 `dsh --profile web`；桌面端默认在自带终端 `dsh plugin add <zip>`。
 - 桌面端安全评测补丁、重启、卸载只针对当前桌面进程的安装树，不碰官方 Web / npm-global。
 - 桌面端安装目录按运行中的 `DSH Desktop.exe` 定位，默认位置或自定义目录都可以。
