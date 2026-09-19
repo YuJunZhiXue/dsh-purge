@@ -294,51 +294,143 @@ export function installDshPurgeToDesktop() {
 
 ### 手动配置安装
 
-`dsh` 不在 PATH、或不想用 `dsh plugin add` 时，按宿主改对应 profile。不要删原有 bundle。
+`dsh` 不在 PATH、官方 `dsh plugin add` 失败、或不想走远程安装时，按下面手工写入。只改**正在用的那个宿主**对应的 profile，不要删原有 bundle，不要同时改 Web 和桌面端。
 
-**1. 找到 Harness 主目录（下文称 `$DSH_HOME`）**
+**0. 先确认宿主，只动一个 profile**
 
-| 安装形态 | 典型路径 |
-|---|---|
-| 环境变量 | `DSH_HOME`（已设置就用它） |
-| Windows 便携包 | 与 `npm-global` 同级的 `.dsh` |
-| 用户默认 | Windows `%USERPROFILE%\.dsh`；Linux / macOS `~/.dsh` |
+| 你实际在用的 | 只改这个目录 | 不要改 |
+|---|---|---|
+| 官方 `dsh web` | `$DSH_HOME/profiles/web` | `desktop`、`default` |
+| 社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `$DSH_HOME/profiles/desktop` | `web`、`default` |
+| 官方 Harness 桌面 EXE | `$DSH_HOME/profiles/default` | `web`、`desktop` |
 
-| 宿主 | profile 目录 |
-|---|---|
-| Web 端 | `$DSH_HOME/profiles/web` |
-| 社区桌面端 | `$DSH_HOME/profiles/desktop` |
-| 官方桌面 EXE | `$DSH_HOME/profiles/default` |
+对应 `profiles/<名>/package.json` 还不存在时，先正常启动一次该宿主，让官方程序自己建好 profile，再继续。
 
-**2. 把本仓库放到 plugins 目录**
+**1. 找到真正在用的 `$DSH_HOME`**
+
+认目录：名字是 `.dsh`（官方 EXE 偶见 `dsh-home`），里面有 `profiles`，并且至少有一个 `profiles/<名>/package.json`。
+
+按这个顺序找，找到第一份能对上当前宿主的就用它：
+
+| 顺序 | 安装形态 | 典型路径 |
+|---|---|---|
+| 1 | 环境变量 | `DSH_HOME`（已设置就用它） |
+| 2 | Windows 便携 / 安装目录 | `dsh.cmd` 或 `npm-global` 旁边的 `.dsh`，例如 `<安装根>\.dsh` |
+| 3 | 用户默认 | Windows `%USERPROFILE%\.dsh`；Linux / macOS `~/.dsh` |
+| 4 | 官方桌面 EXE | `%APPDATA%\DeepSeek Harness\dsh-home`、`%LOCALAPPDATA%\DeepSeek Harness\dsh-home` |
+
+Windows PowerShell 可先列出本机有哪些候选：
+
+```powershell
+$cands = @()
+if ($env:DSH_HOME) { $cands += $env:DSH_HOME }
+$cands += "$env:USERPROFILE\.dsh"
+$dsh = Get-Command dsh -ErrorAction SilentlyContinue
+if ($dsh) {
+  $dir = Split-Path $dsh.Source
+  $cands += @(
+    (Join-Path $dir ".dsh"),
+    (Join-Path (Split-Path $dir) ".dsh"),
+    (Join-Path (Split-Path (Split-Path $dir)) ".dsh")
+  )
+}
+$cands += @(
+  "$env:APPDATA\DeepSeek Harness\dsh-home",
+  "$env:LOCALAPPDATA\DeepSeek Harness\dsh-home"
+)
+$cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
+```
+
+怎么确认找对了：
+
+- Web：`$DSH_HOME/profiles/web/package.json` 里 `"name"` 是 `dsh-profile-web`
+- 社区桌面端：`$DSH_HOME/profiles/desktop/package.json` 里 `"name"` 是 `dsh-profile-desktop`
+- 官方 EXE：`$DSH_HOME/profiles/default/package.json` 存在
+
+本机常有两份 `.dsh`（用户目录一份、安装目录一份）。便携包、安装目录里的官方 `dsh` **用安装根下那份**，不要改到空的 `%USERPROFILE%\.dsh`。改完下面步骤后，启动的必须是这份主目录对应的宿主。
+
+**2. 把插件放到 `$DSH_HOME/plugins/dsh-purge`**
+
+目标树必须长这样（目录名不能改）：
+
+```
+$DSH_HOME/
+  plugins/
+    dsh-purge/                 ← 必须叫 dsh-purge
+      package.json             ← 里面 "name" 必须是 "dsh-purge"
+      client.js
+      cordis.patch.yml
+      lib/
+  profiles/
+    web/package.json           ← 或 desktop / default
+```
+
+有 git 时：
 
 ```sh
+mkdir -p "$DSH_HOME/plugins"
 git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-或把已有仓库复制为 `$DSH_HOME/plugins/dsh-purge`（目录名必须是 `dsh-purge`）。用 `file:../../plugins/dsh-purge` 相对路径即可。
+没有 git 时，下载 [master.tar.gz](https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz)，解压后把里面的 `dsh-purge-master` **改名为** `dsh-purge`，再整夹放到 `plugins` 下。Windows PowerShell 示例（先把 `$home` 换成上一步找到的路径）：
 
-**3. 改对应 profile 的 `package.json`**
-
-- Web：`$DSH_HOME/profiles/web/package.json`
-- 社区桌面端：`$DSH_HOME/profiles/desktop/package.json`
-- 官方桌面 EXE：`$DSH_HOME/profiles/default/package.json`
-
-在 `dependencies` 里追加（不要删别的依赖）：
-
-```json
-"dsh-purge": "file:../../plugins/dsh-purge"
+```powershell
+$home = "D:\DeepSeek Harness\.dsh"
+$plugins = Join-Path $home "plugins"
+New-Item -ItemType Directory -Force -Path $plugins | Out-Null
+$tmp = Join-Path $env:TEMP "dsh-purge-master.tar.gz"
+Invoke-WebRequest -Uri "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz" -OutFile $tmp
+tar -xzf $tmp -C $plugins
+$src = Join-Path $plugins "dsh-purge-master"
+$dst = Join-Path $plugins "dsh-purge"
+if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+Rename-Item $src "dsh-purge"
 ```
 
-在 `dsh.profile.bundles` 数组**末尾追加** `"dsh-purge"`：
+已有本仓库副本时，复制整个目录到 `$DSH_HOME/plugins/dsh-purge`，不要只拷几个 js。
 
-- Web：**必须保留**原来的 `@deepseek-ai/dsh-web-app`，只追加本插件
-- 桌面端：保留原来的 `@deepseek-ai/dsh-base` 等，只追加本插件
+放好后检查：`$DSH_HOME/plugins/dsh-purge/package.json` 能打开，且 `"name": "dsh-purge"`。不要用插件市场的 `api/plugins/download` 地址当源。
 
-完整示意（其它字段按原文件保留）：
+**3. 只改对应 profile 的 `package.json`，先备份**
+
+| 宿主 | 要改的文件 |
+|---|---|
+| Web | `$DSH_HOME/profiles/web/package.json` |
+| 社区桌面端 | `$DSH_HOME/profiles/desktop/package.json` |
+| 官方桌面 EXE | `$DSH_HOME/profiles/default/package.json` |
+
+先复制一份 `package.json.bak`。然后**只追加两处**，原有依赖、原有 bundle、其它字段全部留着：
+
+1. `dependencies` 增加一行：`"dsh-purge": "file:../../plugins/dsh-purge"`
+2. `dsh.profile.bundles` **末尾**追加 `"dsh-purge"`（已经有就不要再加）
+
+`file:../../plugins/dsh-purge` 是从 `profiles/web`（或 `desktop` / `default`）走到 `$DSH_HOME/plugins/dsh-purge` 的相对路径，三层目录都一样，不要改成绝对路径。
+
+改前（官方默认常见长这样，你机器上还会有其它插件，那些一行都不要删）：
 
 ```json
 {
+  "name": "dsh-profile-web",
+  "private": true,
+  "dependencies": {},
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app"
+      ],
+      "patchReload": "live"
+    }
+  }
+}
+```
+
+改后：
+
+```json
+{
+  "name": "dsh-profile-web",
+  "private": true,
   "dependencies": {
     "dsh-purge": "file:../../plugins/dsh-purge"
   },
@@ -348,15 +440,24 @@ git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-pu
         "@deepseek-ai/dsh-base",
         "@deepseek-ai/dsh-web-app",
         "dsh-purge"
-      ]
+      ],
+      "patchReload": "live"
     }
   }
 }
 ```
 
-桌面 profile 若没有 `dsh-web-app` 这一行，不要硬加；只保证 `bundles` 里有 `"dsh-purge"`。
+注意：
 
-**4. 安装依赖**
+- Web：**必须保留** `@deepseek-ai/dsh-web-app`，只在数组末尾追加本插件
+- 桌面端：保留原来的 `@deepseek-ai/dsh-base` 等；没有 `dsh-web-app` 就不要硬加
+- JSON 要合法：新增项前面要有逗号，最后一项后面不要多余逗号
+- `patchReload`、其它插件名、版本号都不要动
+- 已经写过 `"dsh-purge"` 就不要再写第二份
+
+**4. 只在刚改的那个 profile 目录装依赖**
+
+本机要有 `pnpm`（官方 dsh 一般自带）。进入**上一步改过的那个** profile 目录再执行，不要在仓库根目录、也不要在 `$DSH_HOME` 根目录执行。
 
 ```sh
 cd "$DSH_HOME/profiles/web"       # Web
@@ -369,22 +470,41 @@ cd "$DSH_HOME/profiles/default"   # 官方 EXE
 pnpm install
 ```
 
-Windows PowerShell：
+Windows PowerShell（路径换成第 1 步找到的那份）：
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\web"
 # cd "$env:USERPROFILE\.dsh\profiles\desktop"
 # cd "$env:USERPROFILE\.dsh\profiles\default"
-# 便携包：<安装根>\.dsh\profiles\<web|desktop|default>
+# 便携包示例：
+# cd "D:\DeepSeek Harness\.dsh\profiles\web"
 pnpm install
 ```
 
-**5. 重启，再打补丁**
+成功标志：出现 `$DSH_HOME/profiles/<web|desktop|default>/node_modules/dsh-purge/package.json`。
 
-1. 完全退出刚装的那个宿主（Web 关进程；桌面端退出托盘），再启动。
-2. 设置页应出现「规则设定」。有缓存就 Ctrl+F5。
-3. 在**这个宿主**点「应用」，或聊天 `/purge apply`。
-4. 按提示再重启一次。桌面端的「重启 / 卸载」会重启桌面应用。
+常见失败：
+
+- 提示找不到 `pnpm`：先装 pnpm，或用官方 dsh 自带的 Node / pnpm
+- `Could not resolve` / 找不到本地包：检查 `plugins/dsh-purge/package.json` 是否存在，以及 `file:../../plugins/dsh-purge` 有没有写错
+- JSON 解析失败：把 `package.json` 用编辑器校验逗号后重试；不行就用备份还原再改一次
+
+**5. 完全退出该宿主，再启动，再打补丁**
+
+只写入 `package.json` **还不会**改 `@deepseek-ai` 包，必须重启后再点「应用」。
+
+1. 完全退出刚装的那个宿主：Web 关掉 `dsh web`；社区桌面端退出托盘再开 `DSH Desktop.exe`；官方 EXE 也要退出托盘
+2. 打开**这个宿主**的设置页，应出现「规则设定」。有缓存就 Ctrl+F5
+3. 只在这个宿主点「应用」，或聊天 `/purge apply`。不要用 Web 去点桌面端的应用，也不要反过来
+4. 按提示再重启一次，补丁才会进当前进程。桌面端的「重启 / 卸载」会重启桌面应用，不会去拉 `dsh web`
+
+**6. 怎么确认装上了**
+
+- 设置页有「规则设定」卡片
+- 聊天 `/purge status` 能打出 `DSH_HOME` 和补丁列表，路径应等于第 1 步用的那份
+- `profiles/<名>/node_modules/dsh-purge` 指向 `plugins/dsh-purge`
+
+还没有卡片时，多半是改错了另一份 `.dsh`，或改了 `web` 却在桌面端里等设置页。回到第 1 步核对路径，不要在两份主目录各改一半。
 
 ### 卸载
 

@@ -297,51 +297,143 @@ export function installDshPurgeToDesktop() {
 
 ### Manual install
 
-Use this when `dsh` is not on `PATH` or you do not want `dsh plugin add`. Edit the profile for that host. Do **not** delete existing bundles.
+Use this when `dsh` is not on `PATH`, official `dsh plugin add` fails, or you do not want a remote install. Edit **only the profile for the host you are using**. Do **not** delete existing bundles. Do not edit Web and Desktop in the same pass.
 
-**1. Find the Harness home (`$DSH_HOME`)**
+**0. Pick one host, one profile**
 
-| Layout | Typical path |
-|---|---|
-| Env | `DSH_HOME` if set (community Desktop host-commands also set this) |
-| Windows portable | `.dsh` next to `npm-global` |
-| User default | Windows `%USERPROFILE%\.dsh`; Linux / macOS `~/.dsh` |
+| What you actually run | Edit only this directory | Leave alone |
+|---|---|---|
+| Official `dsh web` | `$DSH_HOME/profiles/web` | `desktop`, `default` |
+| Community [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `$DSH_HOME/profiles/desktop` | `web`, `default` |
+| Official Harness desktop EXE | `$DSH_HOME/profiles/default` | `web`, `desktop` |
 
-| Host | Profile directory |
-|---|---|
-| Official Web | `$DSH_HOME/profiles/web` |
-| Official desktop EXE | `$DSH_HOME/profiles/default` |
-| Community DSH Desktop | `$DSH_HOME/profiles/desktop` |
+If `profiles/<name>/package.json` is missing, start that host once so the official program creates the profile, then continue.
 
-**2. Put this repo under plugins**
+**1. Find the `$DSH_HOME` this host actually uses**
+
+A real home is named `.dsh` (official EXE sometimes uses `dsh-home`), contains `profiles`, and has at least one `profiles/<name>/package.json`.
+
+Search in this order and use the first tree that matches the host you run:
+
+| Order | Layout | Typical path |
+|---|---|---|
+| 1 | Environment | `DSH_HOME` if set |
+| 2 | Windows portable / install folder | `.dsh` next to `dsh.cmd` or `npm-global`, for example `<install root>\.dsh` |
+| 3 | User default | Windows `%USERPROFILE%\.dsh`; Linux / macOS `~/.dsh` |
+| 4 | Official desktop EXE | `%APPDATA%\DeepSeek Harness\dsh-home`, `%LOCALAPPDATA%\DeepSeek Harness\dsh-home` |
+
+PowerShell can list candidates:
+
+```powershell
+$cands = @()
+if ($env:DSH_HOME) { $cands += $env:DSH_HOME }
+$cands += "$env:USERPROFILE\.dsh"
+$dsh = Get-Command dsh -ErrorAction SilentlyContinue
+if ($dsh) {
+  $dir = Split-Path $dsh.Source
+  $cands += @(
+    (Join-Path $dir ".dsh"),
+    (Join-Path (Split-Path $dir) ".dsh"),
+    (Join-Path (Split-Path (Split-Path $dir)) ".dsh")
+  )
+}
+$cands += @(
+  "$env:APPDATA\DeepSeek Harness\dsh-home",
+  "$env:LOCALAPPDATA\DeepSeek Harness\dsh-home"
+)
+$cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
+```
+
+How to confirm you found the right one:
+
+- Web: `$DSH_HOME/profiles/web/package.json` has `"name": "dsh-profile-web"`
+- Community Desktop: `$DSH_HOME/profiles/desktop/package.json` has `"name": "dsh-profile-desktop"`
+- Official EXE: `$DSH_HOME/profiles/default/package.json` exists
+
+Machines often have two homes (user folder and install folder). A portable / install-dir official `dsh` uses the `.dsh` next to the install root — not an empty `%USERPROFILE%\.dsh`. After the steps below, start the host that belongs to that home.
+
+**2. Put the plugin at `$DSH_HOME/plugins/dsh-purge`**
+
+The tree must look like this (do not rename the folder):
+
+```
+$DSH_HOME/
+  plugins/
+    dsh-purge/                 ← must be named dsh-purge
+      package.json             ← "name" must be "dsh-purge"
+      client.js
+      cordis.patch.yml
+      lib/
+  profiles/
+    web/package.json           ← or desktop / default
+```
+
+With git:
 
 ```sh
+mkdir -p "$DSH_HOME/plugins"
 git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-Or copy the tree to `$DSH_HOME/plugins/dsh-purge` (folder name must be `dsh-purge`). The `file:../../plugins/dsh-purge` relative path is enough. A junction is only needed if `plugin add` is given a local path that contains spaces.
+Without git, download [master.tar.gz](https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz), extract it, rename `dsh-purge-master` to `dsh-purge`, and place that folder under `plugins`. PowerShell example (set `$home` to the path from step 1):
 
-**3. Edit that profile’s `package.json`**
-
-- Web: `$DSH_HOME/profiles/web/package.json`
-- Official desktop EXE: `$DSH_HOME/profiles/default/package.json`
-- Community DSH Desktop: `$DSH_HOME/profiles/desktop/package.json`
-
-Add to `dependencies` (keep other deps):
-
-```json
-"dsh-purge": "file:../../plugins/dsh-purge"
+```powershell
+$home = "D:\DeepSeek Harness\.dsh"
+$plugins = Join-Path $home "plugins"
+New-Item -ItemType Directory -Force -Path $plugins | Out-Null
+$tmp = Join-Path $env:TEMP "dsh-purge-master.tar.gz"
+Invoke-WebRequest -Uri "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz" -OutFile $tmp
+tar -xzf $tmp -C $plugins
+$src = Join-Path $plugins "dsh-purge-master"
+$dst = Join-Path $plugins "dsh-purge"
+if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+Rename-Item $src "dsh-purge"
 ```
 
-**Append** `"dsh-purge"` at the end of `dsh.profile.bundles`:
+If you already have a clone, copy the whole tree to `$DSH_HOME/plugins/dsh-purge`. Do not copy a few `.js` files by themselves.
 
-- Web: **keep** `@deepseek-ai/dsh-web-app`, only append this plugin
-- Official / community Desktop: keep `@deepseek-ai/dsh-base` (and the rest), only append this plugin
+Check: `$DSH_HOME/plugins/dsh-purge/package.json` opens and `"name": "dsh-purge"`. Do not use the Hub `api/plugins/download` URL as the source.
 
-Sketch (keep every other field from the file on disk):
+**3. Edit only that profile’s `package.json` — back it up first**
+
+| Host | File to edit |
+|---|---|
+| Web | `$DSH_HOME/profiles/web/package.json` |
+| Community Desktop | `$DSH_HOME/profiles/desktop/package.json` |
+| Official desktop EXE | `$DSH_HOME/profiles/default/package.json` |
+
+Copy `package.json.bak` first. Then **add only two things**. Keep every existing dependency, bundle, and other field:
+
+1. In `dependencies`, add `"dsh-purge": "file:../../plugins/dsh-purge"`
+2. At the **end** of `dsh.profile.bundles`, append `"dsh-purge"` (skip if it is already there)
+
+`file:../../plugins/dsh-purge` is the relative path from `profiles/web` (or `desktop` / `default`) to `$DSH_HOME/plugins/dsh-purge`. The same relative path works for all three. Do not switch it to an absolute path.
+
+Before (official default often looks like this; your file may list more plugins — keep them):
 
 ```json
 {
+  "name": "dsh-profile-web",
+  "private": true,
+  "dependencies": {},
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app"
+      ],
+      "patchReload": "live"
+    }
+  }
+}
+```
+
+After:
+
+```json
+{
+  "name": "dsh-profile-web",
+  "private": true,
   "dependencies": {
     "dsh-purge": "file:../../plugins/dsh-purge"
   },
@@ -351,43 +443,71 @@ Sketch (keep every other field from the file on disk):
         "@deepseek-ai/dsh-base",
         "@deepseek-ai/dsh-web-app",
         "dsh-purge"
-      ]
+      ],
+      "patchReload": "live"
     }
   }
 }
 ```
 
-If the desktop profile has no `dsh-web-app` row, do not add it; just make sure `"dsh-purge"` is in `bundles`.
+Notes:
 
-**4. Install deps**
+- Web: **keep** `@deepseek-ai/dsh-web-app`; only append this plugin
+- Desktop: keep `@deepseek-ai/dsh-base` and the rest; if there is no `dsh-web-app` row, do not add one
+- JSON must stay valid: a comma before the new item, no trailing comma after the last item
+- Leave `patchReload`, other plugin names, and versions alone
+- Do not write `"dsh-purge"` twice
+
+**4. Run `pnpm install` only in the profile you just edited**
+
+`pnpm` must be available (official `dsh` usually ships it). `cd` into **that profile directory**, not the repo root and not `$DSH_HOME` itself.
 
 ```sh
 cd "$DSH_HOME/profiles/web"
 pnpm install
 
-cd "$DSH_HOME/profiles/default"
-pnpm install
-
 cd "$DSH_HOME/profiles/desktop"
 pnpm install
-```
 
-PowerShell: use the real Harness home:
-
-```powershell
-cd "$env:USERPROFILE\.dsh\profiles\web"          # Web
-# cd "$env:USERPROFILE\.dsh\profiles\desktop"    # community Desktop
-# cd "$env:USERPROFILE\.dsh\profiles\default"    # official EXE
-# portable: <install root>\.dsh\profiles\<web|desktop|default>
+cd "$DSH_HOME/profiles/default"
 pnpm install
 ```
 
-**5. Restart, then apply patches**
+PowerShell (use the home from step 1):
 
-1. Fully quit the current host (Web process, or official EXE / community Desktop tray) and start it again. Community Desktop opens `DSH Desktop.exe`, not `dsh web`.
-2. Settings should show **Rules**. Ctrl+F5 if cached.
-3. Click **Apply**, or `/purge apply`, or `dsh-purge --apply` from the plugin dir.
-4. Restart again when prompted so patched packages load in this process. Settings **Restart / Uninstall** relaunch the desktop app when you are on Desktop.
+```powershell
+cd "$env:USERPROFILE\.dsh\profiles\web"
+# cd "$env:USERPROFILE\.dsh\profiles\desktop"
+# cd "$env:USERPROFILE\.dsh\profiles\default"
+# portable example:
+# cd "D:\DeepSeek Harness\.dsh\profiles\web"
+pnpm install
+```
+
+Success: `$DSH_HOME/profiles/<web|desktop|default>/node_modules/dsh-purge/package.json` exists.
+
+Common failures:
+
+- `pnpm` not found: install pnpm, or use the Node / pnpm that ships with official `dsh`
+- `Could not resolve` / missing local package: check that `plugins/dsh-purge/package.json` exists and `file:../../plugins/dsh-purge` is correct
+- JSON parse error: fix commas in `package.json` and retry; restore the backup if needed
+
+**5. Fully quit that host, start it, then apply**
+
+Writing `package.json` does **not** patch `@deepseek-ai` by itself. Restart, then click **Apply**.
+
+1. Fully quit the host you just installed into: stop `dsh web`; quit the community Desktop tray and open `DSH Desktop.exe`; quit the official EXE tray as well
+2. Open **that host’s** Settings page. **Rules** should appear. Ctrl+F5 if cached
+3. Click **Apply** on this host only, or run `/purge apply` in chat. Do not Apply Web from Desktop or Desktop from Web
+4. Restart again when prompted so patched packages load in this process. Settings **Restart / Uninstall** relaunch the desktop app; they do not launch `dsh web`
+
+**6. How to confirm it is installed**
+
+- Settings shows the **Rules** card
+- `/purge status` prints `DSH_HOME` and the patch list; the path should match step 1
+- `profiles/<name>/node_modules/dsh-purge` points at `plugins/dsh-purge`
+
+If the card is missing, you likely edited the other `.dsh`, or you edited `web` and then opened Desktop. Go back to step 1. Do not split the same install across two homes.
 
 ### Uninstall
 
