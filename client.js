@@ -855,6 +855,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [overrideLoaded, setOverrideLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
 			const [updateBusy, setUpdateBusy] = useState(false);
+			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
+			const [updateJob, setUpdateJob] = useState(null);
 			const [askRestart, setAskRestart] = useState(false);
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
@@ -888,32 +890,39 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				if (d.channel) setChannel(d.channel);
 				setUpdateInfo(d);
 				syncPicks(d);
+				if (kind === "check") setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
+				else if (kind === "done" || kind === "switched" || kind === "channel") setCanApplyUpdate(false);
 				const version = d.localVersion || d.localSha || "—";
 				const remote = d.remoteVersion || d.remoteSha || "—";
 				let text = tr("update.latest", { version });
 				if (d.hasUpdate) text = tr("update.available", { remote, local: version });
 				if (d.pinned && d.hasUpdate) text = tr("update.pinned", { version, remote });
-				if (kind === "switched") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || "—" });
+				if (kind === "switched" || kind === "channel") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || "—" });
 				if (kind === "done") text = tr("update.done", { version: d.localVersion || d.remoteVersion || "—" });
 				if (d.error) text = d.error;
 				setUpdateNotice({ kind: d.ok === false || d.error ? "error" : "ok", text });
 			}, []);
 
-			const checkUpdate = useCallback(() => {
+			const checkUpdate = useCallback((id) => {
 				setUpdateBusy(true);
+				setUpdateJob({ id: id || "", kind: "check" });
 				const tr = tRef.current;
 				setUpdateNotice({ kind: "ok", text: tr("update.checking") });
 				apiJson("/dsh-purge/update")
 					.then((d) => {
 						if (!d || (!d.ok && !d.channel)) throw new Error((d && d.error) || "check failed");
-						applyUpdateInfo(d, tr);
+						applyUpdateInfo(d, tr, "check");
 					})
 					.catch((e) => setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) }))
-					.finally(() => setUpdateBusy(false));
+					.finally(() => {
+						setUpdateBusy(false);
+						setUpdateJob(null);
+					});
 			}, [applyUpdateInfo]);
 
-			const postUpdate = useCallback((body, kind) => {
+			const postUpdate = useCallback((body, kind, id) => {
 				setUpdateBusy(true);
+				setUpdateJob({ id: id || "", kind });
 				const tr = tRef.current;
 				setUpdateNotice({ kind: "ok", text: kind === "switched" || kind === "channel" ? tr("update.switching") : tr("update.applying") });
 				return apiJson("/dsh-purge/update", {
@@ -923,7 +932,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				})
 					.then((d) => {
 						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
-						applyUpdateInfo(d, tr, kind === "channel" ? "switched" : kind);
+						applyUpdateInfo(d, tr, kind);
 						if (d.applied || d.needRestart) setAskRestart(true);
 						return d;
 					})
@@ -931,19 +940,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) });
 						throw e;
 					})
-					.finally(() => setUpdateBusy(false));
+					.finally(() => {
+						setUpdateBusy(false);
+						setUpdateJob(null);
+					});
 			}, [applyUpdateInfo]);
 
 			const doUpdate = useCallback((id) => {
 				const lane = id === "beta" ? "beta" : "stable";
-				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "master", channel: lane }, "done").catch(() => {});
+				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "master", channel: lane }, "done", id).catch(() => {});
 			}, [postUpdate]);
 
 			const changeChannel = useCallback((next) => {
 				if (!next) return;
 				const tr = tRef.current;
 				if (!window.confirm(tr("update.confirmChannel", { version: tr("channel." + next) }))) return;
-				postUpdate({ op: "channel", channel: next }, "channel").catch(() => {});
+				postUpdate({ op: "channel", channel: next }, "channel", next).catch(() => {});
 			}, [postUpdate]);
 
 			const switchSelected = useCallback((id) => {
@@ -954,7 +966,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				const label = (hit && (hit.label || hit.version)) || ref;
 				if (!ref) return;
 				if (!window.confirm(tr("update.confirmSwitch", { version: label }))) return;
-				postUpdate({ op: "switch", ref }, "switched").catch(() => {});
+				postUpdate({ op: "switch", ref }, "switched", id).catch(() => {});
 			}, [pick, postUpdate, updateInfo]);
 
 			const loadAll = useCallback(() => {
@@ -1209,9 +1221,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				const onLane = channelNow === id;
 				const noBeta = id === "beta" && updateInfo && updateInfo.hasBeta === false && !list.length;
 				const pickedOther = Boolean(hit && selectedRef && !hit.current);
+				const thisJob = updateJob && updateJob.id === id ? updateJob : null;
 				let actionLabel = t("btn.checkUpdate");
 				let actionKind;
-				let actionClick = checkUpdate;
+				let actionClick = () => checkUpdate(id);
 				let actionDisabled = updateBusy || Boolean(noBeta);
 				if (noBeta) {
 					actionLabel = t("update.noBeta");
@@ -1224,15 +1237,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					actionLabel = id === "beta" ? t("channel.useBeta") : t("channel.useStable");
 					actionKind = "primary";
 					actionClick = () => changeChannel(id);
-				} else if (lane.hasUpdate) {
+				} else if (canApplyUpdate && lane.hasUpdate) {
 					actionLabel = t("btn.doUpdate");
 					actionKind = "primary";
 					actionClick = () => doUpdate(id);
 				}
-				if (updateBusy) {
-					if (pickedOther || !onLane) actionLabel = t("update.switching");
-					else if (lane.hasUpdate && onLane) actionLabel = t("btn.doUpdate.busy");
-					else actionLabel = t("btn.checkUpdate.busy");
+				if (thisJob) {
+					if (thisJob.kind === "check") actionLabel = t("btn.checkUpdate.busy");
+					else if (thisJob.kind === "done") actionLabel = t("btn.doUpdate.busy");
+					else actionLabel = t("update.switching");
 				}
 				return h("div", {
 					className: "dshp-edition" + (onLane ? " is-on" : ""),
