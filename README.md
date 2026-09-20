@@ -751,6 +751,11 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ## Changelog
 
+### 1.1.12-beta.1
+
+- Skill import stays on beta: Settings and `/skills` write zip/folder into official `$DSH_HOME/skills`
+- Stable / Beta columns match official 1.1.11, so you can switch both ways
+
 ### 1.1.11-beta.2
 
 - Stable and Beta sit in two columns, each with its own list; switching a channel checks out that branch and can switch back after restart
