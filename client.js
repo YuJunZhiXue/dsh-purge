@@ -185,8 +185,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"channel.beta": "测试版",
 			"channel.useStable": "切换到正式版",
 			"channel.useBeta": "切换到测试版",
-			"channel.now": "当前通道",
-			"channel.other": "可切换",
+			"channel.local": "本机",
 			"update.checking": "正在检测更新…",
 			"update.applying": "正在更新…",
 			"update.switching": "正在切换版本…",
@@ -391,8 +390,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"channel.beta": "Beta",
 			"channel.useStable": "Switch to stable",
 			"channel.useBeta": "Switch to beta",
-			"channel.now": "Current channel",
-			"channel.other": "Available",
+			"channel.local": "This copy",
 			"update.checking": "Checking for updates…",
 			"update.applying": "Updating…",
 			"update.switching": "Switching version…",
@@ -608,23 +606,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
 .dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
 .dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
-.dshp-ver{width:100%;min-width:0;max-width:none;height:34px;padding:0 10px;font-size:12px}
-.dshp-lanes{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:0 0 16px;background:var(--dshp-line);border:1px solid var(--dshp-line);border-radius:8px;overflow:hidden}
-.dshp-lane{display:flex;flex-direction:column;gap:0;min-width:0;padding:14px 14px 12px;background:var(--dshp-paper);transition:background .2s var(--dshp-ease)}
-.dshp-lane.is-on{background:var(--dshp-bg)}
-.dshp-lane-kicker{margin:0 0 4px;font-family:var(--dshp-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dshp-mute)}
-.dshp-lane.is-on .dshp-lane-kicker{color:var(--dshp-accent)}
-.dshp-lane.is-beta .dshp-lane-kicker{color:var(--dshp-warn)}
-.dshp-lane.is-on.is-beta .dshp-lane-kicker{color:var(--dshp-warn)}
-.dshp-lane-h{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--dshp-line)}
-.dshp-lane-h strong{font-family:var(--dshp-display);font-size:18px;font-weight:500;letter-spacing:.02em}
-.dshp-lane-ver{margin-left:auto;font-family:var(--dshp-mono);font-size:12px;color:var(--dshp-mute);white-space:nowrap}
-.dshp-lane-ops{display:flex;flex-direction:column;gap:8px}
-.dshp-lane-ops .dshp-btn{width:100%}
+.dshp-ver{width:100%;min-width:0;max-width:none;height:32px;padding:0 10px;font-size:12px}
 .dshp-rel{margin:0 0 14px}
+.dshp-now{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 4px}
+.dshp-now-label{font-family:var(--dshp-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dshp-mute)}
+.dshp-now-ver{font-family:var(--dshp-display);font-size:20px;font-weight:500;letter-spacing:.01em}
+.dshp-now-mark{display:inline-flex;align-items:center;margin-left:6px;padding:1px 7px;border-radius:99px;font-family:var(--dshp-mono);font-size:11px;font-style:normal;font-weight:500;line-height:1.5;color:var(--dshp-ok);border:1px solid color-mix(in srgb,var(--dshp-ok) 38%,var(--dshp-line));background:color-mix(in srgb,var(--dshp-ok) 14%,var(--dshp-bg))}
+.dshp-editions{display:flex;flex-direction:column;margin:10px 0 0;border-top:1px solid var(--dshp-line)}
+.dshp-edition{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--dshp-line)}
+.dshp-edition-name{display:inline-flex;align-items:center;gap:0;font-family:var(--dshp-display);font-size:15px;font-weight:500;white-space:nowrap}
+.dshp-edition.is-on .dshp-edition-name{color:var(--dshp-ink)}
+.dshp-edition:not(.is-on) .dshp-edition-name{color:var(--dshp-mute)}
+.dshp-edition .dshp-btn{min-width:118px}
 .dshp-rel .dshp-notice{display:block;margin-top:8px;min-height:16px}
-@media (max-width:640px){.dshp-lanes{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){.dshp-lane{transition:none}}
+@media (max-width:560px){.dshp-edition{grid-template-columns:1fr auto;grid-template-areas:"name btn" "sel sel"}.dshp-edition-name{grid-area:name}.dshp-edition .dshp-ver{grid-area:sel}.dshp-edition .dshp-btn{grid-area:btn}}
 .dshp-area{min-height:220px;resize:vertical}
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
@@ -874,7 +869,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				const versions = (d && d.versions) || [];
 				const next = { stable: "", beta: "" };
 				for (const id of ["stable", "beta"]) {
-					const list = versions.filter((item) => item.channel === id);
+					const list = versions.filter((item) => item.channel === id && keepListedVersion(item));
 					const cur = list.find((item) => item.current);
 					const latest = list.find((item) => item.latest);
 					next[id] = (cur || latest || {}).ref || "";
@@ -1205,9 +1200,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const hostSurface = hostSurfaceOf(s);
 			const versions = (updateInfo && updateInfo.versions) || [];
 			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
-			const renderLane = (id) => {
+			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
+			const renderEdition = (id) => {
 				const lane = (updateInfo && updateInfo.lanes && updateInfo.lanes[id]) || {};
-				const list = versions.filter((item) => item.channel === id);
+				const list = versions.filter((item) => item.channel === id && keepListedVersion(item));
 				const selectedRef = pick[id] || "";
 				const hit = list.find((item) => item.ref === selectedRef) || list.find((item) => item.current) || list.find((item) => item.latest);
 				const onLane = channelNow === id;
@@ -1238,33 +1234,29 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					else if (lane.hasUpdate && onLane) actionLabel = t("btn.doUpdate.busy");
 					else actionLabel = t("btn.checkUpdate.busy");
 				}
-				const verText = lane.version ? "v" + lane.version : (hit && hit.version ? "v" + hit.version : "—");
 				return h("div", {
-					className: "dshp-lane" + (onLane ? " is-on" : "") + (id === "beta" ? " is-beta" : ""),
+					className: "dshp-edition" + (onLane ? " is-on" : ""),
 					"aria-label": t("channel." + id),
 				},
-					h("p", { className: "dshp-lane-kicker" }, onLane ? t("channel.now") : t("channel.other")),
-					h("div", { className: "dshp-lane-h" },
-						h("strong", null, t("channel." + id)),
-						h("span", { className: "dshp-lane-ver" }, verText),
+					h("span", { className: "dshp-edition-name" },
+						t("channel." + id),
+						onLane ? h("em", { className: "dshp-now-mark" }, t("update.current")) : null,
 					),
-					h("div", { className: "dshp-lane-ops" },
-						h("select", {
-							className: "dshp-field dshp-ver",
-							value: selectedRef || (hit && hit.ref) || "",
-							disabled: updateBusy || !list.length,
-							onChange: (e) => setPick((prev) => Object.assign({}, prev, { [id]: e.target.value })),
-							"aria-label": t("update.pick"),
-						},
-							list.length
-								? list.map((item) => h("option", {
-									key: item.ref + (item.sha || ""),
-									value: item.ref,
-								}, (item.version ? "v" + item.version : item.label) + (item.current ? " · " + t("update.current") : item.latest ? " · " + t("update.tip") : "")))
-								: h("option", { value: "" }, noBeta ? t("update.noBeta") : t("update.pick")),
-						),
-						h(Btn, { kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
+					h("select", {
+						className: "dshp-field dshp-ver",
+						value: selectedRef || (hit && hit.ref) || "",
+						disabled: updateBusy || !list.length,
+						onChange: (e) => setPick((prev) => Object.assign({}, prev, { [id]: e.target.value })),
+						"aria-label": t("update.pick"),
+					},
+						list.length
+							? list.map((item) => h("option", {
+								key: item.ref + (item.sha || ""),
+								value: item.ref,
+							}, (item.version ? "v" + item.version : item.label) + (item.latest && !item.current ? " · " + t("update.tip") : "")))
+							: h("option", { value: "" }, noBeta ? t("update.noBeta") : t("update.pick")),
 					),
+					h(Btn, { tiny: true, kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
 				);
 			};
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
@@ -1273,9 +1265,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
 				),
 				h("div", { className: "dshp-rel" },
-					h("div", { className: "dshp-lanes" },
-						renderLane("stable"),
-						renderLane("beta"),
+					h("div", { className: "dshp-now" },
+						h("span", { className: "dshp-now-label" }, t("channel.local")),
+						h("b", { className: "dshp-now-ver" }, localVer ? "v" + localVer : "—"),
+						h("em", { className: "dshp-now-mark" }, t("update.current")),
+					),
+					h("div", { className: "dshp-editions" },
+						renderEdition("stable"),
+						renderEdition("beta"),
 					),
 					noticeNode(updateNotice),
 				),
@@ -1573,10 +1570,26 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			);
 		}
 
+		function skillUiAllowed(d) {
+			if (!d || d.channel === "stable") return false;
+			const ver = String(d.plugin_version || d.localVersion || "").replace(/^v/i, "");
+			if (/^1\.1\.11(?:-|$)/.test(ver)) return false;
+			const parts = ver.match(/^(\d+)\.(\d+)\.(\d+)/);
+			if (!parts) return false;
+			if (+parts[1] !== 1) return +parts[1] > 1;
+			if (+parts[2] !== 1) return +parts[2] > 1;
+			return +parts[3] >= 12;
+		}
+
+		function keepListedVersion(item) {
+			return !/^1\.1\.11-beta/i.test(String((item && item.version) || "").replace(/^v/i, ""));
+		}
+
 		function SkillsSection() {
 			const t = useT();
 			const tRef = useRef(t);
 			tRef.current = t;
+			const [onBeta, setOnBeta] = useState(false);
 			const [st, setSt] = useState(null);
 			const [editId, setEditId] = useState(null);
 			const [editDesc, setEditDesc] = useState("");
@@ -1599,14 +1612,24 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					if (d && d.ok) setSt({ ok: true, skills: d.skills || [] });
 					else fail({ message: (d && d.error) || "bad response" });
 				};
-				skillsApi("status")
-					.then(apply)
-					.catch(() => apiJson("/dsh-purge/status")
-						.then((d) => {
-							if (d && d.ok) apply({ ok: true, skills: d.skills || [] });
-							else fail({ message: (d && d.error) || "404 Not Found" });
-						})
-						.catch(fail));
+				apiJson("/dsh-purge/status")
+					.then((d) => {
+						const allowed = skillUiAllowed(d);
+						setOnBeta(allowed);
+						if (!allowed) {
+							setSt(null);
+							return;
+						}
+						if (d.skills) {
+							apply({ ok: true, skills: d.skills });
+							return;
+						}
+						skillsApi("status").then(apply).catch(fail);
+					})
+					.catch(() => {
+						setOnBeta(false);
+						setSt(null);
+					});
 			}, []);
 
 			useEffect(() => { loadStatus(); }, [loadStatus]);
@@ -1719,6 +1742,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					}))
 					.finally(() => setBusy(false));
 			};
+
+			if (!onBeta) return null;
 
 			let list;
 			if (!st) {
