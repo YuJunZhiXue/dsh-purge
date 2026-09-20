@@ -651,7 +651,7 @@ dsh-purge --edit
 purge_status   purge_apply   purge_revert
 ```
 
-Patched packages load only after a restart. Apply does not restart by itself.
+Patched packages load only after a restart. Apply does not restart by itself. Under the patch title, **Stable** and **Beta** sit in two columns, each with its own version list.
 
 The composer **Undo** button drops the last turn and puts the last user sentence back in the input. On the main agent you can rewind once or the whole last round (including subagents). After rewind, send only what is in the box now. `/rewind` does the same.
 
@@ -744,6 +744,11 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 ---
 
 ## Changelog
+
+### 1.1.11
+
+- Settings splits Stable / Beta into two columns so you can switch and roll back; 1.1.10 can reach this by Check update
+- Skill import is not in this release (it stays on the beta channel)
 
 ### 1.1.10
 
