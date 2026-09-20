@@ -45,6 +45,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const method = String((init && init.method) || "GET").toUpperCase();
 			if (path.indexOf("/dsh-purge/update") !== -1) return method === "POST" ? 180000 : 45000;
 			if (path.indexOf("/dsh-purge/uninstall") !== -1) return 90000;
+			if (path.indexOf("/dsh-purge/skill") !== -1) return method === "POST" ? 120000 : 20000;
 			return 20000;
 		}
 		function isAbortError(e) {
@@ -110,6 +111,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			});
 		}
 
+		function skillsRouteMissing(e) {
+			return /\b404\b|\b405\b|non-json/i.test(String((e && e.message) || e || ""));
+		}
+
+		function skillsApi(op, extra) {
+			const init = {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify(Object.assign({ op: op }, extra || {})),
+			};
+			return apiJson("/dsh-purge/skills", init).catch((e) => {
+				if (!skillsRouteMissing(e)) throw e;
+				return apiJson("/dsh-purge/skill", init);
+			});
+		}
+
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
 			{ key: "prompt", ids: [1, 2, 3, 4, 5, 26, 27, 28, 29, 33] },
@@ -139,7 +156,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "待应用=原文还在。跳过=没装或官方已改写，再点也不会变。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
 			"warn.noRoot.desktop": "未定位到当前桌面应用里的 @deepseek-ai。请退出托盘后重新打开 DSH Desktop.exe，再在桌面端设置页点「应用」。安装目录不限盘符。",
-			"warn.noInject": "提示词优先；为空则注入当前启用的规则集。两边都空会提示必须添加。",
+			"warn.noInject": "提示词优先；为空则注入当前启用的规则集。两边都空会提示必须添加。Skill 不顶替提示词。",
 			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
 			"saved.restoreInject": "已填入默认提示词，点保存写入",
@@ -163,16 +180,26 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.checkUpdate.busy": "检测中…",
 			"btn.doUpdate": "更新",
 			"btn.doUpdate.busy": "更新中…",
+			"channel.title": "通道",
+			"channel.stable": "正式版",
+			"channel.beta": "测试版",
 			"update.checking": "正在检测更新…",
 			"update.applying": "正在更新…",
+			"update.switching": "正在切换版本…",
 			"update.latest": "已是最新（{version}）",
 			"update.available": "有新版本 {remote}，当前 {local}",
+			"update.pinned": "已固定在 {version}，通道最新是 {remote}",
 			"update.done": "已更新到 {version}，请重启",
+			"update.switched": "已切换到 {version}，请重启",
 			"update.autoDone": "已自动更新到 {version}，请重启",
 			"update.dirty": "有新版本，本地有改动未自动覆盖",
 			"update.fail": "更新失败: {error}",
 			"update.timeout": "检测超时，请再点一次检测更新",
 			"update.needRestart": "检测接口未加载，请先重启 dsh 再点检测更新",
+			"update.noBeta": "还没有测试版",
+			"update.switch": "切换到此版本",
+			"update.current": "当前",
+			"update.confirmSwitch": "切换到 {version}？之后可再选回正式版或其它版本。本地未提交的插件改动不会保留。",
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
@@ -203,6 +230,24 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"need.id": "需要 id",
 			"ph.content": "",
 			"btn.saveRule": "保存",
+			"skills.title": "Skill",
+			"skills.hint": "官方 Skill 目录。可导入压缩包或文件夹。命中和加载由 DSH 负责。",
+			"skills.hint.desktop": "当前桌面宿主的官方 Skill 目录。可导入压缩包或文件夹。命中和加载由 DSH 负责。",
+			"skills.empty": "暂无用户 Skill",
+			"btn.importZip": "导入压缩包",
+			"btn.importFolder": "导入文件夹",
+			"skills.importing": "正在导入…",
+			"saved.import": "已导入 {count} 个 Skill",
+			"need.import": "请选择压缩包或文件夹",
+			"err.import.folder": "没读到文件夹里的文件，请直接选 Skill 目录（里面要有 SKILL.md）",
+			"skills.pick": "选择 Skill",
+			"skills.invalid": "官方会忽略：格式不对",
+			"ph.skill.desc": "description（何时用）",
+			"btn.saveSkill": "保存",
+			"need.skill.id": "id 必须是 kebab-case，例如 code-review",
+			"confirm.delete.skill": "从官方 $DSH_HOME/skills 删除 {id}？宿主会自动从目录拿掉。",
+			"err.skills": "读取失败: {error}",
+			"err.skills.needRestart": "Skill 接口未加载，请先重启当前宿主",
 			"btn.restart": "重启",
 			"btn.restart.busy": "重启中…",
 			"restarting": "重启中…",
@@ -310,7 +355,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "Pending = original text still present. Skipped = missing or already rewritten.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
 			"warn.noRoot.desktop": "Could not find @deepseek-ai inside this desktop app. Quit the tray, reopen DSH Desktop.exe, then Apply on the desktop Settings page. The install folder can be on any drive.",
-			"warn.noInject": "The prompt box wins. If it is empty, the enabled rule set is injected. If both are empty you will be asked to add a prompt.",
+			"warn.noInject": "The prompt box wins. If it is empty, the enabled rule set is injected. If both are empty you will be asked to add a prompt. Skills do not replace the prompt.",
 			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
 			"saved.restoreInject": "Default prompt loaded. Save to write.",
@@ -334,16 +379,26 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.checkUpdate.busy": "Checking…",
 			"btn.doUpdate": "Update",
 			"btn.doUpdate.busy": "Updating…",
+			"channel.title": "Channel",
+			"channel.stable": "Stable",
+			"channel.beta": "Beta",
 			"update.checking": "Checking for updates…",
 			"update.applying": "Updating…",
+			"update.switching": "Switching version…",
 			"update.latest": "Up to date ({version})",
 			"update.available": "Update {remote} available (now {local})",
+			"update.pinned": "Pinned at {version}; channel latest is {remote}",
 			"update.done": "Updated to {version}. Restart to apply.",
+			"update.switched": "Switched to {version}. Restart to apply.",
 			"update.autoDone": "Auto-updated to {version}. Restart to apply.",
 			"update.dirty": "Update available; local edits were not overwritten.",
 			"update.fail": "Update failed: {error}",
 			"update.timeout": "Check timed out. Click Check update again.",
 			"update.needRestart": "Update API is not loaded. Restart dsh, then check again.",
+			"update.noBeta": "No beta build yet",
+			"update.switch": "Switch to this version",
+			"update.current": "current",
+			"update.confirmSwitch": "Switch to {version}? You can switch back later. Uncommitted plugin edits will not be kept.",
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
@@ -374,6 +429,24 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"need.id": "id required",
 			"ph.content": "",
 			"btn.saveRule": "Save",
+			"skills.title": "Skills",
+			"skills.hint": "Official skill catalog. Import a zip or folder. DSH owns match and load.",
+			"skills.hint.desktop": "This desktop host’s official skill catalog. Import a zip or folder. DSH owns match and load.",
+			"skills.empty": "No user skills",
+			"btn.importZip": "Import zip",
+			"btn.importFolder": "Import folder",
+			"skills.importing": "Importing…",
+			"saved.import": "Imported {count} skill(s)",
+			"need.import": "Choose a zip or folder",
+			"err.import.folder": "No files were read. Select the skill folder itself (it must contain SKILL.md).",
+			"skills.pick": "Select a skill",
+			"skills.invalid": "Official catalog will ignore this: invalid format",
+			"ph.skill.desc": "description (when to use)",
+			"btn.saveSkill": "Save",
+			"need.skill.id": "id must be kebab-case, e.g. code-review",
+			"confirm.delete.skill": "Delete {id} from official $DSH_HOME/skills? The host will drop it from the catalog.",
+			"err.skills": "Read failed: {error}",
+			"err.skills.needRestart": "Skill API is not loaded. Restart this host first.",
 			"btn.restart": "Restart",
 			"btn.restart.busy": "Restarting…",
 			"restarting": "Restarting…",
@@ -521,6 +594,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
 .dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
 .dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
+.dshp-ver{min-width:168px;max-width:260px;height:28px;padding:0 8px;font-size:12px}
 .dshp-area{min-height:220px;resize:vertical}
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
@@ -609,7 +683,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		function PatchGroups({ state }) {
 			const t = useT();
-			const [open, setOpen] = useState({ prompt: true, code: true, engine: true, tools: false, compat: true });
+			const [open, setOpen] = useState({});
 			if (!state || !state.patch_status) return h("div", { className: "dshp-skel", style: { height: 120 } });
 			return PATCH_GROUPS.map((group) => {
 				const rows = group.ids.map((id) => {
@@ -763,6 +837,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
 			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
+			const [channel, setChannel] = useState("stable");
+			const [selectedRef, setSelectedRef] = useState("");
 			const actionTicket = useRef(0);
 
 			const updateErrorText = (tr, e) => {
@@ -772,41 +848,78 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				return tr("update.fail", { error: msg });
 			};
 
+			const applyUpdateInfo = useCallback((d, tr, kind) => {
+				if (d.channel) setChannel(d.channel);
+				setUpdateInfo(d);
+				setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
+				const versions = d.versions || [];
+				const current = versions.find((item) => item.current);
+				if (current && current.ref) setSelectedRef(current.ref);
+				else if (d.pin) setSelectedRef(d.pin);
+				const version = d.localVersion || d.localSha || "—";
+				const remote = d.remoteVersion || d.remoteSha || "—";
+				let text = tr("update.latest", { version });
+				if (d.hasUpdate) text = tr("update.available", { remote, local: version });
+				if (d.pinned && d.hasUpdate) text = tr("update.pinned", { version, remote });
+				if (kind === "switched") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || selectedRef || "—" });
+				if (kind === "done") text = tr("update.done", { version: d.localVersion || d.remoteVersion || "—" });
+				if (d.error) text = d.error;
+				setUpdateNotice({ kind: d.ok === false || d.error ? "error" : "ok", text });
+			}, [selectedRef]);
+
 			const checkUpdate = useCallback(() => {
 				setUpdateBusy(true);
 				const tr = tRef.current;
 				setUpdateNotice({ kind: "ok", text: tr("update.checking") });
 				apiJson("/dsh-purge/update")
 					.then((d) => {
-						if (!d || !d.ok) throw new Error((d && d.error) || "check failed");
-						setUpdateInfo(d);
-						setCanApplyUpdate(Boolean(d.hasUpdate));
-						setUpdateNotice({
-							kind: "ok",
-							text: d.hasUpdate
-								? tr("update.available", { remote: d.remoteVersion || d.remoteSha, local: d.localVersion || d.localSha })
-								: tr("update.latest", { version: d.localVersion || d.localSha || "—" }),
-						});
+						if (!d || (!d.ok && !d.channel)) throw new Error((d && d.error) || "check failed");
+						applyUpdateInfo(d, tr);
 					})
 					.catch((e) => setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) }))
 					.finally(() => setUpdateBusy(false));
-			}, []);
+			}, [applyUpdateInfo]);
 
-			const doUpdate = useCallback(() => {
+			const postUpdate = useCallback((body, kind) => {
 				setUpdateBusy(true);
 				const tr = tRef.current;
-				setUpdateNotice({ kind: "ok", text: tr("update.applying") });
-				apiJson("/dsh-purge/update", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
+				setUpdateNotice({ kind: "ok", text: kind === "switched" || kind === "channel" ? tr("update.switching") : tr("update.applying") });
+				return apiJson("/dsh-purge/update", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify(body || {}),
+				})
 					.then((d) => {
-						if (!d || !d.ok) throw new Error((d && d.error) || "update failed");
-						setUpdateInfo(d);
-						setCanApplyUpdate(false);
-						setUpdateNotice({ kind: "ok", text: tr("update.done", { version: d.localVersion || d.remoteVersion || "—" }) });
+						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
+						applyUpdateInfo(d, tr, kind === "channel" ? "done" : kind);
 						if (d.applied || d.needRestart) setAskRestart(true);
+						return d;
 					})
-					.catch((e) => setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) }))
+					.catch((e) => {
+						setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) });
+						throw e;
+					})
 					.finally(() => setUpdateBusy(false));
-			}, []);
+			}, [applyUpdateInfo]);
+
+			const doUpdate = useCallback(() => {
+				postUpdate({ op: "apply" }, "done").catch(() => {});
+			}, [postUpdate]);
+
+			const changeChannel = useCallback((next) => {
+				if (!next || next === channel) return;
+				postUpdate({ op: "channel", channel: next }, "channel").catch(() => {});
+			}, [channel, postUpdate]);
+
+			const switchSelected = useCallback(() => {
+				const tr = tRef.current;
+				const versions = (updateInfo && updateInfo.versions) || [];
+				const hit = versions.find((item) => item.ref === selectedRef);
+				const label = (hit && (hit.label || hit.version)) || selectedRef;
+				if (!selectedRef) return;
+				if (!window.confirm(tr("update.confirmSwitch", { version: label }))) return;
+				postUpdate({ op: "switch", ref: selectedRef }, "switched").catch(() => {});
+			}, [postUpdate, selectedRef, updateInfo]);
 
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
@@ -814,7 +927,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.then((d) => {
 						if (d && d.ok) {
 							setState(d);
-							if (d.update && d.update.ok && !d.update.error && !d.update.hasUpdate) setUpdateInfo(d.update);
+							if (d.channel) setChannel(d.channel);
+							if (d.update && d.update.ok && !d.update.error) setUpdateInfo(d.update);
 						} else {
 							setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 							setNotice({ kind: "error", text: tr("err.status", { error: (d && d.error) || "bad response" }) });
@@ -824,6 +938,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 						setNotice({ kind: "error", text: tr("err.status", { error: e.message }) });
 					});
+				apiJson("/dsh-purge/update")
+					.then((d) => {
+						if (!d) return;
+						if (d.channel) setChannel(d.channel);
+						setUpdateInfo(d);
+						setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
+						const current = (d.versions || []).find((item) => item.current);
+						if (current && current.ref) setSelectedRef(current.ref);
+						else if (d.pin) setSelectedRef(d.pin);
+					})
+					.catch(() => {});
 				apiJson("/dsh-purge/override")
 					.then((d) => {
 						if (d && d.ok) {
@@ -1050,11 +1175,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const updateBtnLabel = updateBusy
 				? (canApplyUpdate ? t("btn.doUpdate.busy") : t("btn.checkUpdate.busy"))
 				: (canApplyUpdate ? t("btn.doUpdate") : t("btn.checkUpdate"));
+			const versions = (updateInfo && updateInfo.versions) || [];
+			const selected = versions.find((item) => item.ref === selectedRef);
+			const canSwitchVersion = Boolean(selectedRef && selected && !selected.current);
+			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
 					h("div", { className: "dshp-row", style: { margin: 0, flex: 1, justifyContent: "flex-end" } },
 						h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
+						h("span", { className: "dshp-pill" + (channelNow === "beta" ? " is-wait" : "") }, t("channel." + (channelNow === "beta" ? "beta" : "stable"))),
 						versionText ? h("span", { className: "dshp-pill" + (canApplyUpdate ? " is-wait" : "") }, versionText) : null,
 						h(Btn, {
 							tiny: true,
@@ -1064,6 +1194,38 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						}, updateBtnLabel),
 						noticeNode(updateNotice),
 					),
+				),
+				h("div", { className: "dshp-row", style: { margin: "-4px 0 12px" } },
+					h("div", { className: "dshp-switch", role: "group", "aria-label": t("channel.title") },
+						h("button", {
+							type: "button",
+							className: channelNow === "stable" ? "is-on" : "",
+							disabled: updateBusy,
+							onClick: () => changeChannel("stable"),
+						}, t("channel.stable")),
+						h("button", {
+							type: "button",
+							className: channelNow === "beta" ? "is-on" : "",
+							disabled: updateBusy,
+							onClick: () => changeChannel("beta"),
+						}, t("channel.beta")),
+					),
+					h("select", {
+						className: "dshp-field dshp-ver",
+						value: selectedRef,
+						disabled: updateBusy || versions.length === 0,
+						onChange: (e) => setSelectedRef(e.target.value),
+						"aria-label": t("update.switch"),
+					},
+						versions.length
+							? versions.map((item) => h("option", { key: item.ref + (item.sha || ""), value: item.ref }, item.label + (item.current ? " · " + t("update.current") : "")))
+							: h("option", { value: "" }, t("btn.checkUpdate")),
+					),
+					h(Btn, {
+						tiny: true,
+						disabled: updateBusy || !canSwitchVersion,
+						onClick: switchSelected,
+					}, t("update.switch")),
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
@@ -1359,6 +1521,277 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			);
 		}
 
+		function SkillsSection() {
+			const t = useT();
+			const tRef = useRef(t);
+			tRef.current = t;
+			const [st, setSt] = useState(null);
+			const [editId, setEditId] = useState(null);
+			const [editDesc, setEditDesc] = useState("");
+			const [content, setContent] = useState("");
+			const [busy, setBusy] = useState(false);
+			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const zipRef = useRef(null);
+			const folderRef = useRef(null);
+
+			const loadStatus = useCallback(() => {
+				const tr = tRef.current;
+				const fail = (e) => {
+					setSt({ ok: false, skills: [] });
+					setNotice({
+						kind: "error",
+						text: skillsRouteMissing(e) ? tr("err.skills.needRestart") : tr("err.skills", { error: (e && e.message) || e || "bad response" }),
+					});
+				};
+				const apply = (d) => {
+					if (d && d.ok) setSt({ ok: true, skills: d.skills || [] });
+					else fail({ message: (d && d.error) || "bad response" });
+				};
+				skillsApi("status")
+					.then(apply)
+					.catch(() => apiJson("/dsh-purge/status")
+						.then((d) => {
+							if (d && d.ok) apply({ ok: true, skills: d.skills || [] });
+							else fail({ message: (d && d.error) || "404 Not Found" });
+						})
+						.catch(fail));
+			}, []);
+
+			useEffect(() => { loadStatus(); }, [loadStatus]);
+
+			const doPost = useCallback((action, payload, after) => {
+				setBusy(true);
+				setNotice({ kind: "idle", text: "" });
+				skillsApi(action, payload)
+					.then((d) => {
+						if (d && d.ok) {
+							setNotice({ kind: "ok", text: t("ok.done") });
+							loadStatus();
+							if (after) after(d);
+						} else {
+							setNotice({ kind: "error", text: t("err.action", { error: (d && d.error) || "" }) });
+						}
+					})
+					.catch((e) => setNotice({
+						kind: "error",
+						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
+					}))
+					.finally(() => setBusy(false));
+			}, [loadStatus, t]);
+
+			const openSkill = useCallback((id) => {
+				setBusy(true);
+				skillsApi("read", { id: id })
+					.then((d) => {
+						if (d.ok) {
+							setEditId(id);
+							setEditDesc(d.description || "");
+							setContent(typeof d.content === "string" ? d.content : "");
+						} else setNotice({ kind: "error", text: t("err.read", { error: d.error || "" }) });
+					})
+					.catch((e) => setNotice({ kind: "error", text: t("err.read", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			}, [t]);
+
+			const clearEditor = () => {
+				setEditId(null);
+				setEditDesc("");
+				setContent("");
+			};
+
+			const readAsBase64 = (file) => new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const text = String(reader.result || "");
+					const at = text.indexOf(",");
+					resolve(at >= 0 ? text.slice(at + 1) : text);
+				};
+				reader.onerror = () => reject(new Error(t("need.import")));
+				reader.readAsDataURL(file);
+			});
+
+			const importZip = (file) => {
+				if (!file) {
+					setNotice({ kind: "error", text: t("need.import") });
+					return;
+				}
+				setBusy(true);
+				setNotice({ kind: "ok", text: t("skills.importing") });
+				readAsBase64(file)
+					.then((data) => skillsApi("import", { data, name: file.name }))
+					.then((d) => {
+						if (!d || !d.ok) throw new Error((d && d.error) || "");
+						setNotice({ kind: "ok", text: t("saved.import", { count: (d.imported || []).length || 1 }) });
+						loadStatus();
+					})
+					.catch((e) => setNotice({
+						kind: "error",
+						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
+					}))
+					.finally(() => setBusy(false));
+			};
+
+			const keepFolderFile = (file) => {
+				const rel = String(file.webkitRelativePath || file.name || "").replace(/\\/g, "/");
+				if (!rel || rel.includes("..")) return false;
+				if (/(^|\/)(node_modules|\.git|__MACOSX|\.system)(\/|$)/i.test(rel)) return false;
+				if (/(^|\/)\._/.test(rel) || /\/\.DS_Store$/i.test(rel)) return false;
+				return true;
+			};
+
+			const importFolder = (list) => {
+				const files = Array.from(list || []).filter(keepFolderFile);
+				if (!files.length) {
+					setNotice({ kind: "error", text: t("err.import.folder") });
+					return;
+				}
+				setBusy(true);
+				setNotice({ kind: "ok", text: t("skills.importing") });
+				Promise.all(files.map((file) => readAsBase64(file).then((content) => ({
+					path: file.webkitRelativePath || file.name,
+					content,
+					encoding: "base64",
+				}))))
+					.then((payload) => skillsApi("import", {
+						files: payload,
+						name: String(payload[0] && payload[0].path || "").split("/")[0],
+					}))
+					.then((d) => {
+						if (!d || !d.ok) throw new Error((d && d.error) || "");
+						setNotice({ kind: "ok", text: t("saved.import", { count: (d.imported || []).length || 1 }) });
+						loadStatus();
+					})
+					.catch((e) => setNotice({
+						kind: "error",
+						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
+					}))
+					.finally(() => setBusy(false));
+			};
+
+			let list;
+			if (!st) {
+				list = h("div", { className: "dshp-skel", style: { height: 80, margin: 12 } });
+			} else if (!st.skills || st.skills.length === 0) {
+				list = h("p", { className: "dshp-empty" }, t("skills.empty"));
+			} else {
+				list = st.skills.map((item) => {
+					const isEdit = item.id === editId;
+					return h("div", {
+						key: item.id,
+						className: "dshp-ruleitem" + (isEdit ? " is-edit" : ""),
+						role: "button",
+						tabIndex: 0,
+						onClick: () => openSkill(item.id),
+						onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSkill(item.id); } },
+					},
+						h("div", { className: "dshp-rule-main" },
+							h("span", { className: "dshp-rule-name" }, item.id),
+							h("span", { className: "dshp-rule-meta" },
+								(item.valid ? item.description : t("skills.invalid")) + " · " + formatSize(item.size),
+							),
+						),
+						h("div", { className: "dshp-rule-ops" },
+							h(Btn, {
+								tiny: true,
+								kind: "danger",
+								disabled: busy,
+								onClick: (e) => {
+									e.stopPropagation();
+									if (!window.confirm(t("confirm.delete.skill", { id: item.id }))) return;
+									if (editId === item.id) clearEditor();
+									doPost("delete", { id: item.id });
+								},
+							}, t("delete")),
+						),
+					);
+				});
+			}
+
+			return h("section", { className: "dshp-panel", "aria-label": t("skills.title") },
+				h("div", { className: "dshp-head" },
+					h("h3", { className: "dshp-title" }, t("skills.title")),
+					h("div", { className: "dshp-row", style: { margin: 0 } }, noticeNode(notice)),
+				),
+				h("p", { className: "dshp-hint", style: { margin: "0 0 10px", color: "var(--dshp-mute)", fontSize: 12 } }, hostText(t, "skills.hint", hostSurfaceOf())),
+				h("div", { className: "dshp-split" },
+					h("div", { className: "dshp-rulelist" },
+						h("div", { className: "dshp-rulebody" }, list),
+						h("div", { className: "dshp-create" },
+							h("div", { className: "dshp-create-row" },
+								h("input", {
+									ref: zipRef,
+									type: "file",
+									accept: ".zip,.tgz,.tar.gz,.tar,.skill",
+									style: { display: "none" },
+									onChange: (e) => {
+										const file = e.target.files && e.target.files[0];
+										e.target.value = "";
+										importZip(file);
+									},
+								}),
+								h("input", {
+									ref: (el) => {
+										folderRef.current = el;
+										if (!el) return;
+										el.setAttribute("webkitdirectory", "");
+										el.setAttribute("directory", "");
+										el.multiple = true;
+									},
+									type: "file",
+									multiple: true,
+									style: { display: "none" },
+									onChange: (e) => {
+										const files = Array.from((e.target && e.target.files) || []);
+										e.target.value = "";
+										importFolder(files);
+									},
+								}),
+								h(Btn, {
+									kind: "primary",
+									tiny: true,
+									disabled: busy,
+									onClick: () => zipRef.current && zipRef.current.click(),
+								}, t("btn.importZip")),
+								h(Btn, {
+									tiny: true,
+									disabled: busy,
+									onClick: () => folderRef.current && folderRef.current.click(),
+								}, t("btn.importFolder")),
+							),
+						),
+					),
+					h("div", { className: "dshp-editor" },
+						editId ? [
+							h("div", { key: "meta", className: "dshp-row" },
+								h("input", {
+									className: "dshp-field",
+									placeholder: t("ph.skill.desc"),
+									value: editDesc,
+									onChange: (e) => setEditDesc(e.target.value),
+								}),
+							),
+							h("textarea", {
+								key: "body",
+								className: "dshp-area",
+								value: content,
+								onChange: (e) => setContent(e.target.value),
+								spellCheck: false,
+								placeholder: "",
+							}),
+							h("div", { key: "save", className: "dshp-row" },
+								h(Btn, {
+									kind: "primary",
+									disabled: busy,
+									onClick: () => doPost("save", { id: editId, content, description: editDesc }),
+								}, t("btn.saveSkill")),
+								noticeNode(notice),
+							),
+						] : h("div", { className: "dshp-editor-empty" }, t("skills.pick")),
+					),
+				),
+			);
+		}
+
 		function reopenAfterRestart() {
 			const url = new URL(window.location.href);
 			url.searchParams.delete("token");
@@ -1500,6 +1933,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				),
 				h(PurgifySection, null),
 				h(RulesSection, null),
+				h(SkillsSection, null),
 			);
 		}
 

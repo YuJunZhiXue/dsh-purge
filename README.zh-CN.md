@@ -583,6 +583,7 @@ dsh-purge --uninstall
 | 补丁 | 分组查看状态，应用、还原或卸载 |
 | 提示词 | 编辑 `prompt-inject.md`，作为会话覆盖段 |
 | 规则集 | 多套 `AGENTS.md` / `CLAUDE.md`；启用写入 `$DSH_HOME`，删除从列表去掉 |
+| Skill | 导入压缩包或文件夹到当前宿主官方目录 `$DSH_HOME/skills/<id>/SKILL.md`（Web / 桌面各用自己的主目录，不写死盘符）；命中、加载、`/名称` 由 DSH 负责。也可自己删该文件夹 |
 
 ---
 
@@ -607,6 +608,7 @@ dsh-purge/
 │   ├── restart-web.js
 │   ├── rewind.js
 │   ├── rules.js
+│   ├── skills.js
 │   ├── uninstall-restart.js
 │   ├── uninstall.js
 │   └── update.js
@@ -617,7 +619,7 @@ dsh-purge/
 └── README.zh-CN.md
 ```
 
-运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。
+运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`、`$DSH_HOME/skills/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。Skill 不进 `dsh-purge` 注入段，也不顶替提示词。
 
 ---
 
@@ -645,13 +647,14 @@ dsh-purge --edit
 # 聊天
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
+/skills list | import <压缩包或文件夹> | create <id> [说明] | delete <id> | help
 /rewind
 
 # 模型工具
 purge_status   purge_apply   purge_revert
 ```
 
-设置页「应用」完成后需要重启才会加载已改的包文件。点「重启」才会重启，不会自动重启。
+设置页「应用」完成后需要重启才会加载已改的包文件。点「重启」才会重启，不会自动重启。补丁标题下可切换「正式版 / 测试版」，或从版本列表回退；回退后会固定在该版本，要回到通道最新再点「更新」。
 
 输入框旁的「回退」会丢掉最近一轮对话，并把上一句填回输入框；聊天里 `/rewind` 同样可用。
 
@@ -663,6 +666,7 @@ purge_status   purge_apply   purge_revert
 node --check lib/index.js
 node --check lib/core.js
 node --check lib/rewind.js
+node --check lib/skills.js
 node --check client.js
 ```
 
@@ -690,6 +694,8 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
            │否
            └─> 不写入覆盖段
 ```
+
+**Skill（官方目录，不注入）：** 设置页导入压缩包/文件夹，或 `/skills import`，只把内容写到官方 `$DSH_HOME/skills/<id>/SKILL.md`（可带同目录脚本等资源）。官方 `dsh-skill-filesystem` 监视该目录；模型用 `skill` 工具或 `/id` 加载。卸载插件不删用户 Skill。
 
 **身份（1.3.6）：** 插件不发明「操作员 / LCS」第二套人设。官方 Harness 身份句剥掉；`prompt-inject.md` 原文就是身份。0.1.5 把 inject 折进 `persona-prefix`，避免被梁神 phase-1 滤掉。
 
@@ -732,10 +738,17 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ## 更新记录
 
+### 1.1.11-beta.1
+
+- 设置页可导入压缩包或文件夹到官方 `$DSH_HOME/skills`；正式版 / 测试版可切换并回退
+- 导入不再跟符号链接，压缩包先检查路径；保存时保留官方 frontmatter 字段
+
 ### 1.1.10
 
 - 提示词和规则集都空时不能保存或应用，弹窗要求先添加提示词
 - 第一轮完整注入；不再钉上一轮整篇系统提示，避免来回追加
+- 设置页 / `/skills` 可把压缩包或文件夹导入官方 `$DSH_HOME/skills`；命中与加载仍由 DSH 负责
+- 设置页可切换正式版 / 测试版，并从历史版本回退；回退后会固定，不再自动跟上
 
 ### 1.1.9
 

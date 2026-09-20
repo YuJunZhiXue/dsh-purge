@@ -586,6 +586,7 @@ The **Rules** card appears on the dsh web settings page. Switch **Light / Ink**.
 | Patches | grouped status, Apply, Restore, or Uninstall |
 | Prompt | edit `prompt-inject.md` as the session override |
 | Rule sets | multiple `AGENTS.md` / `CLAUDE.md`; Enable writes under `$DSH_HOME`, Delete removes the row |
+| Skills | import a zip or folder into this host’s official `$DSH_HOME/skills/<id>/SKILL.md` (web and desktop each use their own home; no drive letter is hardcoded); DSH owns match, load, and `/name`. You can also delete that folder yourself |
 
 ---
 
@@ -610,6 +611,7 @@ dsh-purge/
 │   ├── restart-web.js
 │   ├── rewind.js
 │   ├── rules.js
+│   ├── skills.js
 │   ├── uninstall-restart.js
 │   ├── uninstall.js
 │   └── update.js
@@ -620,7 +622,7 @@ dsh-purge/
 └── README.zh-CN.md
 ```
 
-Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`.
+Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`, `$DSH_HOME/skills/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Skills are not part of the `dsh-purge` inject section and do not replace the prompt.
 
 ---
 
@@ -646,12 +648,13 @@ dsh-purge --edit
 
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
+/skills list | import <zip-or-folder> | create <id> [description] | delete <id> | help
 /rewind
 
 purge_status   purge_apply   purge_revert
 ```
 
-Patched packages load only after a restart. Apply does not restart by itself.
+Patched packages load only after a restart. Apply does not restart by itself. Under the patch title you can switch **Stable / Beta** or roll back from the version list. A rollback is pinned; click **Update** to return to the channel tip.
 
 The composer **Undo** button drops the last turn and puts the last user sentence back in the input. On the main agent you can rewind once or the whole last round (including subagents). After rewind, send only what is in the box now. `/rewind` does the same.
 
@@ -667,6 +670,7 @@ node --check lib/web.js
 node --check lib/desktop.js
 node --check lib/host.js
 node --check lib/rewind.js
+node --check lib/skills.js
 node --check client.js
 ```
 
@@ -694,6 +698,8 @@ prompt-inject.md has content? ──yes──> write it verbatim as the dsh-purg
            │no
            └─> no override section
 ```
+
+**Skills (official catalog, not injected):** Settings import (zip or folder) or `/skills import` writes only to official `$DSH_HOME/skills/<id>/SKILL.md` (companion files in that folder are kept). Official `dsh-skill-filesystem` watches that directory; the model loads via the `skill` tool or `/id`. Uninstalling the plugin does not delete user skills.
 
 **Identity (1.3.6):** the plugin does not invent an “operator / LCS” second persona. Official Harness identity lines are stripped; `prompt-inject.md` is the identity. On 0.1.5 the inject is folded into `persona-prefix` so liangshen phase-1 cannot drop it.
 
@@ -745,10 +751,17 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ## Changelog
 
+### 1.1.11-beta.1
+
+- Settings can import a zip or folder into official `$DSH_HOME/skills`; Stable / Beta can be switched and rolled back
+- Import ignores symlinks and checks archive paths; save keeps official frontmatter fields
+
 ### 1.1.10
 
 - Saving or applying with both the prompt and the rule set empty is blocked and shows a dialog
 - First-turn inject is complete; later turns no longer pin the previous full system prompt
+- Settings / `/skills` can import a zip or folder into official `$DSH_HOME/skills`; DSH still owns match and load
+- Settings can switch Stable / Beta and roll back to a published version; a rollback is pinned and will not auto-follow
 
 ### 1.1.9
 
