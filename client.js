@@ -183,6 +183,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"channel.title": "通道",
 			"channel.stable": "正式版",
 			"channel.beta": "测试版",
+			"channel.useStable": "切换到正式版",
+			"channel.useBeta": "切换到测试版",
+			"channel.now": "当前通道",
+			"channel.other": "可切换",
 			"update.checking": "正在检测更新…",
 			"update.applying": "正在更新…",
 			"update.switching": "正在切换版本…",
@@ -198,8 +202,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.needRestart": "检测接口未加载，请先重启 dsh 再点检测更新",
 			"update.noBeta": "还没有测试版",
 			"update.switch": "切换到此版本",
+			"update.pick": "选择版本",
+			"update.tip": "最新",
 			"update.current": "当前",
-			"update.confirmSwitch": "切换到 {version}？之后可再选回正式版或其它版本。本地未提交的插件改动不会保留。",
+			"update.confirmSwitch": "切换到 {version}？之后可再切回另一通道或其它版本。本地未提交的插件改动不会保留。",
+			"update.confirmChannel": "切换到{version}？会按该通道重新安装插件，本地未提交的插件改动不会保留。",
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
@@ -382,6 +389,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"channel.title": "Channel",
 			"channel.stable": "Stable",
 			"channel.beta": "Beta",
+			"channel.useStable": "Switch to stable",
+			"channel.useBeta": "Switch to beta",
+			"channel.now": "Current channel",
+			"channel.other": "Available",
 			"update.checking": "Checking for updates…",
 			"update.applying": "Updating…",
 			"update.switching": "Switching version…",
@@ -397,8 +408,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.needRestart": "Update API is not loaded. Restart dsh, then check again.",
 			"update.noBeta": "No beta build yet",
 			"update.switch": "Switch to this version",
+			"update.pick": "Select version",
+			"update.tip": "latest",
 			"update.current": "current",
 			"update.confirmSwitch": "Switch to {version}? You can switch back later. Uncommitted plugin edits will not be kept.",
+			"update.confirmChannel": "Switch to {version}? The plugin will be reinstalled from that channel. Uncommitted plugin edits will not be kept.",
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
@@ -594,7 +608,23 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
 .dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
 .dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
-.dshp-ver{min-width:168px;max-width:260px;height:28px;padding:0 8px;font-size:12px}
+.dshp-ver{width:100%;min-width:0;max-width:none;height:34px;padding:0 10px;font-size:12px}
+.dshp-lanes{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:0 0 16px;background:var(--dshp-line);border:1px solid var(--dshp-line);border-radius:8px;overflow:hidden}
+.dshp-lane{display:flex;flex-direction:column;gap:0;min-width:0;padding:14px 14px 12px;background:var(--dshp-paper);transition:background .2s var(--dshp-ease)}
+.dshp-lane.is-on{background:var(--dshp-bg)}
+.dshp-lane-kicker{margin:0 0 4px;font-family:var(--dshp-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dshp-mute)}
+.dshp-lane.is-on .dshp-lane-kicker{color:var(--dshp-accent)}
+.dshp-lane.is-beta .dshp-lane-kicker{color:var(--dshp-warn)}
+.dshp-lane.is-on.is-beta .dshp-lane-kicker{color:var(--dshp-warn)}
+.dshp-lane-h{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--dshp-line)}
+.dshp-lane-h strong{font-family:var(--dshp-display);font-size:18px;font-weight:500;letter-spacing:.02em}
+.dshp-lane-ver{margin-left:auto;font-family:var(--dshp-mono);font-size:12px;color:var(--dshp-mute);white-space:nowrap}
+.dshp-lane-ops{display:flex;flex-direction:column;gap:8px}
+.dshp-lane-ops .dshp-btn{width:100%}
+.dshp-rel{margin:0 0 14px}
+.dshp-rel .dshp-notice{display:block;margin-top:8px;min-height:16px}
+@media (max-width:640px){.dshp-lanes{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.dshp-lane{transition:none}}
 .dshp-area{min-height:220px;resize:vertical}
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
@@ -836,10 +866,21 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
 			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
-			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
 			const [channel, setChannel] = useState("stable");
-			const [selectedRef, setSelectedRef] = useState("");
+			const [pick, setPick] = useState({ stable: "", beta: "" });
 			const actionTicket = useRef(0);
+
+			const syncPicks = (d) => {
+				const versions = (d && d.versions) || [];
+				const next = { stable: "", beta: "" };
+				for (const id of ["stable", "beta"]) {
+					const list = versions.filter((item) => item.channel === id);
+					const cur = list.find((item) => item.current);
+					const latest = list.find((item) => item.latest);
+					next[id] = (cur || latest || {}).ref || "";
+				}
+				setPick(next);
+			};
 
 			const updateErrorText = (tr, e) => {
 				const msg = String((e && e.message) || e || "");
@@ -851,21 +892,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const applyUpdateInfo = useCallback((d, tr, kind) => {
 				if (d.channel) setChannel(d.channel);
 				setUpdateInfo(d);
-				setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
-				const versions = d.versions || [];
-				const current = versions.find((item) => item.current);
-				if (current && current.ref) setSelectedRef(current.ref);
-				else if (d.pin) setSelectedRef(d.pin);
+				syncPicks(d);
 				const version = d.localVersion || d.localSha || "—";
 				const remote = d.remoteVersion || d.remoteSha || "—";
 				let text = tr("update.latest", { version });
 				if (d.hasUpdate) text = tr("update.available", { remote, local: version });
 				if (d.pinned && d.hasUpdate) text = tr("update.pinned", { version, remote });
-				if (kind === "switched") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || selectedRef || "—" });
+				if (kind === "switched") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || "—" });
 				if (kind === "done") text = tr("update.done", { version: d.localVersion || d.remoteVersion || "—" });
 				if (d.error) text = d.error;
 				setUpdateNotice({ kind: d.ok === false || d.error ? "error" : "ok", text });
-			}, [selectedRef]);
+			}, []);
 
 			const checkUpdate = useCallback(() => {
 				setUpdateBusy(true);
@@ -891,7 +928,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				})
 					.then((d) => {
 						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
-						applyUpdateInfo(d, tr, kind === "channel" ? "done" : kind);
+						applyUpdateInfo(d, tr, kind === "channel" ? "switched" : kind);
 						if (d.applied || d.needRestart) setAskRestart(true);
 						return d;
 					})
@@ -902,24 +939,28 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.finally(() => setUpdateBusy(false));
 			}, [applyUpdateInfo]);
 
-			const doUpdate = useCallback(() => {
-				postUpdate({ op: "apply" }, "done").catch(() => {});
+			const doUpdate = useCallback((id) => {
+				const lane = id === "beta" ? "beta" : "stable";
+				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "master", channel: lane }, "done").catch(() => {});
 			}, [postUpdate]);
 
 			const changeChannel = useCallback((next) => {
-				if (!next || next === channel) return;
-				postUpdate({ op: "channel", channel: next }, "channel").catch(() => {});
-			}, [channel, postUpdate]);
-
-			const switchSelected = useCallback(() => {
+				if (!next) return;
 				const tr = tRef.current;
-				const versions = (updateInfo && updateInfo.versions) || [];
-				const hit = versions.find((item) => item.ref === selectedRef);
-				const label = (hit && (hit.label || hit.version)) || selectedRef;
-				if (!selectedRef) return;
+				if (!window.confirm(tr("update.confirmChannel", { version: tr("channel." + next) }))) return;
+				postUpdate({ op: "channel", channel: next }, "channel").catch(() => {});
+			}, [postUpdate]);
+
+			const switchSelected = useCallback((id) => {
+				const tr = tRef.current;
+				const ref = pick[id];
+				const versions = ((updateInfo && updateInfo.versions) || []).filter((item) => item.channel === id);
+				const hit = versions.find((item) => item.ref === ref);
+				const label = (hit && (hit.label || hit.version)) || ref;
+				if (!ref) return;
 				if (!window.confirm(tr("update.confirmSwitch", { version: label }))) return;
-				postUpdate({ op: "switch", ref: selectedRef }, "switched").catch(() => {});
-			}, [postUpdate, selectedRef, updateInfo]);
+				postUpdate({ op: "switch", ref }, "switched").catch(() => {});
+			}, [pick, postUpdate, updateInfo]);
 
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
@@ -943,10 +984,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						if (!d) return;
 						if (d.channel) setChannel(d.channel);
 						setUpdateInfo(d);
-						setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
-						const current = (d.versions || []).find((item) => item.current);
-						if (current && current.ref) setSelectedRef(current.ref);
-						else if (d.pin) setSelectedRef(d.pin);
+						syncPicks(d);
 					})
 					.catch(() => {});
 				apiJson("/dsh-purge/override")
@@ -1165,67 +1203,81 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const pct = total ? Math.round((settled / total) * 100) : 0;
 
 			const hostSurface = hostSurfaceOf(s);
-			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
-			const remoteVer = updateInfo && (updateInfo.remoteVersion || updateInfo.remoteSha) || "";
-			const remoteSha = updateInfo && updateInfo.remoteSha || "";
-			const sameVer = remoteVer && localVer && remoteVer === localVer;
-			const versionText = canApplyUpdate && remoteVer
-				? (sameVer && remoteSha ? "v" + remoteVer + " · " + remoteSha : "v" + remoteVer)
-				: (localVer ? "v" + localVer : "");
-			const updateBtnLabel = updateBusy
-				? (canApplyUpdate ? t("btn.doUpdate.busy") : t("btn.checkUpdate.busy"))
-				: (canApplyUpdate ? t("btn.doUpdate") : t("btn.checkUpdate"));
 			const versions = (updateInfo && updateInfo.versions) || [];
-			const selected = versions.find((item) => item.ref === selectedRef);
-			const canSwitchVersion = Boolean(selectedRef && selected && !selected.current);
 			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
+			const renderLane = (id) => {
+				const lane = (updateInfo && updateInfo.lanes && updateInfo.lanes[id]) || {};
+				const list = versions.filter((item) => item.channel === id);
+				const selectedRef = pick[id] || "";
+				const hit = list.find((item) => item.ref === selectedRef) || list.find((item) => item.current) || list.find((item) => item.latest);
+				const onLane = channelNow === id;
+				const noBeta = id === "beta" && updateInfo && updateInfo.hasBeta === false && !list.length;
+				const pickedOther = Boolean(hit && selectedRef && !hit.current);
+				let actionLabel = t("btn.checkUpdate");
+				let actionKind;
+				let actionClick = checkUpdate;
+				let actionDisabled = updateBusy || Boolean(noBeta);
+				if (noBeta) {
+					actionLabel = t("update.noBeta");
+					actionClick = () => {};
+				} else if (pickedOther) {
+					actionLabel = t("update.switch");
+					actionKind = "primary";
+					actionClick = () => switchSelected(id);
+				} else if (!onLane) {
+					actionLabel = id === "beta" ? t("channel.useBeta") : t("channel.useStable");
+					actionKind = "primary";
+					actionClick = () => changeChannel(id);
+				} else if (lane.hasUpdate) {
+					actionLabel = t("btn.doUpdate");
+					actionKind = "primary";
+					actionClick = () => doUpdate(id);
+				}
+				if (updateBusy) {
+					if (pickedOther || !onLane) actionLabel = t("update.switching");
+					else if (lane.hasUpdate && onLane) actionLabel = t("btn.doUpdate.busy");
+					else actionLabel = t("btn.checkUpdate.busy");
+				}
+				const verText = lane.version ? "v" + lane.version : (hit && hit.version ? "v" + hit.version : "—");
+				return h("div", {
+					className: "dshp-lane" + (onLane ? " is-on" : "") + (id === "beta" ? " is-beta" : ""),
+					"aria-label": t("channel." + id),
+				},
+					h("p", { className: "dshp-lane-kicker" }, onLane ? t("channel.now") : t("channel.other")),
+					h("div", { className: "dshp-lane-h" },
+						h("strong", null, t("channel." + id)),
+						h("span", { className: "dshp-lane-ver" }, verText),
+					),
+					h("div", { className: "dshp-lane-ops" },
+						h("select", {
+							className: "dshp-field dshp-ver",
+							value: selectedRef || (hit && hit.ref) || "",
+							disabled: updateBusy || !list.length,
+							onChange: (e) => setPick((prev) => Object.assign({}, prev, { [id]: e.target.value })),
+							"aria-label": t("update.pick"),
+						},
+							list.length
+								? list.map((item) => h("option", {
+									key: item.ref + (item.sha || ""),
+									value: item.ref,
+								}, (item.version ? "v" + item.version : item.label) + (item.current ? " · " + t("update.current") : item.latest ? " · " + t("update.tip") : "")))
+								: h("option", { value: "" }, noBeta ? t("update.noBeta") : t("update.pick")),
+						),
+						h(Btn, { kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
+					),
+				);
+			};
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
-					h("div", { className: "dshp-row", style: { margin: 0, flex: 1, justifyContent: "flex-end" } },
-						h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
-						h("span", { className: "dshp-pill" + (channelNow === "beta" ? " is-wait" : "") }, t("channel." + (channelNow === "beta" ? "beta" : "stable"))),
-						versionText ? h("span", { className: "dshp-pill" + (canApplyUpdate ? " is-wait" : "") }, versionText) : null,
-						h(Btn, {
-							tiny: true,
-							kind: canApplyUpdate ? "primary" : undefined,
-							disabled: updateBusy,
-							onClick: canApplyUpdate ? doUpdate : checkUpdate,
-						}, updateBtnLabel),
-						noticeNode(updateNotice),
-					),
+					h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
 				),
-				h("div", { className: "dshp-row", style: { margin: "-4px 0 12px" } },
-					h("div", { className: "dshp-switch", role: "group", "aria-label": t("channel.title") },
-						h("button", {
-							type: "button",
-							className: channelNow === "stable" ? "is-on" : "",
-							disabled: updateBusy,
-							onClick: () => changeChannel("stable"),
-						}, t("channel.stable")),
-						h("button", {
-							type: "button",
-							className: channelNow === "beta" ? "is-on" : "",
-							disabled: updateBusy,
-							onClick: () => changeChannel("beta"),
-						}, t("channel.beta")),
+				h("div", { className: "dshp-rel" },
+					h("div", { className: "dshp-lanes" },
+						renderLane("stable"),
+						renderLane("beta"),
 					),
-					h("select", {
-						className: "dshp-field dshp-ver",
-						value: selectedRef,
-						disabled: updateBusy || versions.length === 0,
-						onChange: (e) => setSelectedRef(e.target.value),
-						"aria-label": t("update.switch"),
-					},
-						versions.length
-							? versions.map((item) => h("option", { key: item.ref + (item.sha || ""), value: item.ref }, item.label + (item.current ? " · " + t("update.current") : "")))
-							: h("option", { value: "" }, t("btn.checkUpdate")),
-					),
-					h(Btn, {
-						tiny: true,
-						disabled: updateBusy || !canSwitchVersion,
-						onClick: switchSelected,
-					}, t("update.switch")),
+					noticeNode(updateNotice),
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },

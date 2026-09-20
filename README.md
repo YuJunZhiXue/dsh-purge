@@ -654,7 +654,7 @@ dsh-purge --edit
 purge_status   purge_apply   purge_revert
 ```
 
-Patched packages load only after a restart. Apply does not restart by itself. Under the patch title you can switch **Stable / Beta** or roll back from the version list. A rollback is pinned; click **Update** to return to the channel tip.
+Patched packages load only after a restart. Apply does not restart by itself. Under the patch title, **Stable** and **Beta** are separate: each has its own version list and switch action. A rollback is pinned; click **Update** to return to that channel's tip.
 
 The composer **Undo** button drops the last turn and puts the last user sentence back in the input. On the main agent you can rewind once or the whole last round (including subagents). After rewind, send only what is in the box now. `/rewind` does the same.
 
@@ -750,6 +750,10 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 ---
 
 ## Changelog
+
+### 1.1.11-beta.2
+
+- Stable and Beta sit in two columns, each with its own list; switching a channel checks out that branch and can switch back after restart
 
 ### 1.1.11-beta.1
 
