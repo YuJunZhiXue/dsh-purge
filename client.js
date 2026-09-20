@@ -73,6 +73,35 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			} finally { clearTimeout(timer); }
 		}
 
+		function promptBoxEmpty(text) {
+			return !String(text || "").trim();
+		}
+
+		function responseNeedsPrompt(d) {
+			return Boolean(d && (d.needPrompt || d.injectSource === "none"));
+		}
+
+		function warnNeedPrompt(d, tr) {
+			if (!responseNeedsPrompt(d)) return false;
+			window.alert(tr("need.prompt"));
+			return true;
+		}
+
+		function activeRuleHasBody(st) {
+			if (!st || !st.ok) return false;
+			const active = st.rules && st.rules.find((r) => r.id === st.active);
+			return Boolean(active && active.size > 0);
+		}
+
+		async function bothInjectEmpty(overrideText) {
+			if (!promptBoxEmpty(overrideText)) return false;
+			try {
+				return !activeRuleHasBody(await rulesApi("status"));
+			} catch {
+				return true;
+			}
+		}
+
 		function rulesApi(op, extra) {
 			return apiJson("/dsh-purge/rules", {
 				method: "POST",
@@ -110,7 +139,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "待应用=原文还在。跳过=没装或官方已改写，再点也不会变。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
 			"warn.noRoot.desktop": "未定位到当前桌面应用里的 @deepseek-ai。请退出托盘后重新打开 DSH Desktop.exe，再在桌面端设置页点「应用」。安装目录不限盘符。",
-			"warn.noInject": "未自行改过时始终使用插件内置默认提示词。保存不同内容后才会换成你的；恢复默认可改回去。",
+			"warn.noInject": "提示词优先；为空则注入当前启用的规则集。两边都空会提示必须添加。",
+			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
 			"saved.restoreInject": "已填入默认提示词，点保存写入",
 			"skip": "跳过",
@@ -280,7 +310,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "Pending = original text still present. Skipped = missing or already rewritten.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
 			"warn.noRoot.desktop": "Could not find @deepseek-ai inside this desktop app. Quit the tray, reopen DSH Desktop.exe, then Apply on the desktop Settings page. The install folder can be on any drive.",
-			"warn.noInject": "Until you save a different prompt, the plugin keeps its built-in default. Restore default to go back.",
+			"warn.noInject": "The prompt box wins. If it is empty, the enabled rule set is injected. If both are empty you will be asked to add a prompt.",
+			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
 			"saved.restoreInject": "Default prompt loaded. Save to write.",
 			"skip": "Skipped",
@@ -732,6 +763,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
 			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
+			const actionTicket = useRef(0);
 
 			const updateErrorText = (tr, e) => {
 				const msg = String((e && e.message) || e || "");
@@ -797,8 +829,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						if (d && d.ok) {
 							const packed = typeof d.defaultContent === "string" ? d.defaultContent : "";
 							if (packed) setDefaultOverride(packed);
-							const shown = String(d.content || packed || "").trim() ? (d.content || packed) : packed;
-							setOverride(shown);
+							setOverride(typeof d.content === "string" ? d.content : packed);
 							setOverrideLoaded(true);
 						}
 						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
@@ -808,21 +839,41 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			useEffect(() => { loadAll(); }, [loadAll]);
 
-			const doAction = useCallback((action, actionKey) => {
-				setPatchBusy(true);
+			const rejectNeedPrompt = useCallback((tr) => {
 				setAskRestart(false);
-				setNotice({ kind: "idle", text: "" });
+				setNotice({ kind: "error", text: tr("need.prompt") });
+				setTimeout(() => window.alert(tr("need.prompt")), 0);
+			}, []);
+
+			const doAction = useCallback((action, actionKey) => {
 				const tr = tRef.current;
 				const label = tr(actionKey);
-				fetch("/dsh-purge/" + action, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
-					.then((r) => r.json())
-					.then((d) => {
-						if (d.ok) {
+				const ticket = ++actionTicket.current;
+				const run = () => {
+					setPatchBusy(true);
+					setAskRestart(false);
+					setNotice({ kind: "idle", text: "" });
+					fetch("/dsh-purge/" + action, {
+						method: "POST",
+						headers: { "content-type": "application/json" },
+						body: JSON.stringify(action === "apply" ? { content: override } : {}),
+					})
+						.then((r) => r.json())
+						.then((d) => {
+							if (ticket !== actionTicket.current) return;
+							const applyEmptyBlocked = action === "apply" && promptBoxEmpty(override) && (!d || d.injectSource !== "rule");
+							if (responseNeedsPrompt(d) || applyEmptyBlocked) {
+								rejectNeedPrompt(tr);
+								return;
+							}
+							if (!d.ok) {
+								setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
+								return;
+							}
 							if (action === "apply") {
 								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
-								const shown = d.override_content || d.defaultContent;
-								if (typeof shown === "string" && shown) {
-									setOverride(shown);
+								if (typeof d.override_content === "string") {
+									setOverride(d.override_content);
 									setOverrideLoaded(true);
 								}
 							}
@@ -858,32 +909,68 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							setNotice({ kind: "ok", text: tr("ok.done") });
 							loadAll();
 							if (action === "apply") setAskRestart(true);
-						} else {
-							setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
-						}
-					})
-					.catch((e) => setNotice({ kind: "error", text: tr("err.action", { action: label, error: e.message }) }))
-					.finally(() => setPatchBusy(false));
-			}, [loadAll]);
+						})
+						.catch((e) => {
+							if (ticket !== actionTicket.current) return;
+							setNotice({ kind: "error", text: tr("err.action", { action: label, error: e.message }) });
+						})
+						.finally(() => {
+							if (ticket === actionTicket.current) setPatchBusy(false);
+						});
+				};
+				if (action !== "apply") {
+					run();
+					return;
+				}
+				bothInjectEmpty(override).then((empty) => {
+					if (ticket !== actionTicket.current) return;
+					if (empty) {
+						rejectNeedPrompt(tr);
+						return;
+					}
+					run();
+				});
+			}, [loadAll, override, rejectNeedPrompt]);
 
 			const saveOverride = useCallback(() => {
-				setPatchBusy(true);
-				setNotice({ kind: "idle", text: "" });
-				fetch("/dsh-purge/override", {
-					method: "POST",
-					headers: { "content-type": "application/json" },
-					body: JSON.stringify({ content: override }),
-				})
-					.then((r) => r.json())
-					.then((d) => {
-						if (d.ok && typeof d.content === "string") setOverride(d.content);
-						setNotice(d.ok
-							? { kind: "ok", text: t("saved.override") }
-							: { kind: "error", text: t("err.save", { error: d.error || "" }) });
+				const tr = t;
+				const ticket = ++actionTicket.current;
+				const go = () => {
+					setPatchBusy(true);
+					setAskRestart(false);
+					setNotice({ kind: "idle", text: "" });
+					fetch("/dsh-purge/override", {
+						method: "POST",
+						headers: { "content-type": "application/json" },
+						body: JSON.stringify({ content: override }),
 					})
-					.catch((e) => setNotice({ kind: "error", text: t("err.save", { error: e.message }) }))
-					.finally(() => setPatchBusy(false));
-			}, [override, t]);
+						.then((r) => r.json())
+						.then((d) => {
+							if (ticket !== actionTicket.current) return;
+							if (!d.ok || responseNeedsPrompt(d) || (promptBoxEmpty(override) && d.injectSource !== "rule")) {
+								rejectNeedPrompt(tr);
+								return;
+							}
+							if (typeof d.content === "string") setOverride(d.content);
+							setNotice({ kind: "ok", text: t("saved.override") });
+						})
+						.catch((e) => {
+							if (ticket !== actionTicket.current) return;
+							setNotice({ kind: "error", text: t("err.save", { error: e.message }) });
+						})
+						.finally(() => {
+							if (ticket === actionTicket.current) setPatchBusy(false);
+						});
+				};
+				bothInjectEmpty(override).then((empty) => {
+					if (ticket !== actionTicket.current) return;
+					if (empty) {
+						rejectNeedPrompt(tr);
+						return;
+					}
+					go();
+				});
+			}, [override, t, rejectNeedPrompt]);
 
 			const restoreOverride = useCallback(() => {
 				if (!defaultOverride) return;
@@ -1056,6 +1143,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					spellCheck: false,
 					placeholder: "",
 				}),
+				promptBoxEmpty(override) ? h("p", {
+					className: "dshp-hint",
+					style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 },
+				}, t("need.prompt")) : null,
 			);
 		}
 
@@ -1105,9 +1196,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.then((d) => {
 						if (d && d.ok) {
 							setNotice({ kind: "ok", text: t("ok.done") });
+							if (action === "save" || action === "activate") warnNeedPrompt(d, t);
 							loadStatus();
 							if (after) after();
 						} else {
+							warnNeedPrompt(d, t);
 							setNotice({ kind: "error", text: t("err.action", { error: (d && d.error) || "" }) });
 						}
 					})
@@ -1123,7 +1216,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							setEditId(id);
 							setEditName(d.name || id);
 							setEditTarget(d.target || "AGENTS.md");
-							setContent(d.content || "");
+							setContent(typeof d.content === "string" ? d.content : "");
 						} else setNotice({ kind: "error", text: t("err.read", { error: d.error || "" }) });
 					})
 					.catch((e) => setNotice({ kind: "error", text: t("err.read", { error: e.message }) }))
