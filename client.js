@@ -192,9 +192,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.latest": "已是最新（{version}）",
 			"update.available": "有新版本 {remote}，当前 {local}",
 			"update.pinned": "已固定在 {version}，通道最新是 {remote}",
-			"update.done": "已更新到 {version}，请重启",
-			"update.switched": "已切换到 {version}，请重启",
-			"update.autoDone": "已自动更新到 {version}，请重启",
+			"update.done": "已更新到 {version}",
+			"update.switched": "已切换到 {version}",
+			"update.autoDone": "已自动更新到 {version}",
+			"update.reloading": "正在刷新设置页…",
 			"update.dirty": "有新版本，本地有改动未自动覆盖",
 			"update.fail": "更新失败: {error}",
 			"update.timeout": "检测超时，请再点一次检测更新",
@@ -397,9 +398,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.latest": "Up to date ({version})",
 			"update.available": "Update {remote} available (now {local})",
 			"update.pinned": "Pinned at {version}; channel latest is {remote}",
-			"update.done": "Updated to {version}. Restart to apply.",
-			"update.switched": "Switched to {version}. Restart to apply.",
-			"update.autoDone": "Auto-updated to {version}. Restart to apply.",
+			"update.done": "Updated to {version}.",
+			"update.switched": "Switched to {version}.",
+			"update.autoDone": "Auto-updated to {version}.",
+			"update.reloading": "Refreshing settings…",
 			"update.dirty": "Update available; local edits were not overwritten.",
 			"update.fail": "Update failed: {error}",
 			"update.timeout": "Check timed out. Click Check update again.",
@@ -888,8 +890,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const applyUpdateInfo = useCallback((d, tr, kind) => {
 				if (d.channel) setChannel(d.channel);
-				setUpdateInfo(d);
-				syncPicks(d);
+				setUpdateInfo((prev) => {
+					const versions = (d.versions && d.versions.length) ? d.versions : ((prev && prev.versions) || []);
+					return Object.assign({}, prev || {}, d, { versions });
+				});
+				if (d.versions && d.versions.length) syncPicks(d);
 				if (kind === "check") setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
 				else if (kind === "done" || kind === "switched" || kind === "channel") setCanApplyUpdate(false);
 				const version = d.localVersion || d.localSha || "—";
@@ -933,7 +938,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.then((d) => {
 						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
 						applyUpdateInfo(d, tr, kind);
-						if (d.applied || d.needRestart) setAskRestart(true);
+						if (d.applied && d.reloadClient !== false) {
+							setUpdateNotice({ kind: "ok", text: tr("update.reloading") });
+							setTimeout(() => {
+								try { window.location.reload(); } catch { /* ignore */ }
+							}, 280);
+						} else if (d.needRestart) {
+							setAskRestart(true);
+						}
 						return d;
 					})
 					.catch((e) => {
@@ -955,8 +967,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				if (!next) return;
 				const tr = tRef.current;
 				if (!window.confirm(tr("update.confirmChannel", { version: tr("channel." + next) }))) return;
-				postUpdate({ op: "channel", channel: next }, "channel", next).catch(() => {});
-			}, [postUpdate]);
+				const prevChannel = channel;
+				const prevInfo = updateInfo;
+				setChannel(next);
+				setUpdateInfo((cur) => Object.assign({}, cur || {}, { channel: next }));
+				postUpdate({ op: "channel", channel: next }, "channel", next).catch(() => {
+					setChannel(prevChannel);
+					setUpdateInfo(prevInfo);
+				});
+			}, [channel, postUpdate, updateInfo]);
 
 			const switchSelected = useCallback((id) => {
 				const tr = tRef.current;
@@ -966,8 +985,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				const label = (hit && (hit.label || hit.version)) || ref;
 				if (!ref) return;
 				if (!window.confirm(tr("update.confirmSwitch", { version: label }))) return;
-				postUpdate({ op: "switch", ref }, "switched", id).catch(() => {});
-			}, [pick, postUpdate, updateInfo]);
+				const prevChannel = channel;
+				const prevInfo = updateInfo;
+				if (hit && hit.channel) {
+					setChannel(hit.channel);
+					setUpdateInfo((cur) => Object.assign({}, cur || {}, { channel: hit.channel }));
+				}
+				postUpdate({ op: "switch", ref }, "switched", id).catch(() => {
+					setChannel(prevChannel);
+					setUpdateInfo(prevInfo);
+				});
+			}, [channel, pick, postUpdate, updateInfo]);
 
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
