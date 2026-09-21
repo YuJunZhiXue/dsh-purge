@@ -751,8 +751,7 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 - Settings splits Stable / Beta into two columns, each with its own list, switch, and rollback. 1.1.10 can reach this by Check update.
 - **No Skill import.** Skill stays on beta 1.1.12.
-- **Inject the system prompt once per conversation.** The first turn writes the full `prompt-inject`; later steps pin that committed prompt and do not fold it again.
-- **Stop a new「系统提示词」card on every step.** With 0.1.5 in-history, a changed assemble appends another `system/message`, so the transcript repeats system prompt → think → tools. Refolding inject every step made later official sections look like a new prompt; emptying inject did the same. After the inject is already in history, this release pins that committed system prompt and does not append a second copy.
+- **#29:** Stop pinning the previous full system prompt. That pin was meant to stop a new「系统提示词」card each step, but presets that append a section every assemble (梁神 `workspace-instructions`) turned it into “last full prompt + this step’s block”, so the prompt grew every step and prefix cache missed. Later turns only fold `prompt-inject` into persona, and do not fold a second copy when it is already there.
 
 ### 1.1.10
 
