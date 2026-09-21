@@ -752,6 +752,9 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 - Settings splits Stable / Beta into two columns, each with its own list, switch, and rollback. 1.1.10 can reach this by Check update.
 - **No Skill import.** Skill stays on beta 1.1.12.
 - **#29:** Stop pinning the previous full system prompt. That pin was meant to stop a new「系统提示词」card each step, but presets that append a section every assemble (梁神 `workspace-instructions`) turned it into “last full prompt + this step’s block”, so the prompt grew every step and prefix cache missed. Later turns only fold `prompt-inject` into persona, and do not fold a second copy when it is already there.
+- The version list marks「当前」by commit. An older tag with the same 1.1.11 version is no longer current next to `master`.
+- Local routes reject cross-origin requests, and updates only accept a known ref. Another webpage cannot apply, revert, uninstall, or switch.
+- Patch #41 no longer keeps the `dsh-purge:committed` shortcut. Hosts that already applied the old patch need one more Apply to remove it.
 
 ### 1.1.10
 

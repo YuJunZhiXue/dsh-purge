@@ -28,7 +28,8 @@
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
-    "test:identity": "node scripts/test-identity-assembly.mjs"
+    "test:identity": "node scripts/test-identity-assembly.mjs",
+    "test:update": "node scripts/test-update-guards.mjs"
   },
   "license": "MIT",
   "keywords": [
