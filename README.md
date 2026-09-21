@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.1.10</strong></p>
+<p align="center"><strong>Version 1.1.12-beta.1</strong></p>
 
 <p align="center">
     <em>Local official DeepSeek Harness cybersecurity red-team plugin: evaluate and harden host safety policy in a controlled local install; swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
@@ -755,6 +755,14 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 - Skill import stays on beta: Settings and `/skills` write zip/folder into official `$DSH_HOME/skills`
 - Stable / Beta columns match official 1.1.11, so you can switch both ways
+- Same system-prompt fix as official 1.1.11: inject once per conversation, do not append another「系统提示词」on later steps
+
+### 1.1.11
+
+- Settings splits Stable / Beta into two columns, each with its own list, switch, and rollback. 1.1.10 can reach this by Check update.
+- **No Skill import.** Skill stays on beta 1.1.12.
+- **Inject the system prompt once per conversation.** The first turn writes the full `prompt-inject`; later steps pin that committed prompt and do not fold it again.
+- **Stop a new「系统提示词」card on every step.** With 0.1.5 in-history, a changed assemble appends another `system/message`, so the transcript repeats system prompt → think → tools. Refolding inject every step made later official sections look like a new prompt; emptying inject did the same. After the inject is already in history, this release pins that committed system prompt and does not append a second copy.
 
 ### 1.1.11-beta.2
 
