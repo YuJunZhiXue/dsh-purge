@@ -757,7 +757,7 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 - Skill import stays on beta: Settings and `/skills` write zip/folder into official `$DSH_HOME/skills`
 - Stable / Beta columns match official 1.1.11, so you can switch both ways
-- **#29:** Stop pinning the previous full system prompt. Later turns only fold `prompt-inject` into persona (idempotent if already present). Presets that append a `workspace-instructions` section every assemble no longer snowball, so prefix cache stays valid.
+- Same system-prompt fix as official 1.1.11: inject once per conversation, do not append another「系统提示词」on later steps
 
 ### 1.1.11
 
