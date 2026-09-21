@@ -70,6 +70,8 @@ This is a **local official DeepSeek Harness cybersecurity red-team plugin**. It 
 
 <font color="red">
 
+**Disclaimer:** This is a non-profit open-source project. It follows applicable laws and the rules of the platforms it uses, and is intended only for learning and research. Do not use it for any illegal or non-compliant purpose; the user bears any resulting consequences.
+
 **Zero-tolerance statement:** This project opposes and forbids any illegal activity. The authors do not support, encourage, or assist unauthorized network attacks, exploit use, data theft, unlawful intrusion into computer information systems, or generation of illegal or prohibited content. **Anyone who uses this project for crime is solely responsible under the law. The authors have no liability.**
 
 1. **This repository contains no illegal material.** The published code, docs, patches, and default prompt are **not** malware, backdoors, unauthorized pentest kits, ransomware, credential-stuffing scripts, or attack payloads aimed at the public internet or third-party systems. The project does not supply illegal content and does not incite, organize, or assist crime.
@@ -763,15 +765,6 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 - **No Skill import.** Skill stays on beta 1.1.12.
 - **Inject the system prompt once per conversation.** The first turn writes the full `prompt-inject`; later steps pin that committed prompt and do not fold it again.
 - **Stop a new「系统提示词」card on every step.** With 0.1.5 in-history, a changed assemble appends another `system/message`, so the transcript repeats system prompt → think → tools. Refolding inject every step made later official sections look like a new prompt; emptying inject did the same. After the inject is already in history, this release pins that committed system prompt and does not append a second copy.
-
-### 1.1.11-beta.2
-
-- Stable and Beta sit in two columns, each with its own list; switching a channel checks out that branch and can switch back after restart
-
-### 1.1.11-beta.1
-
-- Settings can import a zip or folder into official `$DSH_HOME/skills`; Stable / Beta can be switched and rolled back
-- Import ignores symlinks and checks archive paths; save keeps official frontmatter fields
 
 ### 1.1.10
 
