@@ -2,6 +2,9 @@
 choirboy-prompt/
 /choirboy-prompt/
 
+# 工作区 Skill 目录（官方 <project>/.dsh/skills），不要提交到插件仓库
+/.dsh/
+
 node_modules/
 *.tgz
 npm-debug.log*

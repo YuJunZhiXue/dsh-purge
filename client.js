@@ -138,6 +138,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const zh = {
 			nav: "规则设定",
+			"nav.skills": "规则 · Skill",
 			"theme.aria": "外观",
 			"theme.white": "白",
 			"theme.ink": "墨",
@@ -238,23 +239,40 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"ph.content": "",
 			"btn.saveRule": "保存",
 			"skills.title": "Skill",
-			"skills.hint": "导入到官方目录后，由 DSH 调用：聊天输入 /名称 立即加载；任务对上 description 或 whenToUse 时模型会调 skill 工具。正文写「激活」不会触发。",
-			"skills.hint.desktop": "当前桌面宿主的官方 Skill 目录。聊天输入 /名称 立即加载；任务对上 description 时模型会调 skill 工具。",
+			"skills.kicker": "dsh-purge",
+			"skills.scope.user": "环境",
+			"skills.scope.project": "工作区",
+			"skills.workspace.none": "还没有工作区。打开过项目对话，或填项目根目录绑定。",
+			"ph.workspace": "项目根目录",
+			"btn.bindWorkspace": "绑定",
+			"skills.shadowed": "工作区同名会盖住",
+			"skills.onlyBeta": "Skill 只在测试版。请到「规则设定」切到测试版后再来。",
 			"skills.empty": "暂无用户 Skill",
+			"skills.none": "没有匹配",
+			"skills.count": "{n} 个",
+			"skills.search": "搜索",
+			"btn.createSkill": "新建",
 			"btn.importZip": "导入压缩包",
 			"btn.importFolder": "导入文件夹",
+			"skills.drop": "拖入压缩包或文件夹",
+			"skills.files": "{n} 个文件",
 			"skills.importing": "正在导入…",
 			"saved.import": "已导入 {count} 个 Skill",
+			"saved.create": "已创建 {id}",
 			"need.import": "请选择压缩包或文件夹",
 			"err.import.folder": "没读到文件夹里的文件，请直接选 Skill 目录（里面要有 SKILL.md）",
-			"skills.pick": "选择 Skill",
-			"skills.invalid": "官方会忽略：格式不对",
-			"skills.call.slash": "聊天输入 {cmd}",
-			"skills.call.model": "模型可调",
-			"skills.call.modelOff": "模型不可调",
-			"skills.call.userOff": "不可 /名称",
-			"ph.skill.desc": "description（何时用）",
+			"skills.invalid": "格式不对，官方会忽略",
+			"skills.call.slash": "/{id}",
+			"skills.call.model": "模型",
+			"skills.call.modelOff": "模型关",
+			"skills.call.userOff": "/ 关",
+			"ph.skill.id": "id",
+			"ph.skill.desc": "description",
+			"ph.skill.when": "whenToUse",
+			"skills.kind.bundle": "目录",
+			"skills.kind.flat": "单文件",
 			"btn.saveSkill": "保存",
+			"btn.closeSkill": "收起",
 			"need.skill.id": "id 必须是 kebab-case，例如 code-review",
 			"confirm.delete.skill": "从官方 $DSH_HOME/skills 删除 {id}？宿主会自动从目录拿掉。",
 			"err.skills": "读取失败: {error}",
@@ -348,6 +366,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const en = {
 			nav: "Rules",
+			"nav.skills": "Rules · Skills",
 			"theme.aria": "Appearance",
 			"theme.white": "Light",
 			"theme.ink": "Ink",
@@ -448,23 +467,40 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"ph.content": "",
 			"btn.saveRule": "Save",
 			"skills.title": "Skills",
-			"skills.hint": "After import, DSH calls it: type /name in chat to load now; the model calls the skill tool when the task matches description or whenToUse. Writing「激活」in the body does nothing.",
-			"skills.hint.desktop": "This desktop host’s official skill catalog. Type /name in chat to load; the model calls the skill tool when the task matches the description.",
+			"skills.kicker": "dsh-purge",
+			"skills.scope.user": "Host",
+			"skills.scope.project": "Workspace",
+			"skills.workspace.none": "No workspace yet. Open a project chat, or bind a project root.",
+			"ph.workspace": "Project root",
+			"btn.bindWorkspace": "Bind",
+			"skills.shadowed": "A workspace skill with the same name wins",
+			"skills.onlyBeta": "Skills are on Beta only. Switch to Beta under Rules, then come back.",
 			"skills.empty": "No user skills",
+			"skills.none": "No matches",
+			"skills.count": "{n}",
+			"skills.search": "Search",
+			"btn.createSkill": "New",
 			"btn.importZip": "Import zip",
 			"btn.importFolder": "Import folder",
+			"skills.drop": "Drop a zip or folder",
+			"skills.files": "{n} files",
 			"skills.importing": "Importing…",
 			"saved.import": "Imported {count} skill(s)",
+			"saved.create": "Created {id}",
 			"need.import": "Choose a zip or folder",
 			"err.import.folder": "No files were read. Select the skill folder itself (it must contain SKILL.md).",
-			"skills.pick": "Select a skill",
-			"skills.invalid": "Official catalog will ignore this: invalid format",
-			"skills.call.slash": "Type {cmd} in chat",
-			"skills.call.model": "Model can load",
-			"skills.call.modelOff": "Hidden from model",
-			"skills.call.userOff": "/name disabled",
-			"ph.skill.desc": "description (when to use)",
+			"skills.invalid": "Invalid — official catalog will ignore it",
+			"skills.call.slash": "/{id}",
+			"skills.call.model": "Model",
+			"skills.call.modelOff": "Model off",
+			"skills.call.userOff": "/ off",
+			"ph.skill.id": "id",
+			"ph.skill.desc": "description",
+			"ph.skill.when": "whenToUse",
+			"skills.kind.bundle": "Bundle",
+			"skills.kind.flat": "Flat",
 			"btn.saveSkill": "Save",
+			"btn.closeSkill": "Close",
 			"need.skill.id": "id must be kebab-case, e.g. code-review",
 			"confirm.delete.skill": "Delete {id} from official $DSH_HOME/skills? The host will drop it from the catalog.",
 			"err.skills": "Read failed: {error}",
@@ -662,8 +698,25 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-editor{display:flex;flex-direction:column;gap:10px;min-width:0;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);padding:12px;min-height:320px}
 .dshp-editor .dshp-area{flex:1;min-height:240px}
 .dshp-editor-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--dshp-mute);font-size:13px;min-height:160px}
+.dshp-skill-dir{margin:0 0 12px;font-family:var(--dshp-mono);font-size:12px;color:var(--dshp-mute)}
+.dshp-skill-filter{padding:10px 12px;border-bottom:1px solid var(--dshp-line);background:var(--dshp-paper)}
+.dshp-skill-filter .dshp-field{width:100%;min-width:0}
+.dshp-skill-body{max-height:min(58vh,560px);overflow:auto}
+.dshp-ruleitem.dshp-skill-item{align-items:flex-start;padding:12px 14px}
+.dshp-skill-item .dshp-rule-name{font-size:15px;overflow-wrap:anywhere}
+.dshp-skill-desc{display:block;margin:6px 0 0;font-size:13px;line-height:1.55;color:var(--dshp-ink);overflow-wrap:anywhere;white-space:pre-wrap}
+.dshp-skill-when{display:block;margin:4px 0 0;font-size:12px;line-height:1.5;color:var(--dshp-mute);overflow-wrap:anywhere;white-space:pre-wrap}
+.dshp-skill-ops{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.dshp-skill-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.dshp-chip{appearance:none;display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--dshp-line);border-radius:99px;background:var(--dshp-paper);color:var(--dshp-mute);font:11px/1 var(--dshp-mono)}
+.dshp-chip.is-on{color:var(--dshp-ok);border-color:color-mix(in srgb,var(--dshp-ok) 38%,var(--dshp-line));background:color-mix(in srgb,var(--dshp-ok) 12%,var(--dshp-bg))}
+.dshp-chip.is-bad{color:var(--dshp-bad);border-color:color-mix(in srgb,var(--dshp-bad) 38%,var(--dshp-line))}
+button.dshp-chip{cursor:pointer}
+.dshp-skill-listbox.is-drop{box-shadow:inset 0 0 0 2px var(--dshp-accent);background:var(--dshp-accent-soft)}
+.dshp-skill-drop{padding:10px 12px;border-bottom:1px solid var(--dshp-line);font-size:12px;color:var(--dshp-accent);text-align:center}
+.dshp-skill-edit .dshp-field{width:100%;min-width:0}
 @keyframes dshp-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
+@media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops,.dshp-skill-ops{width:100%;justify-content:flex-end}.dshp-skill-ops{align-items:flex-end}}
 @media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
 `;
 
@@ -1642,11 +1695,36 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [st, setSt] = useState(null);
 			const [editId, setEditId] = useState(null);
 			const [editDesc, setEditDesc] = useState("");
+			const [editWhen, setEditWhen] = useState("");
+			const [editUser, setEditUser] = useState(true);
+			const [editModel, setEditModel] = useState(true);
 			const [content, setContent] = useState("");
+			const [newId, setNewId] = useState("");
+			const [newDesc, setNewDesc] = useState("");
+			const [query, setQuery] = useState("");
+			const [scope, setScope] = useState("user");
+			const [wsId, setWsId] = useState("");
+			const [wsPath, setWsPath] = useState("");
+			const [dragOver, setDragOver] = useState(false);
 			const [busy, setBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
 			const zipRef = useRef(null);
 			const folderRef = useRef(null);
+
+			const applyStatus = useCallback((d) => {
+				if (!d || !d.ok) return false;
+				setSt({
+					ok: true,
+					skills: d.skills || [],
+					skills_dir: d.skills_dir || "$DSH_HOME/skills",
+					workspace_dir: d.workspace_dir || "$WORKSPACE/.dsh/skills",
+					workspace_name: d.workspace_name || "",
+					workspace_ready: !!d.workspace_ready,
+					workspaces: d.workspaces || [],
+				});
+				if (d.workspace_id) setWsId(d.workspace_id);
+				return true;
+			}, []);
 
 			const loadStatus = useCallback(() => {
 				const tr = tRef.current;
@@ -1658,8 +1736,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					});
 				};
 				const apply = (d) => {
-					if (d && d.ok) setSt({ ok: true, skills: d.skills || [] });
-					else fail({ message: (d && d.error) || "bad response" });
+					if (!applyStatus(d)) fail({ message: (d && d.error) || "bad response" });
 				};
 				apiJson("/dsh-purge/status")
 					.then((d) => {
@@ -1670,7 +1747,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							return;
 						}
 						if (d.skills) {
-							apply({ ok: true, skills: d.skills });
+							apply(d);
 							return;
 						}
 						skillsApi("status").then(apply).catch(fail);
@@ -1679,14 +1756,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						setOnBeta(false);
 						setSt(null);
 					});
-			}, []);
+			}, [applyStatus]);
 
 			useEffect(() => { loadStatus(); }, [loadStatus]);
 
 			const doPost = useCallback((action, payload, after) => {
 				setBusy(true);
 				setNotice({ kind: "idle", text: "" });
-				skillsApi(action, payload)
+				skillsApi(action, Object.assign({ scope, workspace: wsId }, payload || {}))
 					.then((d) => {
 						if (d && d.ok) {
 							setNotice({ kind: "ok", text: t("ok.done") });
@@ -1701,25 +1778,34 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
 					}))
 					.finally(() => setBusy(false));
-			}, [loadStatus, t]);
+			}, [loadStatus, t, scope, wsId]);
+
+			const fillEditor = (id, d) => {
+				setEditId(id);
+				setEditDesc(d.description || "");
+				setEditWhen(d.whenToUse || "");
+				setEditUser(d.userInvocable !== false);
+				setEditModel(d.modelInvocable !== false);
+				setContent(typeof d.content === "string" ? d.content : "");
+			};
 
 			const openSkill = useCallback((id) => {
 				setBusy(true);
-				skillsApi("read", { id: id })
+				skillsApi("read", { id: id, scope, workspace: wsId })
 					.then((d) => {
-						if (d.ok) {
-							setEditId(id);
-							setEditDesc(d.description || "");
-							setContent(typeof d.content === "string" ? d.content : "");
-						} else setNotice({ kind: "error", text: t("err.read", { error: d.error || "" }) });
+						if (d.ok) fillEditor(id, d);
+						else setNotice({ kind: "error", text: t("err.read", { error: d.error || "" }) });
 					})
 					.catch((e) => setNotice({ kind: "error", text: t("err.read", { error: e.message }) }))
 					.finally(() => setBusy(false));
-			}, [t]);
+			}, [t, scope, wsId]);
 
 			const clearEditor = () => {
 				setEditId(null);
 				setEditDesc("");
+				setEditWhen("");
+				setEditUser(true);
+				setEditModel(true);
 				setContent("");
 			};
 
@@ -1742,7 +1828,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				setBusy(true);
 				setNotice({ kind: "ok", text: t("skills.importing") });
 				readAsBase64(file)
-					.then((data) => skillsApi("import", { data, name: file.name }))
+					.then((data) => skillsApi("import", { data, name: file.name, scope, workspace: wsId }))
 					.then((d) => {
 						if (!d || !d.ok) throw new Error((d && d.error) || "");
 						setNotice({ kind: "ok", text: t("saved.import", { count: (d.imported || []).length || 1 }) });
@@ -1755,8 +1841,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.finally(() => setBusy(false));
 			};
 
+			const folderPathOf = (file) => String((file && (file.webkitRelativePath || file.relativePath || file.name)) || "").replace(/\\/g, "/");
+
 			const keepFolderFile = (file) => {
-				const rel = String(file.webkitRelativePath || file.name || "").replace(/\\/g, "/");
+				const rel = folderPathOf(file);
 				if (!rel || rel.includes("..")) return false;
 				if (/(^|\/)(node_modules|\.git|__MACOSX|\.system)(\/|$)/i.test(rel)) return false;
 				if (/(^|\/)\._/.test(rel) || /\/\.DS_Store$/i.test(rel)) return false;
@@ -1772,13 +1860,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				setBusy(true);
 				setNotice({ kind: "ok", text: t("skills.importing") });
 				Promise.all(files.map((file) => readAsBase64(file).then((content) => ({
-					path: file.webkitRelativePath || file.name,
+					path: folderPathOf(file),
 					content,
 					encoding: "base64",
 				}))))
 					.then((payload) => skillsApi("import", {
 						files: payload,
 						name: String(payload[0] && payload[0].path || "").split("/")[0],
+						scope,
+						workspace: wsId,
 					}))
 					.then((d) => {
 						if (!d || !d.ok) throw new Error((d && d.error) || "");
@@ -1792,37 +1882,132 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.finally(() => setBusy(false));
 			};
 
-			if (!onBeta) return null;
+			const readDirectoryEntries = (entry) => new Promise((resolve, reject) => {
+				const reader = entry.createReader();
+				const all = [];
+				const next = () => {
+					reader.readEntries((batch) => {
+						if (!batch.length) return resolve(all);
+						all.push(...batch);
+						next();
+					}, reject);
+				};
+				next();
+			});
 
+			const fileFromEntry = (entry, prefix) => new Promise((resolve, reject) => {
+				entry.file((file) => {
+					const path = prefix + file.name;
+					try { Object.defineProperty(file, "webkitRelativePath", { configurable: true, value: path }); } catch { /* ignore */ }
+					file.relativePath = path;
+					resolve(file);
+				}, reject);
+			});
+
+			const walkEntry = async (entry, prefix = "") => {
+				if (!entry) return [];
+				if (entry.isFile) return [await fileFromEntry(entry, prefix)];
+				if (!entry.isDirectory) return [];
+				const children = await readDirectoryEntries(entry);
+				const out = [];
+				for (const child of children) out.push(...await walkEntry(child, prefix + entry.name + "/"));
+				return out;
+			};
+
+			const importDropped = (dt) => {
+				const files = Array.from((dt && dt.files) || []);
+				const items = Array.from((dt && dt.items) || []);
+				const zip = files.find((file) => /\.(zip|tgz|tar\.gz|tar|skill)$/i.test(file.name || ""));
+				const entries = items.map((item) => item.webkitGetAsEntry && item.webkitGetAsEntry()).filter(Boolean);
+				const hasDir = entries.some((entry) => entry.isDirectory);
+				if (zip && !hasDir && files.length === 1) {
+					importZip(zip);
+					return;
+				}
+				if (!entries.length) {
+					if (zip) importZip(zip);
+					else if (files.length) importFolder(files);
+					else setNotice({ kind: "error", text: t("need.import") });
+					return;
+				}
+				Promise.all(entries.map((entry) => walkEntry(entry, "")))
+					.then((groups) => {
+						const collected = groups.flat();
+						if (collected.length) importFolder(collected);
+						else if (zip) importZip(zip);
+						else setNotice({ kind: "error", text: t("err.import.folder") });
+					})
+					.catch(() => setNotice({ kind: "error", text: t("err.import.folder") }));
+			};
+
+			if (!onBeta) {
+				return h("section", { className: "dshp-panel", "aria-label": t("skills.title") },
+					h("p", { className: "dshp-kicker" }, t("skills.kicker")),
+					h("h3", { className: "dshp-title" }, t("skills.title")),
+					h("p", { className: "dshp-hint", style: { margin: "12px 0 0", color: "var(--dshp-mute)", fontSize: 13 } }, t("skills.onlyBeta")),
+				);
+			}
+
+			const q = query.trim().toLowerCase();
+			const scoped = ((st && st.skills) || []).filter((item) => (item.scope || "user") === scope);
+			const items = scoped.filter((item) => {
+				if (!q) return true;
+				return [item.id, item.description, item.whenToUse, item.error].some((x) => String(x || "").toLowerCase().includes(q));
+			});
+			const total = scoped.length;
+			const workspaceReady = !!(st && st.workspace_ready);
+			const workspaces = (st && st.workspaces) || [];
+
+			const projectLocked = scope === "project" && !workspaceReady;
 			let list;
 			if (!st) {
 				list = h("div", { className: "dshp-skel", style: { height: 80, margin: 12 } });
-			} else if (!st.skills || st.skills.length === 0) {
+			} else if (projectLocked) {
+				list = h("p", { className: "dshp-empty" }, t("skills.workspace.none"));
+			} else if (!total) {
 				list = h("p", { className: "dshp-empty" }, t("skills.empty"));
+			} else if (!items.length) {
+				list = h("p", { className: "dshp-empty" }, t("skills.none"));
 			} else {
-				list = st.skills.map((item) => {
+				list = items.map((item) => {
 					const isEdit = item.id === editId;
+					const files = Array.isArray(item.files) ? item.files : [];
 					return h("div", {
 						key: item.id,
-						className: "dshp-ruleitem" + (isEdit ? " is-edit" : ""),
+						className: "dshp-ruleitem dshp-skill-item" + (isEdit ? " is-edit" : ""),
 						role: "button",
 						tabIndex: 0,
-						onClick: () => openSkill(item.id),
-						onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSkill(item.id); } },
+						onClick: () => (isEdit ? clearEditor() : openSkill(item.id)),
+						onKeyDown: (e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.preventDefault();
+								if (isEdit) clearEditor();
+								else openSkill(item.id);
+							}
+						},
 					},
 						h("div", { className: "dshp-rule-main" },
 							h("span", { className: "dshp-rule-name" }, item.id),
+							h("span", { className: "dshp-skill-desc" }, item.valid ? (item.description || "") : (item.error || t("skills.invalid"))),
+							item.whenToUse ? h("span", { className: "dshp-skill-when" }, item.whenToUse) : null,
+							item.shadowed ? h("span", { className: "dshp-skill-when" }, t("skills.shadowed")) : null,
 							h("span", { className: "dshp-rule-meta" },
-								(item.valid ? item.description : t("skills.invalid")) + " · " + formatSize(item.size),
-							),
-							item.valid ? h("span", { className: "dshp-rule-meta" },
 								[
-									item.userInvocable ? t("skills.call.slash", { cmd: "/" + item.id }) : t("skills.call.userOff"),
-									item.modelInvocable ? t("skills.call.model") : t("skills.call.modelOff"),
-								].join(" · "),
-							) : null,
+									item.kind === "flat" ? t("skills.kind.flat") : t("skills.kind.bundle"),
+									formatSize(item.size),
+									files.length ? t("skills.files", { n: files.length }) : null,
+								].filter(Boolean).join(" · "),
+							),
 						),
-						h("div", { className: "dshp-rule-ops" },
+						h("div", { className: "dshp-skill-ops" },
+							h("div", { className: "dshp-skill-chips" },
+								item.valid ? [
+									h("span", { key: "slash", className: "dshp-chip" + (item.userInvocable ? " is-on" : "") },
+										item.userInvocable ? t("skills.call.slash", { id: item.id }) : t("skills.call.userOff")),
+									h("span", { key: "model", className: "dshp-chip" + (item.modelInvocable ? " is-on" : "") },
+										item.modelInvocable ? t("skills.call.model") : t("skills.call.modelOff")),
+								] : h("span", { className: "dshp-chip is-bad" }, t("skills.invalid")),
+							),
 							h(Btn, {
 								tiny: true,
 								kind: "danger",
@@ -1841,85 +2026,222 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			return h("section", { className: "dshp-panel", "aria-label": t("skills.title") },
 				h("div", { className: "dshp-head" },
-					h("h3", { className: "dshp-title" }, t("skills.title")),
-					h("div", { className: "dshp-row", style: { margin: 0 } }, noticeNode(notice)),
+					h("div", null,
+						h("p", { className: "dshp-kicker" }, t("skills.kicker")),
+						h("h3", { className: "dshp-title" }, t("skills.title")),
+					),
+					h("div", { className: "dshp-row", style: { margin: 0 } },
+						h("div", { className: "dshp-switch", role: "group", "aria-label": t("skills.title") },
+							h("button", {
+								type: "button",
+								className: scope === "user" ? "is-on" : "",
+								onClick: () => { setScope("user"); clearEditor(); },
+							}, t("skills.scope.user")),
+							h("button", {
+								type: "button",
+								className: scope === "project" ? "is-on" : "",
+								onClick: () => { setScope("project"); clearEditor(); },
+							}, t("skills.scope.project")),
+						),
+						noticeNode(notice),
+					),
 				),
-				h("p", { className: "dshp-hint", style: { margin: "0 0 10px", color: "var(--dshp-mute)", fontSize: 12 } }, hostText(t, "skills.hint", hostSurfaceOf())),
+				h("p", { className: "dshp-skill-dir" },
+					scope === "project"
+						? ((st && st.workspace_dir) || "$WORKSPACE/.dsh/skills")
+							+ ((st && st.workspace_name) ? " · " + st.workspace_name : "")
+							+ (total ? " · " + t("skills.count", { n: total }) : "")
+						: ((st && st.skills_dir) || "$DSH_HOME/skills") + (total ? " · " + t("skills.count", { n: total }) : ""),
+				),
+				scope === "project" && workspaces.length > 1 ? h("div", { className: "dshp-skill-filter", style: { marginBottom: 8, border: "1px solid var(--dshp-line)", borderRadius: 8 } },
+					h("select", {
+						className: "dshp-field dshp-ver",
+						value: wsId,
+						onChange: (e) => {
+							const next = e.target.value;
+							setWsId(next);
+							clearEditor();
+							skillsApi("workspace", { id: next }).then((d) => { if (!applyStatus(d)) throw new Error((d && d.error) || ""); }).catch((err) => setNotice({ kind: "error", text: t("err.action", { error: err.message }) }));
+						},
+					}, workspaces.map((item) => h("option", { key: item.id, value: item.id }, item.name))),
+				) : null,
+				scope === "project" && !workspaceReady ? h("div", { className: "dshp-create-row", style: { marginBottom: 12 } },
+					h("input", {
+						className: "dshp-field",
+						placeholder: t("ph.workspace"),
+						value: wsPath,
+						onChange: (e) => setWsPath(e.target.value),
+					}),
+					h(Btn, {
+						kind: "primary",
+						tiny: true,
+						disabled: busy,
+						onClick: () => {
+							const pathText = wsPath.trim();
+							if (!pathText) {
+								setNotice({ kind: "error", text: t("skills.workspace.none") });
+								return;
+							}
+							setBusy(true);
+							skillsApi("workspace", { path: pathText })
+								.then((d) => {
+									if (!d || !d.ok) throw new Error((d && d.error) || "");
+									setWsPath("");
+									if (!applyStatus(d)) throw new Error((d && d.error) || "");
+									setNotice({ kind: "ok", text: t("ok.done") });
+								})
+								.catch((e) => setNotice({ kind: "error", text: t("err.action", { error: e.message }) }))
+								.finally(() => setBusy(false));
+						},
+					}, t("btn.bindWorkspace")),
+				) : null,
 				h("div", { className: "dshp-split" },
-					h("div", { className: "dshp-rulelist" },
-						h("div", { className: "dshp-rulebody" }, list),
+					h("div", {
+						className: "dshp-rulelist dshp-skill-listbox" + (dragOver ? " is-drop" : ""),
+						onDragEnter: (e) => { e.preventDefault(); setDragOver(true); },
+						onDragOver: (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setDragOver(true); },
+						onDragLeave: (e) => {
+							if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(false);
+						},
+						onDrop: (e) => {
+							e.preventDefault();
+							setDragOver(false);
+							importDropped(e.dataTransfer);
+						},
+					},
+						h("input", {
+							ref: zipRef,
+							type: "file",
+							accept: ".zip,.tgz,.tar.gz,.tar,.skill",
+							style: { display: "none" },
+							onChange: (e) => {
+								const file = e.target.files && e.target.files[0];
+								e.target.value = "";
+								importZip(file);
+							},
+						}),
+						h("input", {
+							ref: (el) => {
+								folderRef.current = el;
+								if (!el) return;
+								el.setAttribute("webkitdirectory", "");
+								el.setAttribute("directory", "");
+								el.multiple = true;
+							},
+							type: "file",
+							multiple: true,
+							style: { display: "none" },
+							onChange: (e) => {
+								const files = Array.from((e.target && e.target.files) || []);
+								e.target.value = "";
+								importFolder(files);
+							},
+						}),
+						h("div", { className: "dshp-skill-filter" },
+							h("input", {
+								className: "dshp-field",
+								placeholder: t("skills.search"),
+								value: query,
+								onChange: (e) => setQuery(e.target.value),
+							}),
+						),
+						dragOver ? h("div", { className: "dshp-skill-drop" }, t("skills.drop")) : null,
+						h("div", { className: "dshp-skill-body" }, list),
 						h("div", { className: "dshp-create" },
 							h("div", { className: "dshp-create-row" },
-								h("input", {
-									ref: zipRef,
-									type: "file",
-									accept: ".zip,.tgz,.tar.gz,.tar,.skill",
-									style: { display: "none" },
-									onChange: (e) => {
-										const file = e.target.files && e.target.files[0];
-										e.target.value = "";
-										importZip(file);
-									},
-								}),
-								h("input", {
-									ref: (el) => {
-										folderRef.current = el;
-										if (!el) return;
-										el.setAttribute("webkitdirectory", "");
-										el.setAttribute("directory", "");
-										el.multiple = true;
-									},
-									type: "file",
-									multiple: true,
-									style: { display: "none" },
-									onChange: (e) => {
-										const files = Array.from((e.target && e.target.files) || []);
-										e.target.value = "";
-										importFolder(files);
-									},
-								}),
 								h(Btn, {
 									kind: "primary",
 									tiny: true,
-									disabled: busy,
+									disabled: busy || projectLocked,
 									onClick: () => zipRef.current && zipRef.current.click(),
 								}, t("btn.importZip")),
 								h(Btn, {
 									tiny: true,
-									disabled: busy,
+									disabled: busy || projectLocked,
 									onClick: () => folderRef.current && folderRef.current.click(),
 								}, t("btn.importFolder")),
 							),
-						),
-					),
-					h("div", { className: "dshp-editor" },
-						editId ? [
-							h("div", { key: "meta", className: "dshp-row" },
+							h("div", { className: "dshp-create-row" },
+								h("input", {
+									className: "dshp-field",
+									placeholder: t("ph.skill.id"),
+									value: newId,
+									onChange: (e) => setNewId(e.target.value),
+								}),
 								h("input", {
 									className: "dshp-field",
 									placeholder: t("ph.skill.desc"),
-									value: editDesc,
-									onChange: (e) => setEditDesc(e.target.value),
+									value: newDesc,
+									onChange: (e) => setNewDesc(e.target.value),
 								}),
-							),
-							h("textarea", {
-								key: "body",
-								className: "dshp-area",
-								value: content,
-								onChange: (e) => setContent(e.target.value),
-								spellCheck: false,
-								placeholder: "",
-							}),
-							h("div", { key: "save", className: "dshp-row" },
 								h(Btn, {
 									kind: "primary",
-									disabled: busy,
-									onClick: () => doPost("save", { id: editId, content, description: editDesc }),
-								}, t("btn.saveSkill")),
-								noticeNode(notice),
+									tiny: true,
+									disabled: busy || projectLocked,
+									onClick: () => {
+										const id = newId.trim();
+										if (!id) {
+											setNotice({ kind: "error", text: t("need.skill.id") });
+											return;
+										}
+										doPost("create", { id, description: newDesc.trim() || id }, (d) => {
+											setNewId("");
+											setNewDesc("");
+											setNotice({ kind: "ok", text: t("saved.create", { id: (d && d.id) || id }) });
+											if (d && d.id) fillEditor(d.id, d);
+										});
+									},
+								}, t("btn.createSkill")),
 							),
-						] : h("div", { className: "dshp-editor-empty" }, t("skills.pick")),
+						),
 					),
+					editId ? h("div", { className: "dshp-editor dshp-skill-edit" },
+						h("input", {
+							className: "dshp-field",
+							placeholder: t("ph.skill.desc"),
+							value: editDesc,
+							onChange: (e) => setEditDesc(e.target.value),
+						}),
+						h("input", {
+							className: "dshp-field",
+							placeholder: t("ph.skill.when"),
+							value: editWhen,
+							onChange: (e) => setEditWhen(e.target.value),
+						}),
+						h("div", { className: "dshp-skill-chips", style: { justifyContent: "flex-start" } },
+							h("button", {
+								type: "button",
+								className: "dshp-chip" + (editUser ? " is-on" : ""),
+								onClick: () => setEditUser(!editUser),
+							}, t("skills.call.slash", { id: editId })),
+							h("button", {
+								type: "button",
+								className: "dshp-chip" + (editModel ? " is-on" : ""),
+								onClick: () => setEditModel(!editModel),
+							}, t("skills.call.model")),
+						),
+						h("textarea", {
+							className: "dshp-area",
+							value: content,
+							onChange: (e) => setContent(e.target.value),
+							spellCheck: false,
+						}),
+						h("div", { className: "dshp-row" },
+							h(Btn, {
+								kind: "primary",
+								disabled: busy,
+								onClick: () => doPost("save", {
+									id: editId,
+									content,
+									description: editDesc,
+									whenToUse: editWhen,
+									userInvocable: editUser,
+									modelInvocable: editModel,
+								}),
+							}, t("btn.saveSkill")),
+							h(Btn, { disabled: busy, onClick: clearEditor }, t("btn.closeSkill")),
+						),
+					) : null,
 				),
 			);
 		}
@@ -2065,6 +2387,36 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 				),
 				h(PurgifySection, null),
 				h(RulesSection, null),
+			);
+		}
+
+		function SkillsRoot(props) {
+			const t = typeof props.t === "function" ? props.t : ((key) => key);
+			const [theme, setTheme] = useState(readTheme);
+			const setAndStore = useCallback((next) => {
+				setTheme(next);
+				try {
+					window.localStorage.setItem(THEME_MODE_KEY, "manual");
+					window.localStorage.setItem(THEME_KEY, next);
+				} catch { /* ignore */ }
+			}, []);
+			translate = t;
+			return h("div", { className: "dshp-root", "data-theme": theme },
+				h("style", null, PURGE_CSS),
+				h("div", { className: "dshp-toolbar" },
+					h("div", { className: "dshp-switch", role: "group", "aria-label": t("theme.aria") },
+						h("button", {
+							type: "button",
+							className: theme === "white" ? "is-on" : "",
+							onClick: () => setAndStore("white"),
+						}, t("theme.white")),
+						h("button", {
+							type: "button",
+							className: theme === "dusk" ? "is-on" : "",
+							onClick: () => setAndStore("dusk"),
+						}, t("theme.ink")),
+					),
+				),
 				h(SkillsSection, null),
 			);
 		}
@@ -2610,6 +2962,14 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				locale: NS,
 				inject: () => ({ t }),
 			}, SettingsRoot));
+			ctx.slots.inject("settings.section", () => ctx.slots.register({
+				name: "settings.section",
+				id: "dsh-purge-skills",
+				order: 41,
+				label: () => t("nav.skills"),
+				locale: NS,
+				inject: () => ({ t }),
+			}, SkillsRoot));
 			try {
 				if (typeof ctx.inject === "function") {
 					ctx.inject(["sessions"], (host) => installRewindUi(host));
