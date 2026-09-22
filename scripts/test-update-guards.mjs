@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { markCurrent, safeUpdateRef } from "../lib/update.js";
+import { markCurrent, pluginAddSpec, safeUpdateRef } from "../lib/update.js";
 
 assert.equal(safeUpdateRef("master"), "master");
 assert.equal(safeUpdateRef("beta"), "beta");
@@ -10,6 +10,12 @@ assert.equal(safeUpdateRef("--hard"), "");
 assert.equal(safeUpdateRef("origin/master"), "");
 assert.equal(safeUpdateRef("../evil"), "");
 assert.equal(safeUpdateRef("master;rm"), "");
+
+const masterTar = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz";
+assert.equal(pluginAddSpec("git+https://github.com/yujunzhixue/dsh-purge.git", "master"), masterTar);
+assert.equal(pluginAddSpec("github:yujunzhixue/dsh-purge", "master"), masterTar);
+assert.equal(pluginAddSpec("https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip", "master"), masterTar);
+assert.equal(pluginAddSpec("dsh-purge", "master"), "");
 
 const head = "9397203733562d6baeec9e38ac519698c619edcb";
 const tag = "5e6be24acc3e5aac981c701cc34ef710ce48c4c7";
