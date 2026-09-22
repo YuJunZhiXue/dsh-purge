@@ -1,3 +1,7 @@
+# 外部参考仓库，禁止提交
+choirboy-prompt/
+/choirboy-prompt/
+
 node_modules/
 *.tgz
 npm-debug.log*

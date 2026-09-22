@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.1.11</strong></p>
+<p align="center"><strong>Version 1.1.12</strong></p>
 
 <p align="center">
   <em>本机官方 DeepSeek Harness 网络安全红队评测插件：在受控本机环境评测并加固宿主安全策略，不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -243,13 +243,13 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.11&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.12&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.11&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.12&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **网页端（前端）触发代码示例：**
@@ -281,7 +281,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.11&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.12&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -292,7 +292,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | 插件唯一标识符 |
 | name | `dsh-purge` | 插件展示名称 |
-| version | `1.1.11` | 语义化版本号 |
+| version | `1.1.12` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub 源码包地址 |
@@ -585,6 +585,7 @@ dsh-purge --uninstall
 | 补丁 | 分组查看状态，应用、还原或卸载 |
 | 提示词 | 编辑 `prompt-inject.md`，作为会话覆盖段 |
 | 规则集 | 多套 `AGENTS.md` / `CLAUDE.md`；启用写入 `$DSH_HOME`，删除从列表去掉 |
+| Skill | 导入压缩包或文件夹到当前宿主官方目录 `$DSH_HOME/skills/<id>/SKILL.md`（Web / 桌面各用自己的主目录，不写死盘符）；命中、加载、`/名称` 由 DSH 负责。也可自己删该文件夹 |
 
 ---
 
@@ -609,6 +610,7 @@ dsh-purge/
 │   ├── restart-web.js
 │   ├── rewind.js
 │   ├── rules.js
+│   ├── skills.js
 │   ├── uninstall-restart.js
 │   ├── uninstall.js
 │   └── update.js
@@ -619,7 +621,7 @@ dsh-purge/
 └── README.zh-CN.md
 ```
 
-运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。
+运行时用户文件：`$DSH_HOME/prompt-inject.md`、`$DSH_HOME/rules/`、`$DSH_HOME/skills/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。Skill 不进 `dsh-purge` 注入段，也不顶替提示词。
 
 ---
 
@@ -647,13 +649,14 @@ dsh-purge --edit
 # 聊天
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
+/skills list | import <压缩包或文件夹> | create <id> [说明] | delete <id> | help
 /rewind
 
 # 模型工具
 purge_status   purge_apply   purge_revert
 ```
 
-设置页「应用」完成后需要重启才会加载已改的包文件。点「重启」才会重启，不会自动重启。补丁标题下正式版和测试版左右分栏，各自选版本、各自切换。
+设置页「应用」完成后需要重启才会加载已改的包文件。点「重启」才会重启，不会自动重启。补丁标题下正式版和测试版分开两栏：各自看版本、各自切换；回退后会固定在该版本，要回到该通道最新再点「更新」。
 
 输入框旁的「回退」会丢掉最近一轮对话，并把上一句填回输入框；聊天里 `/rewind` 同样可用。
 
@@ -665,6 +668,7 @@ purge_status   purge_apply   purge_revert
 node --check lib/index.js
 node --check lib/core.js
 node --check lib/rewind.js
+node --check lib/skills.js
 node --check client.js
 ```
 
@@ -692,6 +696,8 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
            │否
            └─> 不写入覆盖段
 ```
+
+**Skill（官方目录，不注入）：** 设置页导入压缩包/文件夹，或 `/skills import`，只把内容写到官方 `$DSH_HOME/skills/<id>/SKILL.md`（可带同目录脚本等资源）。官方 `dsh-skill-filesystem` 监视该目录；模型用 `skill` 工具或 `/id` 加载。卸载插件不删用户 Skill。
 
 **身份（1.3.6）：** 插件不发明「操作员 / LCS」第二套人设。官方 Harness 身份句剥掉；`prompt-inject.md` 原文就是身份。0.1.5 把 inject 折进 `persona-prefix`，避免被梁神 phase-1 滤掉。
 
@@ -734,10 +740,15 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 ## 更新记录
 
+### 1.1.12
+
+- **测试版转为正式版。** 设置页和 `/skills` 可把压缩包或文件夹导入官方 `$DSH_HOME/skills`。命中和加载仍由 DSH 负责。
+- 带上 1.1.11 的系统提示修复：不再钉上一轮全文（#29）。版本列表按提交号标「当前」。本机接口拒绝跨站请求。补丁 #41 不再保留 `dsh-purge:committed`。
+
 ### 1.1.11
 
 - 设置页把正式版和测试版左右分开，各自选版本、各自切换和回退。还在 1.1.10 的点「检测更新」就能升到这一版。
-- **没有 Skill 导入。** Skill 只在测试版 1.1.12。
+- **当时没有 Skill 导入。** Skill 从 1.1.12 起进入正式版。
 - **#29：** 去掉「钉住上一条系统提示全文」。起初为了避免每步追加「系统提示词」，把上一轮全文钉回去；和每轮追加 section 的预设（梁神的 `workspace-instructions`）叠在一起后，系统提示每步变长，前缀缓存整段失效。现在每轮只把 `prompt-inject` 折进 persona，已经折过就不再折第二份。
 - 版本列表按提交号标「当前」。同为 1.1.11 的旧标签不再和 `master` 一起显示当前。
 - 本机接口拒绝跨站请求，更新只接受已知版本。任意网页不能再调用应用、还原、卸载或切换。
@@ -747,6 +758,8 @@ prompt-inject.md 有内容? ──是──> 原样写入 dsh-purge systemPrompt
 
 - 提示词和规则集都空时不能保存或应用，弹窗要求先添加提示词
 - 第一轮完整注入；不再钉上一轮整篇系统提示，避免来回追加
+- 设置页 / `/skills` 可把压缩包或文件夹导入官方 `$DSH_HOME/skills`；命中与加载仍由 DSH 负责
+- 设置页可切换正式版 / 测试版，并从历史版本回退；回退后会固定，不再自动跟上
 
 ### 1.1.9
 
