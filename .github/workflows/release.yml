@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'YuJunZhiXue/dsh-purge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          tag="v${version}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "already published: $tag"
+            exit 0
+          fi
+          first="$(head -n 1 release-notes.md | tr -d '\r')"
+          if [ "$first" != "# ${version}" ]; then
+            echo "release-notes.md 第一行必须是 # ${version}，现在是: ${first}"
+            exit 1
+          fi
+          zip="dsh-purge-${version}.zip"
+          if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
+            commit="$(git rev-parse "refs/tags/${tag}^{}")"
+            git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
+            gh release create "$tag" "$zip" --title "$tag" --notes-file release-notes.md
+          else
+            git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" HEAD
+            args=(release create "$tag" "$zip" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
+            case "$version" in
+              *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
+            esac
+            gh "${args[@]}"
+          fi
+          echo "published https://github.com/YuJunZhiXue/dsh-purge/releases/tag/${tag}"
