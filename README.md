@@ -561,12 +561,12 @@ It does not patch the Harness source tree. Use **Apply** on the settings page. I
 
 | Symptom | Patch | What it does |
 |---|---|---|
-| Picking a workspace / new chat wipes to empty | `#4` `#28` `#39` | 0.1.5 `dsh-persona` requires `prefix`; old presets still send `text`. Alias `text` → `prefix` so 0.1.2 presets (liangshen) can mount |
-| History: `summary requires notice form` | `#40` | `dsh-session-format-v0-to-v1` allows mnemon `instructions` / `recall` sources to carry `summary` |
+| Picking a workspace / new chat wipes to empty | `#4` `#27` `#38` | 0.1.5 `dsh-persona` requires `prefix`; old presets still send `text`. Alias `text` → `prefix` so 0.1.2 presets (liangshen) can mount |
+| History: `summary requires notice form` | `#39` | `dsh-session-format-v0-to-v1` allows mnemon `instructions` / `recall` sources to carry `summary` |
 | “Who are you” falls back to DeepSeek assistant | inject file | No second identity. The `dsh-purge` section is verbatim `prompt-inject.md` |
-| Liangshen turn 1 looks uninjected | `#29` | phase-1 keeps persona / persona-prefix / persona-suffix plus inject; official tool catalog stays isolated |
+| Liangshen turn 1 looks uninjected | `#28` | phase-1 keeps persona / persona-prefix / persona-suffix plus inject; official tool catalog stays isolated |
 
-`#20` / `#21` / `#28` / `#29` remain optional plugin rows: skip if those packages are absent.
+`#20` / `#27` / `#28` remain optional plugin rows: skip if those packages are absent.
 
 ---
 
@@ -635,7 +635,7 @@ Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`, `$DSH_HOME
 - Until the user saves a different prompt, `prompt-inject.md` stays the built-in default.
 - `/purge status` prints `DSH_HOME` and the patch list.
 - On 0.1.5, selecting an existing workspace should restore the session — not wipe to an empty workspace.
-- Skipped items are expected when a target file is absent (for example #20 / #21 without `dsh-web-fetch-http`).
+- Skipped items are expected when a target file is absent (for example #20 without `dsh-web-fetch-http`).
 
 ---
 

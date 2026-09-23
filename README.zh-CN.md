@@ -558,12 +558,12 @@ dsh-purge --uninstall
 
 | 现象 | 补丁 | 处理 |
 |---|---|---|
-| 选工作区 / 开新对话被清空 | `#4` `#28` `#39` | 0.1.5 的 `dsh-persona` 只要 `prefix`；旧预设仍写 `text`。补丁把 `text` 收成 `prefix` 别名，梁神等 0.1.2 预设才能挂上 |
-| 历史会话 `summary requires notice form` | `#40` | `dsh-session-format-v0-to-v1` 允许 mnemon 的 `instructions` / `recall` 带着 `summary` |
+| 选工作区 / 开新对话被清空 | `#4` `#27` `#38` | 0.1.5 的 `dsh-persona` 只要 `prefix`；旧预设仍写 `text`。补丁把 `text` 收成 `prefix` 别名，梁神等 0.1.2 预设才能挂上 |
+| 历史会话 `summary requires notice form` | `#39` | `dsh-session-format-v0-to-v1` 允许 mnemon 的 `instructions` / `recall` 带着 `summary` |
 | 「你是谁」回到 DeepSeek 助手 | 注入文件 | 不发明第二套身份；`dsh-purge` 段只贴 `prompt-inject.md` 原文 |
-| 梁神第一轮像没注入 | `#29` | phase-1 保留 persona / persona-prefix / persona-suffix 与 inject，不扒官方工具目录 |
+| 梁神第一轮像没注入 | `#28` | phase-1 保留 persona / persona-prefix / persona-suffix 与 inject，不扒官方工具目录 |
 
-`#20` / `#21` / `#28` / `#29` 仍是可选插件项：没装对应包就跳过。
+`#20` / `#27` / `#28` 仍是可选插件项：没装对应包就跳过。
 
 ---
 
@@ -632,7 +632,7 @@ dsh-purge/
 - 未自行改过时，`prompt-inject.md` 使用插件内置默认提示词。设置页保存不同内容后才换成用户自己的。
 - 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表。
 - 0.1.5 上选已有工作区应能恢复会话，不应被清空成空工作区。
-- 个别项显示跳过是正常的：例如没装 `dsh-web-fetch-http` 时 #20 / #21 会跳过。
+- 个别项显示跳过是正常的：例如没装 `dsh-web-fetch-http` 时 #20 会跳过。
 
 ---
 
