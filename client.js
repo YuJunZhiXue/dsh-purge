@@ -879,12 +879,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 			const syncPicks = (d) => {
 				const versions = (d && d.versions) || [];
+				const ceiling = listedCeiling(versions, d && d.localVersion);
 				const next = { stable: "", beta: "" };
 				for (const id of ["stable", "beta"]) {
-					const list = versions.filter((item) => item.channel === id && keepListedVersion(item));
-					const cur = list.find((item) => item.current);
-					const latest = list.find((item) => item.latest);
-					next[id] = (cur || latest || {}).ref || "";
+					const list = versions.filter((item) => item.channel === id && keepListedVersion(item, ceiling));
+					const hit = preferListed(list, d && d.localVersion);
+					next[id] = (hit && hit.ref) || "";
 				}
 				setPick(next);
 			};
@@ -1251,11 +1251,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
 			const renderEdition = (id) => {
 				const lane = (updateInfo && updateInfo.lanes && updateInfo.lanes[id]) || {};
-				const list = versions.filter((item) => item.channel === id && keepListedVersion(item));
+				const ceiling = listedCeiling(versions, localVer || (updateInfo && updateInfo.localVersion));
+				const list = versions.filter((item) => item.channel === id && keepListedVersion(item, ceiling));
 				const selectedRef = pick[id] || "";
-				const hit = list.find((item) => item.ref === selectedRef) || list.find((item) => item.current) || list.find((item) => item.latest);
+				const hit = list.find((item) => item.ref === selectedRef) || preferListed(list, localVer);
 				const onLane = channelNow === id;
-				const noBeta = id === "beta" && updateInfo && updateInfo.hasBeta === false && !list.length;
+				const noBeta = id === "beta" && Array.isArray(updateInfo && updateInfo.versions) && !list.length;
 				const pickedOther = Boolean(hit && selectedRef && !hit.current);
 				const thisJob = updateJob && updateJob.id === id ? updateJob : null;
 				let actionLabel = t("btn.checkUpdate");
@@ -1293,7 +1294,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					),
 					h("select", {
 						className: "dshp-field dshp-ver",
-						value: selectedRef || (hit && hit.ref) || "",
+						value: list.length ? ((hit && hit.ref) || "") : "",
 						disabled: updateBusy || !list.length,
 						onChange: (e) => setPick((prev) => Object.assign({}, prev, { [id]: e.target.value })),
 						"aria-label": t("update.pick"),
@@ -1302,7 +1303,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							? list.map((item) => h("option", {
 								key: item.ref + (item.sha || ""),
 								value: item.ref,
-							}, (item.version ? "v" + item.version : item.label) + (item.latest && !item.current ? " · " + t("update.tip") : "")))
+							}, versionChoiceLabel(item, t)))
 							: h("option", { value: "" }, noBeta ? t("update.noBeta") : t("update.pick")),
 					),
 					h(Btn, { tiny: true, kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
@@ -1630,8 +1631,63 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			return +parts[3] >= 12;
 		}
 
-		function keepListedVersion(item) {
-			return !/^1\.1\.11-beta/i.test(String((item && item.version) || "").replace(/^v/i, ""));
+		function splitListedVersion(raw) {
+			const text = String(raw || "").trim().replace(/^v/i, "");
+			const cut = text.split("-");
+			const core = String(cut[0] || "").split(".").map((n) => parseInt(n, 10) || 0);
+			return { core: [core[0] || 0, core[1] || 0, core[2] || 0], pre: cut.slice(1).join("-") };
+		}
+
+		function listedVersionNewer(remote, local) {
+			if (!remote || !local || String(remote) === String(local)) return false;
+			const a = splitListedVersion(remote);
+			const b = splitListedVersion(local);
+			for (let i = 0; i < 3; i += 1) {
+				if (a.core[i] !== b.core[i]) return a.core[i] > b.core[i];
+			}
+			if (a.pre && !b.pre) return false;
+			if (!a.pre && b.pre) return true;
+			return a.pre > b.pre;
+		}
+
+		function listedCeiling(versions, localVer) {
+			let best = "";
+			const rows = (versions || []).slice();
+			const local = String(localVer || "").replace(/^v/i, "");
+			if (local && !/(?:^|[-._])(beta|rc|pre|preview|test)(?:\d|$|[-._])/i.test(local)) {
+				rows.push({ channel: "stable", version: local });
+			}
+			for (const item of rows) {
+				if (!item || item.channel === "beta") continue;
+				const ver = String(item.version || "").replace(/^v/i, "");
+				if (!/^\d+\.\d+\.\d+/.test(ver) || /(?:^|[-._])(beta|rc|pre|preview|test)(?:\d|$|[-._])/i.test(ver)) continue;
+				if (!best || listedVersionNewer(ver, best)) best = ver;
+			}
+			return best;
+		}
+
+		function keepListedVersion(item, ceiling) {
+			const ver = String((item && (item.version || item.ref)) || "").replace(/^v/i, "");
+			if (/^1\.1\.11-beta/i.test(ver)) return false;
+			if (item && item.channel === "beta" && ceiling && !listedVersionNewer(ver, ceiling)) return false;
+			return true;
+		}
+
+		function preferListed(list, localVer) {
+			const ver = String(localVer || "").replace(/^v/i, "");
+			return (list || []).find((item) => item.current)
+				|| (list || []).find((item) => ver && String(item.version || "").replace(/^v/i, "") === ver)
+				|| (list || []).find((item) => item.latest)
+				|| (list || [])[0]
+				|| null;
+		}
+
+		function versionChoiceLabel(item, tr) {
+			const ver = String((item && item.version) || "").replace(/^v/i, "");
+			const base = ver ? ("v" + ver) : ((item && (item.label || item.ref)) || "—");
+			if (item && item.current) return base + " · " + tr("update.current");
+			if (item && item.latest) return base + " · " + tr("update.tip");
+			return base;
 		}
 
 		function SkillsSection() {

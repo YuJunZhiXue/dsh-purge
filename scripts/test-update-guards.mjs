@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { markCurrent, pluginAddSpec, safeUpdateRef } from "../lib/update.js";
+import { hideListedVersion, latestStableVersion, markCurrent, pluginAddSpec, safeUpdateRef } from "../lib/update.js";
 
 assert.equal(safeUpdateRef("master"), "master");
 assert.equal(safeUpdateRef("beta"), "beta");
@@ -30,5 +30,27 @@ assert.equal(marked.find((item) => item.ref === "v1.1.11").current, false);
 const onTag = markCurrent(versions, { channel: "stable", pin: "v1.1.11" }, "1.1.11", tag);
 assert.equal(onTag.find((item) => item.ref === "v1.1.11").current, true);
 assert.equal(onTag.find((item) => item.ref === "master").current, false);
+
+const caughtUp = [
+  { ref: "master", version: "1.1.12", channel: "stable", latest: true },
+  { ref: "v1.1.12", version: "1.1.12", channel: "stable" },
+  { ref: "v1.1.12-beta.1", version: "1.1.12-beta.1", channel: "beta" },
+  { ref: "beta", version: "1.1.12-beta.1", channel: "beta", latest: true },
+  { ref: "v1.1.13-beta.1", version: "1.1.13-beta.1", channel: "beta" },
+];
+const ceiling = latestStableVersion(caughtUp);
+assert.equal(ceiling, "1.1.12");
+assert.equal(hideListedVersion(caughtUp[2], ceiling), true);
+assert.equal(hideListedVersion(caughtUp[3], ceiling), true);
+assert.equal(hideListedVersion(caughtUp[4], ceiling), false);
+assert.equal(hideListedVersion({ ref: "v1.1.11-beta.1", version: "1.1.11-beta.1", channel: "beta" }, ""), true);
+
+const visible = caughtUp.filter((item) => !hideListedVersion(item, ceiling));
+assert.deepEqual(visible.map((item) => item.ref), ["master", "v1.1.12", "v1.1.13-beta.1"]);
+const staleSha = "423a91614baa747b56749003d054fedb8e725714";
+const shown = markCurrent(visible, { channel: "stable", pin: "" }, "1.1.12", staleSha);
+assert.equal(shown.find((item) => item.ref === "master").current, true);
+assert.equal(shown.find((item) => item.ref === "v1.1.12").current, false);
+assert.equal(shown.find((item) => item.ref === "v1.1.13-beta.1").current, false);
 
 console.log("ok: update guards");
