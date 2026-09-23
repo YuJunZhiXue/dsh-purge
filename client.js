@@ -2364,6 +2364,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 									body: JSON.stringify({ sessionId, mode: "once" }),
 								});
 								if (data && data.ok && data.sessionId) {
+									if (data.at) rewindSeenAt = data.at;
 									const text = isPluginDraft(data.text) ? "" : (data.text || "");
 									armComposerFill(data.sessionId, text);
 									scheduleComposerFill(data.sessionId, text);
