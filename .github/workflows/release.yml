@@ -41,13 +41,15 @@ jobs:
           if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
             commit="$(git rev-parse "refs/tags/${tag}^{}")"
             git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
-            gh release create "$tag" "$zip" --title "$tag" --notes-file release-notes.md
+            gh release create "$tag" --title "$tag" --notes-file release-notes.md
           else
             git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" HEAD
-            args=(release create "$tag" "$zip" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
+            args=(release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
             case "$version" in
               *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
             esac
             gh "${args[@]}"
           fi
+          test -s "$zip"
+          gh release upload "$tag" "$zip" --clobber
           echo "published https://github.com/YuJunZhiXue/dsh-purge/releases/tag/${tag}"
