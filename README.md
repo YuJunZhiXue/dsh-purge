@@ -757,7 +757,7 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 - Rewind waits for `updateQueue` to finish. A queue item that is already gone no longer becomes an unhandled rejection that can take down the host.
 - The fallback rewind button records this rewind’s timestamp. The 1.2s poll does not open and refill the same rewind a second time.
-- When the text being restored belongs to a turn that is still open, the fork point is the last closed turn. The previous completed turn is no longer dropped. If that turn is still running and does not close within 8 seconds, rewind still fails instead of cutting an incomplete log.
+- When the text being restored belongs to a turn that is still open, the fork point is the last closed turn. The previous completed turn is no longer dropped. If that turn is still running and does not close within 8 seconds, rewind still fails instead of cutting an incomplete log (#34).
 - The bash timeout patch is now one whole-line regular expression, and values that grew extra zeros are pulled back to 10 minutes. Startup no longer appends another zero (#22, #31).
 - Patch replacement accepts regular expressions, and `$1` expands. A finished bundle-layout clean matches `persona: ""`, so the panel does not stay on pending. #39 is optional. The skipped hint now says the patch is not needed for this version, or the component is not installed.
 - Beta versions already covered by the current stable release are hidden from the version list. When the commit does not match, 「当前」follows the local version number.
