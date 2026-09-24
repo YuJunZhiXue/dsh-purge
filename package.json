@@ -1,6 +1,6 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.18",
+  "version": "1.1.19",
   "description": "DeepSeek Harness 网络安全红队工具：本机官方 Harness 受控评测与清洗，不同模型可换不同提示词；默认提示词面向国模「小码酱」。求 Star ⭐",
   "type": "module",
   "main": "lib/index.js",
