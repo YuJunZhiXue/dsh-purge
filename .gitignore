@@ -1,12 +1,24 @@
-# 外部参考仓库，禁止提交
-choirboy-prompt/
-/choirboy-prompt/
-
+# 不上传
 node_modules/
 *.tgz
 npm-debug.log*
+*.log
 .DS_Store
+Thumbs.db
+
+# 外部参考，不是本插件
+choirboy-prompt/
+/choirboy-prompt/
 _archive/
 频道推广手册/
+
+# 嵌入前的提示词原文
 lib/default-prompt-inject.md
 default-prompt-inject.md
+
+# 本机官方安装包、解包目录、拆出的压缩包
+/deepseek-harness-*.exe
+/official-harness-unpacked/
+/official-harness-payload.7z
+*.asar
+*.asar.bak

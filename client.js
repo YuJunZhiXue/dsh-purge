@@ -132,7 +132,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 27, 28, 32] },
 			{ key: "code", ids: [6, 7, 8] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
-			{ key: "tools", ids: [17, 18, 19, 20, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37] },
+			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37] },
 			{ key: "compat", ids: [38, 39, 40] },
 		];
 
@@ -155,7 +155,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.skipped": "跳过",
 			"apply.hint": "待应用=原文还在。跳过=当前版本不需要或组件未安装，再点也不会变。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
-			"warn.noRoot.desktop": "未定位到当前桌面应用里的 @deepseek-ai。请退出托盘后重新打开 DSH Desktop.exe，再在桌面端设置页点「应用」。安装目录不限盘符。",
+			"warn.noRoot.desktop": "官方客户端的代码在 app.asar 里。点「应用」会解开并自动重启，不用另跑脚本。第三方 DSH Desktop 直接点「应用」。",
+			"unpack.restarting": "补丁已写入。点「重启」后客户端会自己重新打开。",
+			"restart.fullQuit": "正在重启，客户端会自己重新打开。",
 			"warn.noInject": "提示词优先；为空则注入当前启用的规则集。两边都空会提示必须添加。Skill 不顶替提示词。",
 			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
@@ -193,6 +195,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.available": "有新版本 {remote}，当前 {local}",
 			"update.pinned": "已固定在 {version}，通道最新是 {remote}",
 			"update.done": "已更新到 {version}",
+			"update.restarting": "已还原并写入新补丁，正在重启…",
+			"update.fullQuit": "补丁已写入。点「重启」后客户端会自己重新打开。",
+			"restart.official.title": "需要重启",
+			"restart.official.body": "补丁已写入。点重启后客户端会自己重新打开。",
 			"update.switched": "已切换到 {version}",
 			"update.autoDone": "已自动更新到 {version}",
 			"update.reloading": "正在刷新设置页…",
@@ -299,7 +305,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.17": "观察策略读写放行",
 			"patch.18": "重复调用守卫禁用",
 			"patch.19": "工具结果修剪禁用",
-			"patch.20": "dsh-web-fetch-http：base 写入依赖",
 			"patch.21": "bash 超时 60s → 10min",
 			"patch.22": "read 上限放宽",
 			"patch.23": "子代理深度 3 → 10",
@@ -364,7 +369,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.skipped": "Skipped",
 			"apply.hint": "Pending = original text still present. Skipped = not needed for this version or component not installed.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
-			"warn.noRoot.desktop": "Could not find @deepseek-ai inside this desktop app. Quit the tray, reopen DSH Desktop.exe, then Apply on the desktop Settings page. The install folder can be on any drive.",
+			"warn.noRoot.desktop": "Official Harness keeps its code in app.asar. Apply unpacks it and restarts the app. Third-party DSH Desktop: just Apply.",
+			"unpack.restarting": "Patches are written. Click Restart and the client opens again by itself.",
+			"restart.fullQuit": "Restarting. The client will open again by itself.",
 			"warn.noInject": "The prompt box wins. If it is empty, the enabled rule set is injected. If both are empty you will be asked to add a prompt. Skills do not replace the prompt.",
 			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
@@ -402,6 +409,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"update.available": "Update {remote} available (now {local})",
 			"update.pinned": "Pinned at {version}; channel latest is {remote}",
 			"update.done": "Updated to {version}.",
+			"update.restarting": "Restored the old patches, wrote the new ones, and restarting…",
+			"update.fullQuit": "Patches are written. Click Restart and the client opens again by itself.",
+			"restart.official.title": "Restart required",
+			"restart.official.body": "Patches are written. Click Restart and the client opens again by itself.",
 			"update.switched": "Switched to {version}.",
 			"update.autoDone": "Auto-updated to {version}.",
 			"update.reloading": "Refreshing settings…",
@@ -508,7 +519,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.17": "Observation policy allow R/W",
 			"patch.18": "Repeat-call guard off",
 			"patch.19": "Tool-result pruner off",
-			"patch.20": "dsh-web-fetch-http: pin base dependency",
 			"patch.21": "bash timeout 60s → 10min",
 			"patch.22": "read cap raised",
 			"patch.23": "subagent depth 3 → 10",
@@ -866,6 +876,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
 			const [updateJob, setUpdateJob] = useState(null);
 			const [askRestart, setAskRestart] = useState(false);
+			const [askOfficialRestart, setAskOfficialRestart] = useState(false);
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
@@ -944,6 +955,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 					.then((d) => {
 						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
 						applyUpdateInfo(d, tr, kind);
+						if (d.needsFullQuit) {
+							setAskOfficialRestart(true);
+							setUpdateNotice({ kind: "ok", text: tr("restart.official.body") });
+							return d;
+						}
+						if (d.restartAfter) {
+							setUpdateNotice({ kind: "ok", text: tr("update.restarting") });
+							return d;
+						}
 						if (d.applied && d.reloadClient !== false) {
 							setUpdateNotice({ kind: "ok", text: tr("update.reloading") });
 							setTimeout(() => {
@@ -1011,6 +1031,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							setState(d);
 							if (d.channel) setChannel(d.channel);
 							if (d.update && d.update.ok && !d.update.error) setUpdateInfo(d.update);
+							if (d.boot_full_quit) setAskOfficialRestart(true);
 						} else {
 							setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 							setNotice({ kind: "error", text: tr("err.status", { error: (d && d.error) || "bad response" }) });
@@ -1072,6 +1093,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 							}
 							if (!d.ok) {
 								setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
+								return;
+							}
+							if (action === "apply" && (d.unpacked_asar || d.needs_full_quit)) {
+								setAskOfficialRestart(true);
+								setNotice({ kind: "ok", text: tr("restart.official.body") });
+								loadAll();
 								return;
 							}
 							if (action === "apply") {
@@ -1369,6 +1396,26 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 						h("div", { className: "dshp-modal-ops" },
 							h(Btn, { disabled: uninstallBusy, onClick: () => setAskUninstall(false) }, t("uninstall.cancel")),
 							h(Btn, { kind: "solid-danger", disabled: uninstallBusy, onClick: doUninstall }, t("uninstall.confirm")),
+						),
+					),
+				) : null,
+				askOfficialRestart ? h("div", {
+					className: "dshp-modal-bg",
+					role: "dialog",
+					"aria-modal": "true",
+					"aria-labelledby": "dshp-official-restart-title",
+				},
+					h("div", { className: "dshp-modal" },
+						h("h4", { id: "dshp-official-restart-title" }, t("restart.official.title")),
+						h("p", null, t("restart.official.body")),
+						h("div", { className: "dshp-modal-ops" },
+							h(Btn, {
+								kind: "primary",
+								onClick: () => {
+									setAskOfficialRestart(false);
+									restartDsh(setNotice, function () {}, t, hostSurface);
+								},
+							}, t("btn.restart")),
 						),
 					),
 				) : null,
