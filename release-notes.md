@@ -1,19 +1,25 @@
-# 1.1.15
+# 1.1.16
 
 ## 中文
 
-- 设置页点「应用」会把输入框里的提示词写入 `prompt-inject.md`。以前只检查有没有字，重启后读的还是旧文件，所以注入像没生效。
-- 带 `complete: true` 的预设在重启后不再丢掉 `dsh-purge` 注入段。点「应用」之后必须再点「重启」，宿主重新打开后新开一轮对话，注入才进入当前会话。
-- bash 超时补丁不再和状态检查共用同一条正则。点「应用」会把 60 秒写成 10 分钟，不会一直停在待应用（#35）。
-- bash 超时写进 `cordis.patch.yml` 时用 `#` 注释。`//` 会被 YAML 当成字符串，`timeoutMs` 校验失败，`dsh` 一启动就崩（#36）。已经起不来的，先把 `@deepseek-ai/dsh-base` 里那一行的 `//` 改成 `#`，或改回 `timeoutMs: 600000`，再更新插件。
-- 去掉点了也不变的「启用 fetch」补丁，后面的编号依次前移。没装 `dsh-web-fetch-http` 时不再占着一条待应用。
-- README 开头写明必须应用并重启。工作原理改成流程图，去掉 0.1.5 适配表和生效验证。
+- 对准 **dsh 0.1.7-rc.1**。工作区说明常量改名为 `AGENT_INSTRUCTIONS_INTRO`，句子没变，补丁跟着改。
+- 沙箱 `confine()` 已是 `async confine(argv, policy, signal)`，补丁按新函数写。直通行为与上一版相同。
+- 子代理深度改到 `dsh-subagent`，默认从 1 提到 10。深度检查还在。
+- 设置服务补回旧的 `register` / `get`。`dsh-mnemon`、`dsh-better-reasoning-effort` 这类还在调旧接口的插件可以继续用。官方 `describe` / `update` 不动。补丁只打一次，不会在启动时重复插入。
+- 删掉 0.1.7 里已经对不上的旧条文，包括单独给 `dsh-base` 补 `dsh-web-fetch-http` 依赖的那条。官方包已经自带。
+- Web 四个内置预设（standard、ptc、cordis、minimal）只清空身份句。工作目录、工具列表、`ptc` 模式，以及 minimal 的 `complete: true` 和 `includeRuntimeContext: false` 不动。
+- `complete: true` 时，`prompt-inject.md` 仍接在这段前面。换宿主版本或旧钩子删段之后，注入不会丢。点「应用」之后仍要再点「重启」，新开一轮对话才进当前会话。
+- `dsh-compaction-instant` 网页端从已删除的 `settingsScope` 改到 `configForms`，页面不再停在 Failed to load plugins。
+- README 的赞赏区换成非盈利声明：严禁商业售卖、付费倒卖或黑灰产牟利，仅供技术参考。
 
 ## English
 
-- Apply on the settings page writes the prompt box into `prompt-inject.md`. It used to only check that the box was not empty, so after a restart the host still read the old file and the inject looked like it never happened.
-- Presets with `complete: true` no longer drop the `dsh-purge` inject section after a restart. After Apply you must click Restart. When the host is back, start a new chat; that is when the inject enters the session.
-- The bash timeout patch no longer shares one regular expression with the status check. Apply now writes 60 seconds as 10 minutes instead of staying on pending (#35).
-- The bash timeout note in `cordis.patch.yml` is a `#` comment. A `//` comment is a YAML string, so `timeoutMs` fails validation and `dsh` dies on startup (#36). If it already will not start, change that `//` to `#` in `@deepseek-ai/dsh-base`, or put the line back to `timeoutMs: 600000`, then update the plugin.
-- The fetch-enable patch that stayed pending is gone, and later patch numbers move up by one. A missing `dsh-web-fetch-http` package no longer occupies a pending row.
-- The README now says at the top that Apply must be followed by Restart. How it works is a flowchart. The 0.1.5 notes table and the verify list are removed.
+- Aligned with **dsh 0.1.7-rc.1**. The workspace-instruction constant is now `AGENT_INSTRUCTIONS_INTRO`. The sentence is unchanged, and the patch follows it.
+- Sandbox `confine()` is now `async confine(argv, policy, signal)`, and the patch matches that function. Passthrough behavior is the same as the previous release.
+- Subagent depth lives on `dsh-subagent`. The default moves from 1 to 10. The depth check remains.
+- The settings service again exposes the old `register` / `get` methods, so plugins such as `dsh-mnemon` and `dsh-better-reasoning-effort` keep working. Official `describe` / `update` stay. The patch applies once and does not insert itself again on startup.
+- Patch text that no longer exists in 0.1.7 is removed, including the extra `dsh-web-fetch-http` dependency on `dsh-base`. The official package already depends on it.
+- The four built-in Web presets (standard, ptc, cordis, minimal) lose only the identity sentence. The working-directory suffix, tool lists, `ptc` mode, and minimal's `complete: true` plus `includeRuntimeContext: false` stay.
+- When `complete: true`, `prompt-inject.md` is still prepended to that section. A host upgrade or an older hook that drops the section does not drop the inject. After Apply you still click Restart and start a new chat before it enters the session.
+- The `dsh-compaction-instant` web client uses `configForms` instead of the removed `settingsScope`, so the page no longer stops on Failed to load plugins.
+- The README sponsor block is now a non-profit notice: no commercial resale and no gray-market profit; technical reference only.
