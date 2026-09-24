@@ -102,4 +102,17 @@ const again = rewritePromptAssembly(
 );
 assert.equal((render(again).match(/Little Code Sauce/g) || []).length, 1);
 
+const kept = rewritePromptAssembly(
+  {
+    sections: [
+      { name: "deployment:persona-prefix", text: persona },
+    ],
+  },
+  { fallbackInject: inject, dropPurgeAfterFold: false },
+);
+const purge = (kept.sections || []).filter((section) => section.name === "dsh-purge");
+assert.equal(purge.length, 1);
+assert.match(purge[0].text, /Little Code Sauce/);
+assert.equal((render(kept).match(/Little Code Sauce/g) || []).length, 1);
+
 console.log("ok: #29 pin snowball is gone");

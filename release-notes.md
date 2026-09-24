@@ -1,21 +1,17 @@
-# 1.1.14
+# 1.1.15
 
 ## 中文
 
-- 回退清队列时会等 `updateQueue` 结束。条目已经不在时不再变成未处理的拒绝，避免把宿主带崩（#32）。
-- 兜底回退按钮成功后会记下这次的时间。1.2 秒后的轮询不会把同一次回退再打开、再回填一遍（#33）。
-- 回填的是还没结束的那一句时，切点改到最后一个已闭合回合。不再多丢上一整轮。回合还在进行、8 秒内等不到结束时，仍然直接失败，不会按不完整日志去切（#34）。
-- bash 超时补丁改成整行正则，并把已经多写出来的 0 收回到 10 分钟。每次启动不再给超时再补一个 0（#22，#31）。
-- 补丁替换支持正则，`$1` 会展开。bundle 布局清洗完成后能认出 `persona: ""`，面板不再一直显示待应用。#39 改为可选。跳过说明改为「当前版本不需要或组件未安装」。
-- 正式版已经追上的测试版不再出现在版本列表里。提交号对不上时，按本机版本号标「当前」。
-- phase-1 不再清空 runtime context，也不改消息白名单。梁神和官方插件的消息照旧保留。
+- 设置页点「应用」会把输入框里的提示词写入 `prompt-inject.md`。以前只检查有没有字，重启后读的还是旧文件，所以注入像没生效。
+- 带 `complete: true` 的预设在重启后不再丢掉 `dsh-purge` 注入段。点「应用」之后必须再点「重启」，宿主重新打开后新开一轮对话，注入才进入当前会话。
+- bash 超时补丁不再和状态检查共用同一条正则。点「应用」会把 60 秒写成 10 分钟，不会一直停在待应用（#35）。
+- 去掉点了也不变的「启用 fetch」补丁，后面的编号依次前移。没装 `dsh-web-fetch-http` 时不再占着一条待应用。
+- README 开头写明必须应用并重启。工作原理改成流程图，去掉 0.1.5 适配表和生效验证。
 
 ## English
 
-- Rewind waits for `updateQueue` to finish. A queue item that is already gone no longer becomes an unhandled rejection that can take down the host (#32).
-- The fallback rewind button records this rewind’s timestamp. The 1.2s poll does not open and refill the same rewind a second time (#33).
-- When the text being restored belongs to a turn that is still open, the fork point is the last closed turn. The previous completed turn is no longer dropped. If that turn is still running and does not close within 8 seconds, rewind still fails instead of cutting an incomplete log (#34).
-- The bash timeout patch is now one whole-line regular expression, and values that grew extra zeros are pulled back to 10 minutes. Startup no longer appends another zero (#22, #31).
-- Patch replacement accepts regular expressions, and `$1` expands. A finished bundle-layout clean matches `persona: ""`, so the panel does not stay on pending. #39 is optional. The skipped hint now says the patch is not needed for this version, or the component is not installed.
-- Beta versions already covered by the current stable release are hidden from the version list. When the commit does not match, 「当前」follows the local version number.
-- Phase-1 no longer clears runtime context or the message allowlist. 梁神 and official plugin messages stay as they are.
+- Apply on the settings page writes the prompt box into `prompt-inject.md`. It used to only check that the box was not empty, so after a restart the host still read the old file and the inject looked like it never happened.
+- Presets with `complete: true` no longer drop the `dsh-purge` inject section after a restart. After Apply you must click Restart. When the host is back, start a new chat; that is when the inject enters the session.
+- The bash timeout patch no longer shares one regular expression with the status check. Apply now writes 60 seconds as 10 minutes instead of staying on pending (#35).
+- The fetch-enable patch that stayed pending is gone, and later patch numbers move up by one. A missing `dsh-web-fetch-http` package no longer occupies a pending row.
+- The README now says at the top that Apply must be followed by Restart. How it works is a flowchart. The 0.1.5 notes table and the verify list are removed.
