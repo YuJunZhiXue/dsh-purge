@@ -2129,7 +2129,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-rewind:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,currentColor)}
 .dshp-rewind:disabled{opacity:.4;cursor:default}
 .dshp-rewind svg{display:block}
-.dshp-rewind-menu{position:absolute;right:0;bottom:calc(100% + 6px);z-index:100;box-sizing:border-box;min-width:196px;padding:4px;border:0;border-radius:12px;background:var(--dsw-specific-menu,#fff);color:var(--dsw-alias-label-primary,#1a1a1a);--dsw-elevation-stroke-color:var(--dsw-alias-border-l1);box-shadow:var(--dsw-elevation-prominent,0 8px 24px rgba(0,0,0,.16))}
+.dshp-rewind-menu{position:absolute;right:0;bottom:calc(100% + 6px);z-index:1200;box-sizing:border-box;min-width:196px;padding:4px;border:0;border-radius:12px;background:var(--dsw-specific-menu,#fff);color:var(--dsw-alias-label-primary,#1a1a1a);--dsw-elevation-stroke-color:var(--dsw-alias-border-l1);box-shadow:var(--dsw-elevation-prominent,0 8px 24px rgba(0,0,0,.16))}
 body[data-ds-dark-theme] .dshp-rewind-menu{background:var(--dsw-specific-menu,#32312d);color:var(--dsw-alias-label-primary,#e6e2db);--dsw-elevation-stroke-color:var(--dsw-alias-border-l1,#3f3d38);box-shadow:var(--dsw-elevation-prominent,0 10px 28px rgba(0,0,0,.45))}
 .dshp-rewind-item{display:flex;flex-direction:column;gap:2px;width:100%;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:12px/1.3 var(--ds-font-sans,system-ui,sans-serif)}
 .dshp-rewind-item:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}
@@ -2144,11 +2144,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 `;
 		const DRAFT_KEY = "dshp-rewind-draft:";
 		const ARM_KEY = "dshp-rewind-arm:";
-		const FILL_DELAYS = [0, 50, 180];
+		const FILL_DELAYS = [0, 50, 180, 400, 800];
 		const ARM_TTL_MS = 45 * 1000;
 		let rewindSeenAt = 0;
 		let rewindSessions = null;
 		let rewindHost = null;
+		let rewindWorkspace = null;
+		let rewindConversation = null;
 		let pendingComposer = { sessionId: "", text: "", at: 0 };
 		let armedFill = { sessionId: "", text: "", at: 0 };
 
@@ -2163,7 +2165,29 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		function currentSessionId(sessions) {
-			try { return sessions?.list?.getSnapshot?.()?.current || ""; } catch { return ""; }
+			try {
+				const selected = rewindWorkspace?.selection?.getSnapshot?.()?.sessionId;
+				if (typeof selected === "string" && selected) return selected;
+			} catch { /* ignore */ }
+			try {
+				const snap = sessions?.list?.getSnapshot?.();
+				if (typeof snap?.current === "string" && snap.current) return snap.current;
+			} catch { /* ignore */ }
+			return "";
+		}
+
+		function sessionKnown(sessions, sessionId) {
+			try {
+				const snap = sessions?.list?.getSnapshot?.();
+				if (!snap || !sessionId) return false;
+				if (snap.byId && Object.prototype.hasOwnProperty.call(snap.byId, sessionId)) return true;
+				if (Array.isArray(snap.ids) && snap.ids.includes(sessionId)) return true;
+			} catch { /* ignore */ }
+			return false;
+		}
+
+		function waitMs(ms) {
+			return new Promise((resolve) => window.setTimeout(resolve, ms));
 		}
 
 		function isPluginDraft(text) {
@@ -2222,14 +2246,27 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			return text;
 		}
 
+		function conversationFace() {
+			if (rewindConversation) return rewindConversation;
+			const host = rewindHost;
+			if (host?.conversation) return host.conversation;
+			if (typeof host?.get === "function") {
+				try { return host.get("conversation"); } catch { return undefined; }
+			}
+			return undefined;
+		}
+
 		function conversationInput(sessionId) {
 			try {
-				const host = rewindHost;
-				const conversation = host?.conversation || (typeof host?.get === "function" ? host.get("conversation") : undefined);
-				const sessions = host?.sessions || rewindSessions;
+				const input = conversationFace()?.input;
+				if (!input || !sessionId) return null;
+				if (typeof input.shell === "function") {
+					try { return input.shell(sessionId); } catch { /* session not retained yet */ }
+				}
+				const sessions = rewindHost?.sessions || rewindSessions;
 				const actx = typeof sessions?.scope === "function" ? sessions.scope(sessionId) : undefined;
-				if (conversation?.input?.for && actx) return conversation.input.for(actx);
-				return conversation?.input || null;
+				if (typeof input.for === "function" && actx) return input.for(actx);
+				return null;
 			} catch {
 				return null;
 			}
@@ -2331,14 +2368,36 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		async function openRewoundSession(sessions, sessionId) {
-			if (!sessions || !sessionId) return;
-			try { await sessions.refresh?.(); } catch { /* ignore */ }
-			try { sessions.open(sessionId); } catch { /* ignore */ }
-			await dropInheritedQueue(sessions, sessionId);
-			window.setTimeout(() => {
-				try { sessions.open(sessionId); } catch { /* ignore */ }
-				dropInheritedQueue(sessions, sessionId);
-			}, 250);
+			if (!sessionId) return;
+			const workspace = rewindWorkspace;
+			let lastError = null;
+			for (let attempt = 0; attempt < 25; attempt += 1) {
+				if (sessions && typeof sessions.refresh === "function" && !sessionKnown(sessions, sessionId)) {
+					try { await sessions.refresh(); } catch (error) { lastError = error; }
+				}
+				const known = sessionKnown(sessions, sessionId);
+				if (known || typeof sessions?.open === "function") {
+					try {
+						if (workspace && typeof workspace.openSession === "function") {
+							workspace.openSession(sessionId);
+						} else if (typeof sessions?.open === "function") {
+							sessions.open(sessionId);
+						} else {
+							throw new Error("无法打开回退后的会话");
+						}
+						const selected = workspace?.selection?.getSnapshot?.()?.sessionId;
+						if (!workspace || selected === sessionId) {
+							await dropInheritedQueue(sessions, sessionId);
+							window.setTimeout(() => { dropInheritedQueue(sessions, sessionId); }, 250);
+							return;
+						}
+					} catch (error) {
+						lastError = error;
+					}
+				}
+				await waitMs(120);
+			}
+			throw new Error((lastError && lastError.message) || "回退后的会话没有打开");
 		}
 
 		class RewindSafe extends Component {
@@ -2564,7 +2623,12 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				}
 			};
 
-			const label = busy ? rewindText(t, "rewind.busy", "回退中…") : rewindText(t, "rewind.label", "回退");
+			const failLabel = notice
+				? (notice.length > 18 ? notice.slice(0, 18) + "…" : notice)
+				: "";
+			const label = busy
+				? rewindText(t, "rewind.busy", "回退中…")
+				: (failLabel || rewindText(t, "rewind.label", "回退"));
 			const title = notice || rewindText(t, "rewind.aria", "回退");
 			return h("div", { className: "dshp-rewind-wrap", ref: wrapRef },
 				h("style", null, REWIND_CSS),
@@ -2632,6 +2696,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		function installRewindUi(ctx) {
 			rewindHost = ctx;
 			rewindSessions = ctx.sessions;
+			rewindWorkspace = ctx.uiWorkspace || null;
+			rewindConversation = ctx.conversation || null;
 			ctx.slots.inject("conversation.input.right", () => ctx.slots.register({
 				name: "conversation.input.right",
 				id: "dsh-purge-rewind",
@@ -2667,7 +2733,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			}, SettingsRoot));
 			try {
 				if (typeof ctx.inject === "function") {
-					ctx.inject(["sessions"], (host) => installRewindUi(host));
+					ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => installRewindUi(host));
 				} else if (ctx.sessions) {
 					installRewindUi(ctx);
 				}
