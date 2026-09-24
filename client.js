@@ -1979,9 +1979,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		}
 
 		function reopenAfterRestart() {
-			const url = new URL(window.location.href);
-			url.searchParams.delete("token");
-			window.location.replace(url.pathname + url.search + url.hash);
+			window.location.reload();
 		}
 
 		function waitForRestart(setNotice, setBusy, t) {

@@ -1,3 +1,15 @@
+# 1.1.18
+
+## 中文
+
+- **重启**：点「重启」后旧页面的 token 会失效，只刷新等于打不开。现在会等端口释放（必要时结束旧进程），并按新进程打印的地址打开浏览器。请用新打开的页面，再新开一轮对话。
+- **设置**：1.1.17 之前若已把 `legacyApplyPath` 叠进 `dsh-settings`，点「应用」会收成一份，提供商目录才能起来。收好之后再重启一次。
+
+## English
+
+- **Restart**: the old page token dies with the process, so a refresh looks like restart did nothing. Restart now frees the port and opens the browser at the new `dsh web:` URL. Use that page and start a new chat.
+- **Settings**: Apply collapses duplicate `legacyApplyPath` left by earlier 1.1.17 patches so `dsh-settings` can load. Restart once after that apply.
+
 # 1.1.17
 
 ## 中文
