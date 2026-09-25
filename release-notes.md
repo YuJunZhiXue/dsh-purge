@@ -1,3 +1,19 @@
+# 1.1.20
+
+## 中文
+
+- **宿主版本**：当前对准 **dsh 0.1.7-rc.2**。上一档 **0.1.7-rc.1**（含 `0.1.7-rc.1.20260924.1`）的旧锚点仍可用。
+- **官方桌面升级**：已经下载的新版本会在重启，或在应用里点安装并重启时真正安装，然后解开新版本并重新打补丁。没有新版本时，重启仍是关掉再打开当前客户端。安装目录不写死盘符。
+- **补丁**：#14、#35 跟上 rc.2 的升级写法，不再报必需补丁失败。#29、#33、#36 的新提示句也会打上。
+- Web 和社区版 DSH Desktop 的应用、重启保持原样。
+
+## English
+
+- **Host version**: current target is **dsh 0.1.7-rc.2**. Anchors for the previous target, **0.1.7-rc.1** (including `0.1.7-rc.1.20260924.1`), still match.
+- **Official desktop upgrade**: a downloaded update installs on Restart, or on the in-app install-and-restart action, then the new build is unpacked and patched. With no pending update, Restart still closes and reopens the current client. Install paths are not pinned to a drive letter.
+- **Patches**: #14 and #35 match the rc.2 escalation text, so Apply no longer fails those required patches. #29, #33, and #36 follow the new prompt wording.
+- Web and community DSH Desktop keep their existing Apply and restart.
+
 # 1.1.19
 
 ## 中文
