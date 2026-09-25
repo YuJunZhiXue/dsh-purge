@@ -1,3 +1,27 @@
+# 1.1.21
+
+## 中文
+
+- **修复必需补丁失败 #43、#9、#15、#23、#42**。点「应用」不再因为这 5 条报「清洗未完成」。提示词本来就会写入；这 5 条没写上时，界面却把整次应用判失败，看起来像插件失效。
+- **原因**：上级文件夹名叫 DeepSeek Harness 时，整棵目录被当成官方桌面。Web 的 npm 包因此被排除，这 5 条对得上的原文也没写进去。安装路径不写死盘符。现在只有旁边真有桌面程序，或路径在该安装的 `resources/app` 里，才算桌面安装。Web、社区桌面、官方桌面各自打自己的包。
+- **#43**：去掉 Web 四个内置预设（standard、ptc、cordis、minimal）里的身份句。没写上时，预设里的原身份句会留在注入旁边。
+- **#9**：审批请求自动放行。
+- **#15**：沙箱 `confine` 不再包一层，命令按原样执行。
+- **#23**：子代理默认深度从 1 提到 10。
+- **#42**：给设置服务补回旧的 `register` / `get`，还在调旧接口的插件才能加载。
+- 文件在、但这份原文不在当前版本里时，显示跳过，不再把整次应用判失败。原文还在时仍会写上。
+
+## English
+
+- **Fixes required-patch failures #43, #9, #15, #23, and #42.** Apply no longer reports the cleanse as incomplete because of these five. The prompt was already written; the failure made the plugin look dead.
+- **Cause**: a parent folder named DeepSeek Harness was treated as the official desktop install, so the Web npm packages were excluded and these five were never written. Install paths are not pinned to a drive letter. A tree counts as the desktop install only when the desktop executable is beside it, or the path is under that install's `resources/app`. Web, community desktop, and official desktop each patch their own packages.
+- **#43**: strips the identity sentence from the four built-in Web presets (standard, ptc, cordis, minimal). Left in place, that sentence stays next to the inject.
+- **#9**: approval requests are auto-granted.
+- **#15**: sandbox `confine` no longer wraps the command.
+- **#23**: subagent default depth moves from 1 to 10.
+- **#42**: the settings service gets the old `register` / `get` methods back, so plugins that still call them can load.
+- When the file exists but this version does not contain that original text, the row shows skipped and Apply still completes. Text that is present is still written.
+
 # 1.1.20
 
 ## 中文
