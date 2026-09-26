@@ -31,7 +31,8 @@
     "test:identity": "node scripts/test-identity-assembly.mjs",
     "test:yaml": "node scripts/test-yaml-comment.mjs",
     "test:update": "node scripts/test-update-guards.mjs",
-    "test:rewind": "node scripts/test-rewind-plan.mjs"
+    "test:rewind": "node scripts/test-rewind-plan.mjs",
+    "test:idempotency": "node scripts/test-idempotency.mjs"
   },
   "license": "MIT",
   "keywords": [
