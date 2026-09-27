@@ -1,3 +1,13 @@
+# 1.1.24-beta.1
+
+## 中文
+
+- **同步正式版 [#40](https://github.com/YuJunZhiXue/dsh-purge/issues/40) / [#41](https://github.com/YuJunZhiXue/dsh-purge/issues/41)**：源码版桌面误判与 apps/cli 误写防护。
+
+## English
+
+- **Backport stable [#40](https://github.com/YuJunZhiXue/dsh-purge/issues/40) / [#41](https://github.com/YuJunZhiXue/dsh-purge/issues/41)**: source-tree desktop false positive + apps/cli write guard.
+
 # 1.1.23-beta.3
 
 ## 中文
