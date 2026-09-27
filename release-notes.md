@@ -1,3 +1,12 @@
+# 1.1.23-beta.3
+
+## 中文
+
+- **同步正式版 [#38](https://github.com/YuJunZhiXue/dsh-purge/issues/38) 修复**：`#1`/`#2`/`#3` 补 `skipIfMarked`，避免每次 apply 叠加提示词。
+
+## English
+
+- **Backport stable [#38](https://github.com/YuJunZhiXue/dsh-purge/issues/38) fix**: `skipIfMarked` on `#1`/`#2`/`#3` so prompt apply stays idempotent.
 # 1.1.23-beta.2
 
 ## 中文
