@@ -22,3 +22,11 @@ default-prompt-inject.md
 /official-harness-payload.7z
 *.asar
 *.asar.bak
+
+# local reference clone
+Z3r0/
+
+
+# Windows 不用 ps1 引导（走环境适配 config.json）
+scripts/redteam-setup.ps1
+

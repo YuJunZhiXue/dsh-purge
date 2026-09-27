@@ -1,0 +1,86 @@
+DISCLOSURE — dual-use content declaration
+=========================================
+
+Package: dsh-redteam-mode
+Declared class: dual-use (see "contentPolicy" in package.json)
+Upstream: https://github.com/Jueze-2019/dsh-redteam-mode
+Policy reference: https://docs.npmjs.com/policies/dual-use
+
+What this package is
+--------------------
+
+dsh-redteam-mode is a plugin for DeepSeek Harness (DSH) that turns the agent
+runtime into an orchestration console for **authorized** adversary emulation and
+penetration-testing engagements. It is an orchestration, evidence-recording and
+reporting layer. Its security-relevant nature comes from what it *drives* and
+*records*, not from shipping attack code.
+
+This package contains NO exploit code
+-------------------------------------
+
+The published tarball contains no vulnerability exploits, no payloads, no
+shellcode, no credential dumps and no C2 implants. It consists of:
+
+  lib/            orchestration logic, a local SQLite fact base, tool schemas,
+                  a right-side console UI and report rendering
+  skills/         23 Markdown instruction documents (prose runbooks) telling an
+                  agent how to *operate* third-party tools the user installs
+  presets/        agent preset composition (YAML)
+  scripts/        redteam-setup.sh — an optional environment bootstrap that
+                  downloads well-known open-source security tools (nmap, nuclei,
+                  fscan, gogo, chisel, frp, ...) into the user's own home
+                  directory
+
+Dual-use capabilities, and their legitimate use
+-----------------------------------------------
+
+1. Orchestrating security tooling. The plugin coordinates scanning tools that the
+   user installs themselves and records what was found. Legitimate use: running a
+   scoped, authorized assessment against systems the operator owns or has written
+   permission to test.
+
+2. Command execution on the operator's own machine. Tool invocations are issued on
+   the local host that runs DSH — the operator's own assessment workstation or a
+   disposable virtual machine. The package does not self-propagate, does not
+   install persistence, and does not contact any server controlled by the author.
+
+3. Reconnaissance guidance. Skills describe passive and active information
+   gathering techniques. Legitimate use: mapping the attack surface of an
+   authorized target, which is the standard first phase of any engagement.
+
+4. Credential and session handling guidance. Skills describe testing for weak
+   credentials on systems within an authorized scope, and how to record sessions
+   the operator has legitimately obtained. All captured material stays in a local
+   SQLite database under the operator's own $DSH_HOME directory; it is never
+   transmitted anywhere by this package.
+
+5. Environment bootstrap (scripts/redteam-setup.sh). This shell script downloads
+   open-source security binaries from their official GitHub release assets into
+   $DSH_HOME/redteam/toolkit/. It does not install system packages, does not
+   require or use sudo, does not modify network or proxy configuration, and does
+   not run any downloaded binary beyond a --version/-h smoke test. Operators who
+   prefer to install these tools themselves can skip the script entirely; nothing
+   in the plugin requires it to run.
+
+Hard boundaries the package declares and enforces
+-------------------------------------------------
+
+* Authorization-only. The README, the agent preset and all role prompts state that
+  use is limited to engagements with written authorization, and that unauthorized
+  scanning or intrusion is illegal in most jurisdictions.
+* Local-only data. No telemetry, no analytics, no cloud sync, no author-controlled
+  endpoints. All findings stay on the operator's machine.
+* Judgement-free tooling. The package does not decide whether a target is in scope;
+  that determination is the operator's responsibility.
+
+Intended operators
+------------------
+
+Professional penetration testers, red teams and security engineers running
+authorized engagements, typically inside a dedicated and disposable Kali virtual
+machine rather than on a day-to-day workstation.
+
+Contact
+-------
+
+Issues: https://github.com/Jueze-2019/dsh-redteam-mode/issues

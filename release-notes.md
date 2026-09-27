@@ -1,3 +1,21 @@
+# 1.1.23-beta.1
+
+## 中文
+
+- **内嵌演练台**：清洗 + 红队控制台并进同一插件；侧栏「红队模式 / 全面浏览」、设置页与浮层 dock 可用。
+- **环境适配**：路径 / 工具 / 密钥均可选填；留空走默认（`$DSH_HOME/redteam/toolkit`、自动查找、PATH）。
+- **技能库**：宿主 skills 未注入时从本包 `skills/redteam` 回退，并做真实可用性检查（不再整表「未知」）；缺密钥/工具标不可用，可在环境适配补全后重查。
+- **多宿主**：官方 exe、社区版、dsh web 共用同一 bundle（desktop / web profile）；桌面端与 dsh web 仍不能同时开。
+- 技能与预设仍只在本包内分发，不写官方 `$DSH_HOME/skills`。
+
+## English
+
+- **Embedded drill console**: purge + red-team UI in one plugin; sidebar RedTeam / full browse, settings, and floating dock.
+- **Env adapt**: optional paths/tools/keys; empty fields keep defaults (`$DSH_HOME/redteam/toolkit`, auto-resolve, PATH).
+- **Skills**: filesystem fallback from package `skills/redteam` with real availability checks (no more all-unknown); missing keys/tools show broken until Env adapt is filled.
+- **Hosts**: official exe, community, and dsh web share the same bundle; desktop and dsh web still cannot run together.
+- Skills/presets ship in-package only; nothing is written to official `$DSH_HOME/skills`.
+
 # 1.1.22
 
 ## 中文
