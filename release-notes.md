@@ -1,3 +1,13 @@
+# 1.1.25-beta.1
+
+## 中文
+
+- **同步正式版 [#43](https://github.com/YuJunZhiXue/dsh-purge/issues/43)**：用户 profile cordis.patch.yml 不再被 bak 回滚覆盖。
+
+## English
+
+- **Backport stable [#43](https://github.com/YuJunZhiXue/dsh-purge/issues/43)**: do not restore bak over user profile cordis.patch.yml.
+
 # 1.1.24-beta.1
 
 ## 中文
