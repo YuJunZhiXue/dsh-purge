@@ -1,3 +1,17 @@
+# 1.1.23-beta.2
+
+## 中文
+
+- **环境发送门控**：红队会话首次发送走完整授权门（AuthGate）；跳过工具后仅弹出精简环境对话框；`envAdaptSkip` 持久化（不再开机清零）。
+- **主题**：浮层 dock 跟随宿主浅/深色——浅色白底、深色墨底，去掉杂色玻璃杂讯。
+- **布局**：会话控件靠右；红队模式与模式切换并排；标签统一为 dsh-purge。
+
+## English
+
+- **Env send gate**: first send in red-team sessions uses full AuthGate; after skip-tools, only a compact env dialog; `envAdaptSkip` persists across restarts.
+- **Theme**: floating dock follows host light/dark — white / ink, less frosted noise.
+- **Layout**: session controls right-aligned; red-team mode chip beside mode switch; dsh-purge labels.
+
 # 1.1.23-beta.1
 
 ## 中文

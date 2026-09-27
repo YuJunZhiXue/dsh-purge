@@ -143,6 +143,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.toggle": "dsh-purge",
 			"dock.full": "全面浏览",
 			"dock.redteam": "红队模式",
+			"dock.newSession": "dsh-purge",
+			"dock.inSession": "dsh-purge",
 			"dock.close": "收起",
 			"dock.unauthorized": "未授权",
 			"auth.title": "演练台授权确认",
@@ -158,6 +160,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"auth.ok": "确认授权",
 			"auth.ok.tab": "确认授权并进入演练台",
 			"auth.ok.full": "确认授权并全面浏览",
+			"auth.ok.env": "确认授权并打开环境适配",
+			"envGate.title": "环境适配",
+			"envGate.lead": "红队模式需要工具环境。Kali 会自动使用；否则请配置工具，或确认暂不配置后继续对话。",
+			"envGate.go": "打开环境适配",
+			"envGate.skip": "暂不配置工具",
+			"envGate.skipConfirm": "确认不配置工具？扫描/隧道类技能可能不可用，仍可正常对话。",
+			"envGate.skipYes": "确认并继续对话",
+			"envGate.skipNo": "返回配置",
+			"envGate.kaliHint": "推荐在 Kali 虚拟机中运行；本机也可在环境适配里填路径或整包文件夹自动分配。",
 			"theme.aria": "外观",
 			"theme.white": "白",
 			"theme.ink": "墨",
@@ -377,6 +388,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.toggle": "dsh-purge",
 			"dock.full": "Full view",
 			"dock.redteam": "RedTeam",
+			"dock.newSession": "dsh-purge",
+			"dock.inSession": "dsh-purge",
 			"dock.close": "Collapse",
 			"dock.unauthorized": "Unauthorized",
 			"auth.title": "Drill console authorization",
@@ -392,6 +405,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"auth.ok": "Authorize",
 			"auth.ok.tab": "Authorize and open Drill",
 			"auth.ok.full": "Authorize and open Full view",
+			"auth.ok.env": "Authorize and open Env adapt",
+			"envGate.title": "Environment setup",
+			"envGate.lead": "RedTeam needs tools. Kali is used automatically; otherwise configure tools, or confirm skip and continue chatting.",
+			"envGate.go": "Open Env adapt",
+			"envGate.skip": "Skip tool setup",
+			"envGate.skipConfirm": "Skip tool setup? Scan/tunnel skills may be unavailable; chat still works.",
+			"envGate.skipYes": "Confirm and continue",
+			"envGate.skipNo": "Back to setup",
+			"envGate.kaliHint": "Prefer Kali VM. On this host you can set paths or auto-assign from a toolkit folder.",
 			"theme.aria": "Appearance",
 			"theme.white": "Light",
 			"theme.ink": "Ink",
@@ -605,14 +627,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		};
 
 		const THEME_KEY = "dshp-theme";
-		const THEME_MODE_KEY = "dshp-theme-mode"; // "manual" = user picked; else follow host
+		const THEME_MODE_KEY = "dshp-theme-mode"; // 旧版手动锁；现已废弃，清洗始终跟宿主浅色/深色
 		const PURGE_CSS = `
 .dshp-root{--dshp-display:"Songti SC","Noto Serif SC","Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;--dshp-sans:"Yu Gothic UI","Hiragino Sans GB","Source Han Sans SC",system-ui,sans-serif;--dshp-mono:"Cascadia Mono","Sarasa Mono SC",ui-monospace,monospace;--dshp-ease:cubic-bezier(.16,1,.3,1);max-width:920px;display:flex;flex-direction:column;gap:18px;padding:16px;border-radius:12px;background:var(--dshp-bg);color:var(--dshp-ink);font-family:var(--dshp-sans)}
-.dshp-root[data-theme="white"]{--dshp-bg:#ffffff;--dshp-paper:#f7f6f3;--dshp-ink:#4a4742;--dshp-mute:#9a958c;--dshp-line:#eceae4;--dshp-fill:#f3f1ec;--dshp-accent:#7d9a86;--dshp-accent-soft:#e7efe9;--dshp-ok:#5d8a6c;--dshp-warn:#a8844a;--dshp-bad:#c48989;color-scheme:light}
+.dshp-root[data-theme="white"]{--dshp-bg:#f4f2ec;--dshp-paper:#fffcf7;--dshp-ink:#1a1916;--dshp-mute:#5c574e;--dshp-line:#d8d3c8;--dshp-fill:#ebe7df;--dshp-accent:#3f6b52;--dshp-accent-soft:#d7e6dc;--dshp-ok:#1f5c38;--dshp-warn:#8a5a12;--dshp-bad:#9a3434;color-scheme:light}
 .dshp-root[data-theme="dusk"]{--dshp-bg:#2a2926;--dshp-paper:#32312d;--dshp-ink:#e6e2db;--dshp-mute:#a8a39a;--dshp-line:#3f3d38;--dshp-fill:#353430;--dshp-accent:#9bb5a6;--dshp-accent-soft:#3a433d;--dshp-ok:#8fbf9c;--dshp-warn:#d4b07a;--dshp-bad:#d4a0a0;color-scheme:dark}
 .dshp-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px}
 .dshp-switch{display:inline-flex;border:1px solid var(--dshp-line);border-radius:999px;overflow:hidden;background:var(--dshp-paper)}
-.dshp-switch button{appearance:none;border:0;background:transparent;color:var(--dshp-mute);font:12px/1 var(--dshp-sans);padding:6px 14px;cursor:pointer}
+.dshp-switch button{appearance:none;border:0;background:transparent;color:var(--dshp-mute);font:12px/1 var(--dshp-sans);padding:6px 14px;cursor:default}
+.dshp-switch button:disabled{opacity:1;cursor:default}
 .dshp-switch button.is-on{background:var(--dshp-accent-soft);color:var(--dshp-ink)}
 .dshp-switch button:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:-2px}
 .dshp-panel{border:1px solid var(--dshp-line);background:var(--dshp-paper);border-radius:10px;padding:18px 18px 16px}
@@ -726,15 +749,19 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-dock-tab.on{color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));font-weight:600;border-bottom-color:var(--dsw-alias-brand-primary,#6dbf8c);background:transparent}
 .dshp-dock-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:transparent;border-radius:0 0 12px 12px}
 .dshp-dock-body .dshp-root{max-width:none;height:100%;flex:1;min-height:0;overflow:auto;background:transparent!important;--dshp-bg:transparent;--dshp-paper:color-mix(in srgb,var(--dshp-ink) 7%,transparent);--dshp-fill:color-mix(in srgb,var(--dshp-ink) 6%,transparent);--dshp-line:color-mix(in srgb,var(--dshp-ink) 20%,transparent);--dshp-accent-soft:color-mix(in srgb,var(--dshp-accent) 22%,transparent)}
-.dshp-dock-body .dshp-root[data-theme="white"]{--dshp-ink:#1c1b18;--dshp-mute:#5a554c;--dshp-ok:#2f6b45;--dshp-warn:#8a5f18;--dshp-bad:#a14545}
-.dshp-dock-body .dshp-root[data-theme="dusk"]{--dshp-ink:#f4f1ea;--dshp-mute:#c9c3b8;--dshp-ok:#9fd0ad;--dshp-warn:#e0c08a;--dshp-bad:#e0b0b0}
+.dshp-dock-body .dshp-root[data-theme="white"]{--dshp-ink:#1a1916;--dshp-mute:#534e46;--dshp-ok:#1f5c38;--dshp-warn:#8a5a12;--dshp-bad:#9a3434;--dshp-paper:#fffcf7;--dshp-fill:#ebe7df;--dshp-line:#d0caba;--dshp-accent:#3f6b52;--dshp-accent-soft:#d7e6dc;--dshp-bg:#f4f2ec}
+.dshp-dock-body .dshp-root[data-theme="dusk"]{--dshp-ink:#f4f1ea;--dshp-mute:#c9c3b8;--dshp-ok:#9fd0ad;--dshp-warn:#e0c08a;--dshp-bad:#e0b0b0;--dshp-paper:#32312d;--dshp-fill:#353430;--dshp-line:#4a4740;--dshp-accent:#9bb5a6;--dshp-accent-soft:#3a433d;--dshp-bg:#2a2926}
 .dshp-dock-body .dshp-panel,.dshp-dock-body .dshp-metric,.dshp-dock-body .dshp-group,.dshp-dock-body .dshp-editor,.dshp-dock-body .dshp-active,.dshp-dock-body .dshp-ask,.dshp-dock-body .dshp-create,.dshp-dock-body .dshp-switch{background:color-mix(in srgb,var(--dshp-ink) 6%,transparent)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.dshp-dock-body .dshp-root[data-theme="white"] .dshp-panel,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-metric,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-group,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-editor,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-active,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-ask,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-create,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-switch,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-rulelist,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-table,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-ruleitem{background:#fffcf7!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:#d0caba!important;color:#1a1916!important}
+.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-panel,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-metric,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-group,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-editor,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-active,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-ask,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-create,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-switch,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-rulelist,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-table,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-ruleitem{background:#32312d!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:#4a4740!important;color:#f4f1ea!important}
 .dshp-dock-body .dshp-field,.dshp-dock-body .dshp-area{background:color-mix(in srgb,var(--dshp-ink) 8%,transparent);color:var(--dshp-ink);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-area{background:#fff!important;color:#1a1916!important;border-color:#c8c2b6!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-field,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-area{background:#2a2926!important;color:#f4f1ea!important;border-color:#4a4740!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .dshp-dock-body select.dshp-field,.dshp-dock-body .dshp-field.dshp-ver{background:var(--dshp-paper,#2a2926)!important;color:var(--dshp-ink)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color-scheme:dark}
-.dshp-dock-body .dshp-root[data-theme="white"] select.dshp-field,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field.dshp-ver{background:#ffffff!important;color:#1c1b18!important;color-scheme:light}
+.dshp-dock-body .dshp-root[data-theme="white"] select.dshp-field,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field.dshp-ver{background:#fff!important;color:#1a1916!important;color-scheme:light}
 .dshp-dock-body .dshp-root[data-theme="dusk"] select.dshp-field,.dshp-dock-body .dshp-root[data-theme="dusk"] .dshp-field.dshp-ver{background:#32312d!important;color:#e6e2db!important;color-scheme:dark}
 .dshp-dock-body select.dshp-field option,.dshp-dock-body .dshp-field.dshp-ver option{background:#1c1c1c;color:#f2f2f2}
-.dshp-dock-body .dshp-root[data-theme="white"] select.dshp-field option,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field.dshp-ver option{background:#ffffff;color:#1c1b18}
+.dshp-dock-body .dshp-root[data-theme="white"] select.dshp-field option,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field.dshp-ver option{background:#fff;color:#1a1916}
 .dshp-dock-body .dshp-title,.dshp-dock-body .dshp-kicker,.dshp-dock-body .dshp-sub h4,.dshp-dock-body .dshp-group-h strong,.dshp-dock-body .dshp-metric b{color:var(--dshp-ink)}
 .dshp-dock-body .dshp-mute,.dshp-dock-body .dshp-metric span,.dshp-dock-body .dshp-group-h em,.dshp-dock-body .dshp-count,.dshp-dock-body .dshp-rule-meta{color:var(--dshp-mute)}
 .dshp-dock-body .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;min-width:0;display:flex!important;flex-direction:column;box-shadow:none;border:0;transform:none!important;opacity:1!important;pointer-events:auto!important;background:transparent!important;color:#f4f2ec;font-size:13.5px;line-height:1.55;font-weight:450;--rt-ink:#f4f2ec;--rt-mute:#d2ccc0;--rt-surf:color-mix(in srgb,#0c0c0c 42%,transparent);--rt-surf-2:color-mix(in srgb,#0c0c0c 55%,transparent);--rt-line:color-mix(in srgb,#fff 22%,transparent)}
@@ -757,12 +784,53 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-dock-body .rt-eng-select option,.dshp-dock-body .rt-input option{background:#1c1c1c;color:#f2f2f2}
 .dshp-dock-body .rt-err{color:#ffb4b4!important;font-weight:600}
 .dshp-dock-body .rt-rep-http,.dshp-dock-body pre{background:color-mix(in srgb,#000 55%,transparent)!important;color:var(--rt-ink)!important;border:1px solid var(--rt-line)}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-dock{--rt-ink:#1a1916;--rt-mute:#4a453c;--rt-surf:color-mix(in srgb,#fff 78%,transparent);--rt-surf-2:color-mix(in srgb,#fff 88%,transparent);--rt-line:color-mix(in srgb,#1a1916 18%,transparent);color:var(--rt-ink)}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-embedded>.rt-head,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-tabs,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-foot{background:color-mix(in srgb,#fff 70%,transparent)!important}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-title,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-card h4,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item-name{text-shadow:none;color:var(--rt-ink)!important}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body textarea.rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body select.rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-eng-select{background:#fff!important;color:#1a1916!important}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-err{color:#a14545!important}
-body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!important}
+/* 宿主浅色 / 白主题：实底、高对比、少眩光（避免半透明白+浅灰字） */
+body:not([data-ds-dark-theme]) .dshp-dock{background:#f3f0e8!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid #c9c3b6!important;box-shadow:0 14px 36px rgba(26,25,22,.18),0 0 0 1px rgba(26,25,22,.06)!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-head,body:not([data-ds-dark-theme]) .dshp-dock-tabs{background:#ebe7df!important;border-bottom-color:#c9c3b6!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-head b,body:not([data-ds-dark-theme]) .dshp-dock-head button{color:#1a1916!important;text-shadow:none!important}
+body:not([data-ds-dark-theme]) .dshp-dock-head button{background:#fffcf7!important;border-color:#c9c3b6!important}
+body:not([data-ds-dark-theme]) .dshp-dock-tab{color:#5c574e!important;text-shadow:none!important}
+body:not([data-ds-dark-theme]) .dshp-dock-tab:hover,body:not([data-ds-dark-theme]) .dshp-dock-tab.on{color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body{background:#f3f0e8!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-root{background:#f3f0e8!important;--dshp-bg:#f3f0e8;--dshp-paper:#fffcf7;--dshp-fill:#ebe7df;--dshp-ink:#1a1916;--dshp-mute:#534e46;--dshp-line:#c9c3b6;--dshp-accent:#3f6b52;--dshp-accent-soft:#d7e6dc}
+body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-panel,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-metric,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-group,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-editor,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-active,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-ask,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-create,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-switch,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-rulelist{background:#fffcf7!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:#c9c3b6!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-field,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-area,body:not([data-ds-dark-theme]) .dshp-dock-body select.dshp-field,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-field.dshp-ver{background:#fff!important;color:#1a1916!important;border-color:#bdb6a8!important;backdrop-filter:none!important;color-scheme:light}
+body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-title,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-sub h4,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-group-h strong,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-metric b,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-btn,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-rule-name{color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-mute,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-kicker,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-metric span,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-group-h em,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-count,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-rule-meta,body:not([data-ds-dark-theme]) .dshp-dock-body .dshp-hint{color:#534e46!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-dock{--rt-ink:#1a1916;--rt-mute:#4f4a42;--rt-surf:#fffcf7;--rt-surf-2:#ebe7df;--rt-line:#c9c3b6;color:#1a1916!important;background:#f3f0e8!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-embedded>.rt-head,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-tabs,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-foot{background:#ebe7df!important;border-color:#c9c3b6!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-body{background:#f3f0e8!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-card,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-pane,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-side,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-main,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-list,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-toolbar,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-evi,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-live-body,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-chain,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-split,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-table{background:#fffcf7!important;color:#1a1916!important;border:1px solid #c9c3b6!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-title,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-card h4,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item-name,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-tab.on,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-kv b,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-mono,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-row,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item,body:not([data-ds-dark-theme]) .dshp-dock-body h4,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-link,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-toolbar>span{text-shadow:none!important;color:#1a1916!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-tab,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-foot,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-empty,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item-desc,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-kb-sub,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-kv span,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-tag,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-sec-sub{color:#4f4a42!important;opacity:1!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-row.head,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-vrow.head,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-score-row.head,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-table thead{background:#ebe7df!important;color:#4f4a42!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-row:hover,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item:hover,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-item.on,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-seg:hover,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-seg.on{background:#ebe7df!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body textarea.rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body select.rt-input,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-eng-select{background:#fff!important;color:#1a1916!important;border:1px solid #bdb6a8!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-eng-select option,body:not([data-ds-dark-theme]) .dshp-dock-body .rt-input option{background:#fff;color:#1a1916}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-err{color:#9a3434!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{background:#3f6b52!important;border-color:#3f6b52!important;color:#fff!important}
+body:not([data-ds-dark-theme]) .dshp-dock-body .rt-rep-http,body:not([data-ds-dark-theme]) .dshp-dock-body pre{background:#ebe7df!important;color:#1a1916!important;border:1px solid #c9c3b6!important}
+body:not([data-ds-dark-theme]) .dshp-auth-modal{background:#fffcf7;color:#1a1916;border-color:#c9c3b6}
+body:not([data-ds-dark-theme]) .dshp-auth-legal{background:#f3f0e8;color:#1a1916;border-color:#c9c3b6}
+body:not([data-ds-dark-theme]) .dshp-auth-warn{background:#f5e6c8;color:#6b4a10}
+body:not([data-ds-dark-theme]) .dshp-auth-ops button{border-color:#c9c3b6;color:#1a1916;background:#fff}
+body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:#3f6b52;border-color:#3f6b52;color:#fff}
+body:not([data-ds-dark-theme]) .dshp-hero-chip-btn,body:not([data-ds-dark-theme]) .dshp-hbtn{color:#1a1916;border-color:#3f6b52;background:#d7e6dc}
+body:not([data-ds-dark-theme]) .dshp-hero-chip-btn:hover,body:not([data-ds-dark-theme]) .dshp-hbtn:hover{background:#c5dacd;color:#1a1916}
+/* 宿主深色 / 墨主题：清洗实底墨色，与「墨」开关一致 */
+body[data-ds-dark-theme] .dshp-dock{background:#2a2926!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid #4a4740!important;box-shadow:0 18px 48px rgba(0,0,0,.45)!important;color:#f4f1ea!important}
+body[data-ds-dark-theme] .dshp-dock-head,body[data-ds-dark-theme] .dshp-dock-tabs{background:#32312d!important;border-bottom-color:#4a4740!important;color:#f4f1ea!important}
+body[data-ds-dark-theme] .dshp-dock-head b,body[data-ds-dark-theme] .dshp-dock-head button{color:#f4f1ea!important;text-shadow:none!important}
+body[data-ds-dark-theme] .dshp-dock-head button{background:#2a2926!important;border-color:#4a4740!important}
+body[data-ds-dark-theme] .dshp-dock-tab{color:#c9c3b8!important;text-shadow:none!important}
+body[data-ds-dark-theme] .dshp-dock-tab:hover,body[data-ds-dark-theme] .dshp-dock-tab.on{color:#f4f1ea!important}
+body[data-ds-dark-theme] .dshp-dock-body{background:#2a2926!important}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-root{background:#2a2926!important;--dshp-bg:#2a2926;--dshp-paper:#32312d;--dshp-fill:#353430;--dshp-ink:#f4f1ea;--dshp-mute:#c9c3b8;--dshp-line:#4a4740;--dshp-accent:#9bb5a6;--dshp-accent-soft:#3a433d}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-panel,body[data-ds-dark-theme] .dshp-dock-body .dshp-metric,body[data-ds-dark-theme] .dshp-dock-body .dshp-group,body[data-ds-dark-theme] .dshp-dock-body .dshp-editor,body[data-ds-dark-theme] .dshp-dock-body .dshp-active,body[data-ds-dark-theme] .dshp-dock-body .dshp-ask,body[data-ds-dark-theme] .dshp-dock-body .dshp-create,body[data-ds-dark-theme] .dshp-dock-body .dshp-switch,body[data-ds-dark-theme] .dshp-dock-body .dshp-rulelist{background:#32312d!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:#4a4740!important;color:#f4f1ea!important}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-field,body[data-ds-dark-theme] .dshp-dock-body .dshp-area,body[data-ds-dark-theme] .dshp-dock-body select.dshp-field,body[data-ds-dark-theme] .dshp-dock-body .dshp-field.dshp-ver{background:#2a2926!important;color:#f4f1ea!important;border-color:#4a4740!important;backdrop-filter:none!important;color-scheme:dark}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-title,body[data-ds-dark-theme] .dshp-dock-body .dshp-sub h4,body[data-ds-dark-theme] .dshp-dock-body .dshp-group-h strong,body[data-ds-dark-theme] .dshp-dock-body .dshp-metric b,body[data-ds-dark-theme] .dshp-dock-body .dshp-btn,body[data-ds-dark-theme] .dshp-dock-body .dshp-rule-name{color:#f4f1ea!important}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-mute,body[data-ds-dark-theme] .dshp-dock-body .dshp-kicker,body[data-ds-dark-theme] .dshp-dock-body .dshp-metric span,body[data-ds-dark-theme] .dshp-dock-body .dshp-group-h em,body[data-ds-dark-theme] .dshp-dock-body .dshp-count,body[data-ds-dark-theme] .dshp-dock-body .dshp-rule-meta,body[data-ds-dark-theme] .dshp-dock-body .dshp-hint{color:#c9c3b8!important}
+body[data-ds-dark-theme] .dshp-dock-body .dshp-switch button.is-on{background:#3a433d;color:#f4f1ea}
 .dshp-dock-resize,.dshp-dock-resize-l,.dshp-dock-resize-r,.dshp-dock-resize-b{position:absolute;z-index:60;pointer-events:auto;touch-action:none}
 .dshp-dock-resize{right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 46%,color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 75%,transparent) 46%);border-radius:0 0 12px 0;opacity:.95}
 .dshp-dock-resize-l{left:-2px;top:0;bottom:0;width:10px;cursor:ew-resize;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
@@ -771,6 +839,7 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 .dshp-dock-resize-b{left:10px;right:22px;bottom:-2px;height:10px;cursor:ns-resize;background:transparent}
 .dshp-dock-resize-b:hover{background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 35%,transparent)}
 .dshp-auth-mask{position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:auto}
+.dshp-env-gate{z-index:10200}
 .dshp-auth-modal{width:min(680px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--dsw-alias-border-l1,#333);border-radius:12px;background:var(--dsw-alias-bg-layer-1,#1a1a1a);color:var(--dsw-alias-label-primary,#eee)}
 .dshp-auth-modal h2{margin:0;font-size:16px;font-weight:600}
 .dshp-auth-warn{padding:8px 10px;border-radius:8px;background:#3a2e18;color:#f0d48a;font-size:13px}
@@ -792,6 +861,10 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 .dshp-hbtn:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 12%,transparent);color:var(--dsw-alias-label-primary,currentColor)}
 .dshp-hbtn.on{border-color:var(--dsw-alias-brand-primary,#6dbf8c);color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 32%,transparent)}
 .dshp-live-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--dsw-alias-brand-primary,#6dbf8c);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 28%,transparent)}
+.dshp-hero-chip{display:inline-flex;align-items:center;margin-left:6px;flex:0 0 auto}
+.dshp-hero-chip-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 50%,transparent);border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 10%,transparent);color:var(--dsw-alias-label-primary,currentColor);cursor:pointer;font:12.5px/1 inherit;white-space:nowrap}
+.dshp-hero-chip-btn:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
+.dshp-hero-chip-btn.on{border-color:var(--dsw-alias-brand-primary,#6dbf8c);color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 32%,transparent)}
 `;
 
 		function formatSize(bytes) {
@@ -2203,6 +2276,15 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 					const scheme = (root.style.colorScheme || getComputedStyle(root).getPropertyValue("color-scheme") || "").toLowerCase();
 					if (scheme.includes("dark")) return "dusk";
 					if (scheme.includes("light")) return "white";
+					/* 部分宿主用 class / data-theme 标浅色深色 */
+					const bodyClass = String(document.body?.className || "");
+					if (/\bdark\b|theme-dark|ds-dark/i.test(bodyClass)) return "dusk";
+					if (/\blight\b|theme-light|ds-light/i.test(bodyClass)) return "white";
+					const attr = document.body?.getAttribute("data-theme")
+						|| document.documentElement?.getAttribute("data-theme")
+						|| "";
+					if (/dark/i.test(attr)) return "dusk";
+					if (/light|white/i.test(attr)) return "white";
 				}
 				if (typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
 					return "dusk";
@@ -2212,33 +2294,25 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 		}
 
 		function readTheme() {
-			try {
-				if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") {
-					const v = window.localStorage.getItem(THEME_KEY);
-					if (v === "dusk" || v === "white") return v;
-				}
-			} catch { /* ignore */ }
+			/* 清洗配色跟宿主：浅色→白，深色→墨；不再用本地 manual 锁死 */
 			return detectHostTheme();
 		}
 
 		function SettingsRoot(props) {
 			const t = typeof props.t === "function" ? props.t : ((key) => key);
 			const [theme, setTheme] = useState(readTheme);
-			const setAndStore = useCallback((next) => {
-				setTheme(next);
-				try {
-					window.localStorage.setItem(THEME_MODE_KEY, "manual");
-					window.localStorage.setItem(THEME_KEY, next);
-				} catch { /* ignore */ }
-			}, []);
 			useEffect(() => {
 				let cancelled = false;
 				let timer = 0;
+				try {
+					/* 清掉旧版「手动锁」，浅色→白 / 深色→墨 始终跟宿主 */
+					window.localStorage.removeItem(THEME_MODE_KEY);
+				} catch { /* ignore */ }
 				const syncFromHost = () => {
-					try {
-						if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") return;
-					} catch { /* ignore */ }
-					if (!cancelled) setTheme(detectHostTheme());
+					if (cancelled) return;
+					const next = detectHostTheme();
+					setTheme(next);
+					try { window.localStorage.setItem(THEME_KEY, next); } catch { /* ignore */ }
 				};
 				const syncSoon = () => {
 					if (timer) window.clearTimeout(timer);
@@ -2250,18 +2324,32 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 					mq = window.matchMedia?.("(prefers-color-scheme: dark)");
 					mq?.addEventListener?.("change", syncFromHost);
 				} catch { /* ignore */ }
-				let obs;
+				const observers = [];
 				try {
 					if (document.body) {
-						obs = new MutationObserver(syncSoon);
-						obs.observe(document.body, { attributes: true, attributeFilter: ["data-ds-dark-theme"] });
+						const obs = new MutationObserver(syncSoon);
+						obs.observe(document.body, {
+							attributes: true,
+							attributeFilter: ["data-ds-dark-theme", "data-theme", "class"],
+						});
+						observers.push(obs);
+					}
+					if (document.documentElement) {
+						const obs = new MutationObserver(syncSoon);
+						obs.observe(document.documentElement, {
+							attributes: true,
+							attributeFilter: ["data-theme", "class", "style"],
+						});
+						observers.push(obs);
 					}
 				} catch { /* ignore */ }
+				const iv = window.setInterval(syncFromHost, 2000);
 				return () => {
 					cancelled = true;
 					if (timer) window.clearTimeout(timer);
+					window.clearInterval(iv);
 					try { mq?.removeEventListener?.("change", syncFromHost); } catch { /* ignore */ }
-					try { obs?.disconnect(); } catch { /* ignore */ }
+					observers.forEach((obs) => { try { obs.disconnect(); } catch { /* ignore */ } });
 				};
 			}, []);
 			translate = t;
@@ -2271,12 +2359,16 @@ body:not([data-ds-dark-theme]) .dshp-dock-body .rt-btn-primary{color:#fff!import
 						h("button", {
 							type: "button",
 							className: theme === "white" ? "is-on" : "",
-							onClick: () => setAndStore("white"),
+							"aria-pressed": theme === "white" ? "true" : "false",
+							title: "宿主浅色 → 白",
+							disabled: true,
 						}, t("theme.white")),
 						h("button", {
 							type: "button",
 							className: theme === "dusk" ? "is-on" : "",
-							onClick: () => setAndStore("dusk"),
+							"aria-pressed": theme === "dusk" ? "true" : "false",
+							title: "宿主深色 → 墨",
+							disabled: true,
 						}, t("theme.ink")),
 					),
 				),
@@ -5326,6 +5418,21 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [err, setErr] = React.useState(null)
       const [msg, setMsg] = React.useState(null)
       const [busy, setBusy] = React.useState(false)
+      const [folderPath, setFolderPath] = React.useState('')
+
+      const applyDraftFrom = (r) => {
+        const c = (r && r.config) || {}
+        setDraft({
+          platform: c.platform || 'auto',
+          toolkitDir: c.toolkitDir || '',
+          nucleiTemplatesDir: c.nucleiTemplatesDir || '',
+          binDirsText: (c.binDirs || []).join('\n'),
+          tools: Object.assign({}, c.tools || {}),
+          env: Object.assign({ FOFA_KEY: '', REDTEAM_VPS_HOST: '', REDTEAM_VPS_KEY: '' }, c.env || {}),
+          notes: c.notes || '',
+        })
+        if (c.toolkitDir) setFolderPath(c.toolkitDir)
+      }
 
       const load = () => {
         setBusy(true); setMsg(null)
@@ -5333,16 +5440,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           setBusy(false)
           if (!r || r.ok === false) { setErr((r && r.error) || '读取失败'); return }
           setErr(null); setData(r)
-          const c = r.config || {}
-          setDraft({
-            platform: c.platform || 'auto',
-            toolkitDir: c.toolkitDir || '',
-            nucleiTemplatesDir: c.nucleiTemplatesDir || '',
-            binDirsText: (c.binDirs || []).join('\n'),
-            tools: Object.assign({}, c.tools || {}),
-            env: Object.assign({ FOFA_KEY: '', REDTEAM_VPS_HOST: '', REDTEAM_VPS_KEY: '' }, c.env || {}),
-            notes: c.notes || '',
-          })
+          applyDraftFrom(r)
         }, (e) => { setBusy(false); setErr(String((e && e.message) || e)) })
       }
       React.useEffect(load, [refreshKey])
@@ -5358,21 +5456,30 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           tools: draft.tools,
           env: draft.env,
           notes: draft.notes,
+          envAdaptConfigured: true,
+          envAdaptSkip: false,
         }
         api({ op: 'platformConfigSave', config }).then((r) => {
           setBusy(false)
           if (!r || r.ok === false) { setMsg({ err: (r && r.error) || '保存失败' }); return }
           setData(r)
           setMsg({ ok: '已保存到 ' + ((r.config && r.config.path) || '$DSH_HOME/redteam/config.json') })
-          const c = r.config || {}
-          setDraft({
-            platform: c.platform || 'auto',
-            toolkitDir: c.toolkitDir || '',
-            nucleiTemplatesDir: c.nucleiTemplatesDir || '',
-            binDirsText: (c.binDirs || []).join('\n'),
-            tools: Object.assign({}, c.tools || {}),
-            env: Object.assign({ FOFA_KEY: '', REDTEAM_VPS_HOST: '', REDTEAM_VPS_KEY: '' }, c.env || {}),
-            notes: c.notes || '',
+          applyDraftFrom(r)
+        }, (e) => { setBusy(false); setMsg({ err: String((e && e.message) || e) }) })
+      }
+
+      const assignFolder = () => {
+        const dir = String(folderPath || (draft && draft.toolkitDir) || '').trim()
+        if (!dir) { setMsg({ err: '请先填写工具所在文件夹路径' }); return }
+        setBusy(true); setMsg(null)
+        api({ op: 'platformAssignToolkit', dir }).then((r) => {
+          setBusy(false)
+          if (!r || r.ok === false) { setMsg({ err: (r && r.error) || '自动分配失败' }); return }
+          setData(r)
+          applyDraftFrom(r)
+          setMsg({
+            ok: '已从文件夹分配 ' + (r.assignedCount || 0) + ' 个工具'
+              + (r.nucleiTemplatesDir ? '，并识别 nuclei-templates' : ''),
           })
         }, (e) => { setBusy(false); setMsg({ err: String((e && e.message) || e) }) })
       }
@@ -5381,6 +5488,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const setEnv = (key, value) => setDraft((d) => d ? Object.assign({}, d, { env: Object.assign({}, d.env, { [key]: value }) }) : d)
 
       const runtime = (data && data.runtime) || {}
+      const adapt = (data && data.adapt) || {}
       const tools = (data && data.tools && data.tools.items) || []
       const found = tools.filter((t) => t.path).length
       const defaultToolkit = (data && data.toolkitDir) || '$DSH_HOME/redteam/toolkit'
@@ -5390,6 +5498,9 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         h('div', { className: 'rt-toolbar' },
           h('span', { style: { fontWeight: 600 } }, '环境适配'),
           h('span', { className: 'rt-tag' }, runtime.effective === 'windows' ? 'Windows' : 'Linux/Kali'),
+          adapt.kali ? h('span', { className: 'rt-tag rt-tag-live' }, 'Kali') : null,
+          h('span', { className: 'rt-tag' + (adapt.ready ? ' rt-tag-live' : ' rt-tag-warn') },
+            adapt.ready ? ('就绪 · ' + (adapt.reason || '')) : '待配置'),
           h('span', { className: 'rt-tag' + (found ? ' rt-tag-live' : ' rt-tag-warn') }, '工具 ' + found + '/' + tools.length),
           h('div', { className: 'rt-spacer' }),
           h('button', { className: 'rt-btn', disabled: busy, onClick: load }, busy ? '读取中…' : '刷新'),
@@ -5397,8 +5508,32 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         err ? h('div', { className: 'rt-err' }, err) : null,
         msg ? h('div', { className: msg.err ? 'rt-err' : 'rt-foot' }, msg.err || msg.ok) : null,
         h('div', { className: 'rt-card', style: { margin: '8px 12px', fontSize: 12, lineHeight: 1.6 } },
-          '均可选填：留空则用默认路径/自动查找。填了的覆盖默认。密钥类只在需要测绘/反弹时才填。'),
+          adapt.message
+            || '均可选填：留空则用默认路径/自动查找。填了的覆盖默认。密钥类只在需要测绘/反弹时才填。'),
+        h('div', { className: 'rt-card', style: { margin: '8px 12px', fontSize: 12, lineHeight: 1.6 } },
+          h('div', { style: { fontWeight: 600, marginBottom: 6 } }, '整包文件夹 → 自动分配工具'),
+          h('div', { style: { marginBottom: 8, opacity: 0.9 } },
+            '工具都在同一个文件夹（含子目录）时，填路径后点「自动分配」：会写入 toolkitDir，并按文件名匹配 nmap / nuclei / fscan 等填到下方。'),
+          h('div', { style: { display: 'flex', gap: 8, alignItems: 'center' } },
+            h('input', {
+              className: 'rt-input', style: { flex: 1 },
+              placeholder: '例如 D:\\pentest-tools 或 /opt/toolkit',
+              value: folderPath,
+              onChange: (e) => setFolderPath(e.target.value),
+              onKeyDown: (e) => { if (e.key === 'Enter') assignFolder() },
+            }),
+            h('button', {
+              className: 'rt-btn rt-btn-primary', disabled: busy,
+              onClick: assignFolder,
+            }, busy ? '扫描中…' : '自动分配'))),
         data && data.hint ? h('div', { className: 'rt-card', style: { margin: '8px 12px', fontSize: 12, lineHeight: 1.6 } }, data.hint) : null,
+        data && data.egress ? h('div', { className: 'rt-card', style: { margin: '8px 12px', fontSize: 12, lineHeight: 1.55 } },
+          h('div', { style: { fontWeight: 600, marginBottom: 6 } }, '出网状态（借鉴 Z3r0 egress，只读）'),
+          h('div', { className: 'rt-mono', style: { fontSize: 11 } }, 'HTTP_PROXY=' + (data.egress.http_proxy || '(空)')),
+          h('div', { className: 'rt-mono', style: { fontSize: 11 } }, 'HTTPS_PROXY=' + (data.egress.https_proxy || '(空)')),
+          h('div', { className: 'rt-mono', style: { fontSize: 11 } }, 'ALL_PROXY=' + (data.egress.all_proxy || '(空)')),
+          h('div', { className: 'rt-mono', style: { fontSize: 11 } }, 'NO_PROXY=' + (data.egress.no_proxy || '(空)')),
+          h('div', { style: { marginTop: 6, opacity: 0.85 } }, data.egress.note || '')) : null,
         !draft ? h('div', { className: 'rt-empty' }, '加载中…') : h('div', { className: 'rt-pane' },
           h('div', { className: 'rt-card' },
             h('h4', null, '平台与目录'),
@@ -5473,8 +5608,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
             h('span', null,
               '配置文件：' + ((data && data.config && data.config.path) || '$DSH_HOME/redteam/config.json')
               + ' | 留空字段全部走默认'))))
-
-
     }
 
     /* ---------------------------------------------------------- 得分目标 */
@@ -6759,16 +6892,28 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
 		function requestDrill(kind) {
 			const pending = kind || "tab";
+			const openEnv = () => {
+				try {
+					if (__dshPurgeDrill && __dshPurgeDrill.setUI) {
+						__dshPurgeDrill.setUI({ open: true, tab: "env" });
+					}
+				} catch { /* ignore */ }
+			};
 			if (readDrillAuth()) {
 				setDock({ open: true, tab: "drill", authOpen: false, pending: "tab" });
 				try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
+				if (pending === "env") openEnv();
 				if (pending === "full") {
 					try { window.open(window.location.href.split("#")[0] + "#redteam-full", "_blank", "noopener"); } catch { /* ignore */ }
 				}
 				return;
 			}
-			// 未授权：只弹授权窗，仍停在清洗页。打开侧栏本身绝不弹窗。
-			setDock({ open: true, tab: "clean", authOpen: true, pending: pending });
+			/* 未授权：直接切到演练台页签并弹出授权窗（不再停在清洗页，避免像「没触发」） */
+			setDock({ open: true, tab: "drill", authOpen: true, pending: pending });
+		}
+
+		function requestDrillEnv() {
+			requestDrill("env");
 		}
 
 		function openDockClean() {
@@ -6843,7 +6988,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				if (locked) return;
 				setChecks((prev) => Object.assign({}, prev, { [id]: !prev[id] }));
 			};
-			const okLabel = !ready ? t("auth.ok") : (props.pending === "full" ? t("auth.ok.full") : t("auth.ok.tab"));
+			const okLabel = !ready
+				? t("auth.ok")
+				: (props.pending === "full"
+					? t("auth.ok.full")
+					: (props.pending === "env" ? t("auth.ok.env") : t("auth.ok.tab")));
 			return h("div", { className: "dshp-auth-mask", role: "dialog", "aria-modal": "true" },
 				h("div", { className: "dshp-auth-modal" },
 					h("h2", null, t("auth.title")),
@@ -6881,11 +7030,314 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 								const kind = props.pending || "tab";
 								setDock({ authOpen: false, open: true, tab: "drill", pending: "tab" });
 								try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
+								if (kind === "env") {
+									try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true, tab: "env" }); } catch { /* ignore */ }
+								}
 								if (kind === "full") {
 									try { window.open(window.location.href.split("#")[0] + "#redteam-full", "_blank", "noopener"); } catch { /* ignore */ }
 								}
 							},
 						}, okLabel),
+					),
+				),
+			);
+		}
+
+		function isRedteamPresetId(value) {
+			const text = String(value || "").trim();
+			if (!text) return false;
+			if (text === "redteam") return true;
+			if (/红队/.test(text)) return true;
+			if (/^red[\s_-]*team$/i.test(text)) return true;
+			return false;
+		}
+
+		function readSessionAgentPreset(sess) {
+			if (!sess || typeof sess !== "object") return "";
+			try {
+				const pv = sess.projectionValues;
+				if (pv && typeof pv.agentPreset === "string") return pv.agentPreset;
+			} catch { /* ignore */ }
+			try {
+				if (typeof sess.agentPreset === "string") return sess.agentPreset;
+			} catch { /* ignore */ }
+			try {
+				const header = sess.header;
+				if (header && typeof header.agentPreset === "string") return header.agentPreset;
+			} catch { /* ignore */ }
+			return "";
+		}
+
+		function isRedteamModeActive() {
+			try {
+				const sessions = rewindSessions || (rewindHost && rewindHost.sessions);
+				const sid = currentSessionId(sessions);
+				if (sid && sessions) {
+					try {
+						const snap = typeof sessions.list?.getSnapshot === "function" ? sessions.list.getSnapshot() : null;
+						const sess = snap && snap.byId ? snap.byId[sid] : null;
+						if (isRedteamPresetId(readSessionAgentPreset(sess))) return true;
+					} catch { /* ignore */ }
+					try {
+						const actx = typeof sessions.scope === "function" ? sessions.scope(sid) : undefined;
+						const face = typeof sessions.sessionOf === "function" ? sessions.sessionOf(actx) : undefined;
+						const faceSnap = face && typeof face.getSnapshot === "function" ? face.getSnapshot() : face;
+						if (isRedteamPresetId(readSessionAgentPreset(faceSnap))) return true;
+					} catch { /* ignore */ }
+				}
+			} catch { /* ignore */ }
+			/* 新会话：模式下拉里的「红队模式」chip（选好但还没写入 session） */
+			try {
+				const nodes = document.querySelectorAll(
+					"[class*='seatLabel'], [class*='HKgFRW_seat'], [class*='seat'][class*='Label'], button[class*='seat']",
+				);
+				for (const el of nodes) {
+					const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+					if (/红队模式/.test(text) || /^RedTeam\b/i.test(text)) return true;
+				}
+			} catch { /* ignore */ }
+			try {
+				const labels = document.querySelectorAll("[class*='PfFEtG_label'], [title*='红队'], [title*='RedTeam']");
+				for (const el of labels) {
+					if (isRedteamPresetId(el.textContent) || /红队/.test(String(el.textContent || ""))) return true;
+				}
+			} catch { /* ignore */ }
+			return false;
+		}
+
+		function looksLikeSendControl(el) {
+			if (!el || el.nodeType !== 1) return false;
+			const btn = el.closest("button, [role='button']");
+			if (!btn) return false;
+			if (btn.closest(".dshp-dock, .dshp-auth-mask, .rt-dock, .dshp-env-gate")) return false;
+			const label = [
+				btn.getAttribute("aria-label"),
+				btn.getAttribute("title"),
+				btn.getAttribute("data-testid"),
+				btn.textContent,
+			].filter(Boolean).join(" ");
+			if (/停止|Stop/i.test(label) && !/发送|Send/i.test(label)) return false;
+			if (/发送|Submit|Send(?!\s*feedback)/i.test(label)) return true;
+			/* composer 主按钮：data-composer-card 内的 primary */
+			try {
+				const card = btn.closest("[data-composer-card], [data-composer-seat]");
+				if (card) {
+					const cls = String(btn.className || "");
+					if (/primary/i.test(cls) && btn.querySelector("svg")) return true;
+				}
+			} catch { /* ignore */ }
+			if (btn.type === "submit") {
+				const form = btn.closest("form");
+				if (form && form.querySelector("textarea, [contenteditable='true']")) return true;
+			}
+			return false;
+		}
+
+		function fetchEnvAdaptStatus() {
+			return fetch("/redteam/api", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ op: "platformEnvAdaptStatus" }),
+			}).then((r) => r.json()).catch(() => null);
+		}
+
+		/** 同步探测（拦截 submit 时不能 await） */
+		function fetchEnvAdaptStatusSync() {
+			try {
+				const xhr = new XMLHttpRequest();
+				xhr.open("POST", "/redteam/api", false);
+				xhr.setRequestHeader("content-type", "application/json");
+				xhr.send(JSON.stringify({ op: "platformEnvAdaptStatus" }));
+				if (xhr.status >= 200 && xhr.status < 300) return JSON.parse(xhr.responseText);
+			} catch { /* ignore */ }
+			return null;
+		}
+
+		/** 红队发送前门禁：未就绪 → 授权并打开环境适配；可确认跳过。 */
+		function EnvAdaptSendGate() {
+			const t = useT();
+			const [open, setOpen] = useState(false);
+			const [confirmSkip, setConfirmSkip] = useState(false);
+			const [status, setStatus] = useState(null);
+			const [busy, setBusy] = useState(false);
+			const cacheRef = useRef({ at: 0, ready: false });
+			const openRef = useRef(false);
+			openRef.current = open;
+
+			const refresh = useCallback(async () => {
+				const r = await fetchEnvAdaptStatus();
+				const ready = !!(r && r.ready);
+				cacheRef.current = { at: Date.now(), ready: ready, skipped: !!(r && r.skipped) };
+				setStatus(r);
+				return r;
+			}, []);
+
+			const blockAndOpen = useCallback(() => {
+				setConfirmSkip(false);
+				refresh();
+				/* 第一次：只走完整授权窗 → 授权后进环境适配页 */
+				if (!readDrillAuth()) {
+					setOpen(false);
+					requestDrillEnv();
+					return true;
+				}
+				/* 已授权过：只弹精简环境适配窗，不再自动拉开整块演练台 */
+				setOpen(true);
+				return true;
+			}, [refresh]);
+
+			const mustBlockSubmit = useCallback(() => {
+				if (!isRedteamModeActive()) return false;
+				let cached = cacheRef.current;
+				if (!cached.at || Date.now() - cached.at > 2500) {
+					const fresh = fetchEnvAdaptStatusSync();
+					if (fresh) {
+						cached = {
+							at: Date.now(),
+							ready: !!fresh.ready,
+							skipped: !!fresh.skipped,
+						};
+						cacheRef.current = cached;
+						setStatus(fresh);
+					}
+				}
+				if (cached.ready) return false;
+				blockAndOpen();
+				return true;
+			}, [blockAndOpen]);
+
+			/* 挂住宿主 SessionInputShell.submit —— 比点按钮启发式可靠 */
+			useEffect(() => {
+				const wrapped = new WeakSet();
+				const patchShell = (shell) => {
+					if (!shell || wrapped.has(shell)) return;
+					if (typeof shell.submit !== "function") return;
+					wrapped.add(shell);
+					const orig = shell.submit.bind(shell);
+					shell.submit = function gatedSubmit(mode) {
+						try {
+							if (mustBlockSubmit()) return;
+						} catch { /* 门禁异常时不吞掉发送 */ }
+						return orig(mode);
+					};
+					if (shell.actions && typeof shell.actions === "object") {
+						shell.actions.submit = () => shell.submit("queue");
+					}
+				};
+				const tick = () => {
+					try {
+						const sessions = rewindSessions || (rewindHost && rewindHost.sessions);
+						const sid = currentSessionId(sessions);
+						if (!sid) return;
+						patchShell(conversationInput(sid));
+					} catch { /* ignore */ }
+				};
+				tick();
+				const iv = window.setInterval(tick, 400);
+				return () => window.clearInterval(iv);
+			}, [mustBlockSubmit]);
+
+			useEffect(() => {
+				let alive = true;
+				const tick = () => {
+					if (!alive) return;
+					if (!isRedteamModeActive()) return;
+					refresh();
+				};
+				tick();
+				const iv = window.setInterval(tick, 5000);
+				return () => { alive = false; window.clearInterval(iv); };
+			}, [refresh]);
+
+			useEffect(() => {
+				const onPointer = (e) => {
+					if (!looksLikeSendControl(e.target)) return;
+					if (!mustBlockSubmit()) return;
+					e.preventDefault();
+					e.stopPropagation();
+					if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+				};
+				const onKey = (e) => {
+					if (e.key !== "Enter" || e.shiftKey || e.isComposing) return;
+					const inComposer = e.target && e.target.closest
+						&& e.target.closest("[data-composer-card], [data-composer-seat], [contenteditable='true'], textarea");
+					if (!inComposer) return;
+					if (e.target.closest && e.target.closest(".dshp-dock, .dshp-auth-mask, .rt-dock, .dshp-env-gate")) return;
+					if (!mustBlockSubmit()) return;
+					e.preventDefault();
+					e.stopPropagation();
+					if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+				};
+				document.addEventListener("pointerdown", onPointer, true);
+				document.addEventListener("click", onPointer, true);
+				document.addEventListener("keydown", onKey, true);
+				return () => {
+					document.removeEventListener("pointerdown", onPointer, true);
+					document.removeEventListener("click", onPointer, true);
+					document.removeEventListener("keydown", onKey, true);
+				};
+			}, [mustBlockSubmit]);
+
+			if (!open) return null;
+
+			const message = (status && status.message) || t("envGate.lead");
+			return h("div", { className: "dshp-auth-mask dshp-env-gate", role: "dialog", "aria-modal": "true" },
+				h("div", { className: "dshp-auth-modal", style: { width: "min(480px,100%)" } },
+					h("h2", null, t("envGate.title")),
+					h("div", { style: { fontSize: 13, lineHeight: 1.55 } }, message),
+					h("div", { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary,#999)", lineHeight: 1.5 } }, t("envGate.kaliHint")),
+					confirmSkip
+						? h("div", { className: "dshp-auth-warn" }, t("envGate.skipConfirm"))
+						: null,
+					h("div", { className: "dshp-auth-ops" },
+						confirmSkip
+							? [
+								h("button", {
+									key: "no",
+									type: "button",
+									onClick: () => setConfirmSkip(false),
+								}, t("envGate.skipNo")),
+								h("button", {
+									key: "yes",
+									type: "button",
+									className: "primary",
+									disabled: busy,
+									onClick: () => {
+										setBusy(true);
+										fetch("/redteam/api", {
+											method: "POST",
+											headers: { "content-type": "application/json" },
+											body: JSON.stringify({ op: "platformEnvAdaptSkip", skip: true }),
+										}).then((r) => r.json()).then((r) => {
+											setBusy(false);
+											cacheRef.current = { at: Date.now(), ready: true, skipped: true };
+											setStatus(r);
+											setOpen(false);
+											setConfirmSkip(false);
+										}).catch(() => {
+											setBusy(false);
+											cacheRef.current = { at: Date.now(), ready: true, skipped: true };
+											setOpen(false);
+										});
+									},
+								}, t("envGate.skipYes")),
+							]
+							: [
+								h("button", {
+									key: "skip",
+									type: "button",
+									onClick: () => setConfirmSkip(true),
+								}, t("envGate.skip")),
+								h("button", {
+									key: "go",
+									type: "button",
+									className: "primary",
+									onClick: () => {
+										setOpen(false);
+										requestDrillEnv();
+									},
+								}, t("envGate.go")),
+							],
 					),
 				),
 			);
@@ -7088,57 +7540,76 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			);
 		}
 
-		function SidebarToggle(props) {
+		/** 首页：模式旁挂「dsh-purge」→ 打开插件。红队模式走模式下拉（registry 声明）。 */
+		function HeroNewSessionMount() {
 			const t = useT();
 			const st = useDock();
-			return h("button", {
-				className: "dshp-icon-btn" + (st.open ? " on" : ""),
-				title: t("dock.toggle"),
+			const [host, setHost] = useState(null);
+			useEffect(() => {
+				let dead = false;
+				const ensure = () => {
+					if (dead || typeof document === "undefined") return;
+					const row = document.querySelector('[class*="heroWorkspaceRow"]');
+					if (!row) {
+						setHost((prev) => (prev ? null : prev));
+						return;
+					}
+					let el = row.querySelector(":scope > .dshp-hero-chip");
+					if (!el) {
+						el = document.createElement("div");
+						el.className = "dshp-hero-chip";
+						row.appendChild(el);
+					}
+					setHost((prev) => (prev === el ? prev : el));
+				};
+				ensure();
+				const obs = typeof MutationObserver !== "undefined"
+					? new MutationObserver(() => ensure())
+					: null;
+				if (obs) obs.observe(document.body, { childList: true, subtree: true });
+				const iv = setInterval(ensure, 1000);
+				return () => {
+					dead = true;
+					if (obs) obs.disconnect();
+					clearInterval(iv);
+				};
+			}, []);
+			if (!host) return null;
+			const btn = h("button", {
+				type: "button",
+				className: "dshp-hero-chip-btn" + (st.open ? " on" : ""),
+				title: t("dock.newSession"),
 				onClick: () => toggleDock(),
 			},
 				st.open ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
-				props.wide ? t("dock.toggle") : "P",
+				t("dock.newSession"),
 			);
+			try {
+				const rd = require("react-dom");
+				if (rd && typeof rd.createPortal === "function") return rd.createPortal(btn, host);
+			} catch { /* host 可能没暴露 react-dom */ }
+			return null;
 		}
-		function SidebarFull(props) {
-			const t = useT();
-			return h("button", {
-				className: "dshp-icon-btn",
-				title: t("dock.full"),
-				onClick: () => requestDrill("full"),
-			}, t("dock.full"));
-		}
-		/** 还原上游 dsh-redteam-mode 的「红队模式」左下角入口：直接打开演练台。 */
-		function SidebarRedTeam(props) {
-			const t = useT();
-			const st = useDock();
-			const on = st.open && st.tab === "drill";
-			return h("button", {
-				className: "dshp-icon-btn" + (on ? " on" : ""),
-				title: t("dock.redteam"),
-				onClick: () => requestDrill("tab"),
-			},
-				on ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
-				t("dock.redteam"),
-			);
-		}
-		function HeaderToggle() {
+
+		/** 会话中：顶栏右侧显示 dsh-purge，打开插件。 */
+		function SessionHeaderPurge() {
 			const t = useT();
 			const st = useDock();
 			return h("button", {
+				type: "button",
 				className: "dshp-hbtn" + (st.open ? " on" : ""),
-				title: st.open ? (t("dock.toggle") + " · 已开启") : (t("dock.toggle") + " · 点击打开"),
+				title: st.open ? (t("dock.inSession") + " · 已开启") : (t("dock.inSession") + " · 点击打开"),
 				onClick: () => toggleDock(),
 			},
 				st.open ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
-				t("dock.toggle"),
+				t("dock.inSession"),
 			);
 		}
 
 		function installRewindUi(ctx) {
 			rewindHost = ctx;
 			rewindSessions = ctx.sessions;
-			rewindWorkspace = ctx.uiWorkspace || null;
+			rewindWorkspace = ctx.uiWorkspace || ctx.workspaces || null;
 			rewindConversation = ctx.conversation || null;
 			ctx.slots.inject("conversation.input.right", () => ctx.slots.register({
 				name: "conversation.input.right",
@@ -7178,40 +7649,27 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				name: "shell.overlay",
 				id: "dsh-purge-dock",
 				order: 50,
-			}, () => h(PurgeDock)));
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-toggle",
-				order: 48,
-				label: () => t("dock.toggle"),
-			}, (props) => h(SidebarToggle, props)));
-			/* 对齐上游 dsh-redteam-mode：左下角「红队模式」入口 */
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-redteam",
-				order: 49,
-				label: () => t("dock.redteam"),
-			}, (props) => h(SidebarRedTeam, props)));
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-full",
-				order: 51,
-				label: () => t("dock.full"),
-			}, (props) => h(SidebarFull, props)));
+			}, () => h(react.Fragment, null, h(PurgeDock), h(HeroNewSessionMount), h(EnvAdaptSendGate))));
 			ctx.slots.inject("conversation.session.header.utilities", () => ctx.slots.register({
 				name: "conversation.session.header.utilities",
 				id: "dsh-purge-header",
-				order: 50,
-				label: () => t("dock.toggle"),
-			}, () => h(HeaderToggle)));
+				order: 90,
+				label: () => t("dock.inSession"),
+			}, () => h(SessionHeaderPurge)));
 			try {
 				if (typeof ctx.inject === "function") {
-					ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => installRewindUi(host));
+					ctx.inject(["sessions", "uiWorkspace", "workspaces", "conversation"], (host) => installRewindUi(host));
 				} else if (ctx.sessions) {
 					installRewindUi(ctx);
 				}
 			} catch (e) {
-				try { console.warn("[dsh-purge] rewind ui skipped:", e); } catch { /* ignore */ }
+				try {
+					if (typeof ctx.inject === "function") {
+						ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => installRewindUi(host));
+					}
+				} catch (e2) {
+					try { console.warn("[dsh-purge] rewind ui skipped:", e2 || e); } catch { /* ignore */ }
+				}
 			}
 		}
 

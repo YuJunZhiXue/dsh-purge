@@ -177,7 +177,7 @@ const dockBlock = `
 				}
 				return;
 			}
-			setDock({ open: true, tab: "clean", authOpen: true, pending: pending });
+			setDock({ open: true, tab: "drill", authOpen: true, pending: pending });
 		}
 
 		function openDockClean() {
@@ -332,44 +332,45 @@ const dockBlock = `
 			);
 		}
 
-		function SidebarToggle(props) {
+		function HeroNewSessionMount() {
 			const t = useT();
 			const st = useDock();
-			return h("button", {
-				className: "dshp-icon-btn" + (st.open ? " on" : ""),
-				title: t("dock.toggle"),
+			const [host, setHost] = useState(null);
+			useEffect(() => {
+				let dead = false;
+				const ensure = () => {
+					if (dead || typeof document === "undefined") return;
+					const row = document.querySelector('[class*="heroWorkspaceRow"]');
+					if (!row) { setHost((prev) => (prev ? null : prev)); return; }
+					let el = row.querySelector(":scope > .dshp-hero-chip");
+					if (!el) {
+						el = document.createElement("div");
+						el.className = "dshp-hero-chip";
+						row.appendChild(el);
+					}
+					setHost((prev) => (prev === el ? prev : el));
+				};
+				ensure();
+				const obs = typeof MutationObserver !== "undefined" ? new MutationObserver(() => ensure()) : null;
+				if (obs) obs.observe(document.body, { childList: true, subtree: true });
+				const iv = setInterval(ensure, 1000);
+				return () => { dead = true; if (obs) obs.disconnect(); clearInterval(iv); };
+			}, []);
+			if (!host) return null;
+			const btn = h("button", {
+				type: "button",
+				className: "dshp-hero-chip-btn" + (st.open ? " on" : ""),
+				title: t("dock.newSession"),
 				onClick: () => toggleDock(),
-			}, props.wide ? t("dock.toggle") : "P");
-		}
-		function SidebarRedTeam(props) {
-			const t = useT();
-			const st = useDock();
-			const on = st.open && st.tab === "drill";
-			return h("button", {
-				className: "dshp-icon-btn" + (on ? " on" : ""),
-				title: t("dock.redteam"),
-				onClick: () => requestDrill("tab"),
 			},
-				on ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
-				t("dock.redteam"),
+				st.open ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
+				t("dock.newSession"),
 			);
-		}
-		function SidebarFull(props) {
-			const t = useT();
-			return h("button", {
-				className: "dshp-icon-btn",
-				title: t("dock.full"),
-				onClick: () => requestDrill("full"),
-			}, t("dock.full"));
-		}
-		function HeaderToggle() {
-			const t = useT();
-			const st = useDock();
-			return h("button", {
-				className: "dshp-hbtn" + (st.open ? " on" : ""),
-				title: t("dock.toggle"),
-				onClick: () => toggleDock(),
-			}, t("dock.toggle"));
+			try {
+				const rd = require("react-dom");
+				if (rd && typeof rd.createPortal === "function") return rd.createPortal(btn, host);
+			} catch { /* ignore */ }
+			return null;
 		}
 
 `;
@@ -420,39 +421,21 @@ const newApply = `		function apply(ctx) {
 				name: "shell.overlay",
 				id: "dsh-purge-dock",
 				order: 50,
-			}, () => h(PurgeDock)));
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-toggle",
-				order: 48,
-				label: () => t("dock.toggle"),
-			}, (props) => h(SidebarToggle, props)));
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-redteam",
-				order: 49,
-				label: () => t("dock.redteam"),
-			}, (props) => h(SidebarRedTeam, props)));
-			ctx.slots.inject("sidebar.footer.action", () => ctx.slots.register({
-				name: "sidebar.footer.action",
-				id: "dsh-purge-full",
-				order: 51,
-				label: () => t("dock.full"),
-			}, (props) => h(SidebarFull, props)));
-			ctx.slots.inject("conversation.session.header.utilities", () => ctx.slots.register({
-				name: "conversation.session.header.utilities",
-				id: "dsh-purge-header",
-				order: 50,
-				label: () => t("dock.toggle"),
-			}, () => h(HeaderToggle)));
+			}, () => h(react.Fragment, null, h(PurgeDock), h(HeroNewSessionMount))));
 			try {
 				if (typeof ctx.inject === "function") {
-					ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => installRewindUi(host));
+					ctx.inject(["sessions", "uiWorkspace", "workspaces", "conversation"], (host) => installRewindUi(host));
 				} else if (ctx.sessions) {
 					installRewindUi(ctx);
 				}
 			} catch (e) {
-				try { console.warn("[dsh-purge] rewind ui skipped:", e); } catch { /* ignore */ }
+				try {
+					if (typeof ctx.inject === "function") {
+						ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => installRewindUi(host));
+					}
+				} catch (e2) {
+					try { console.warn("[dsh-purge] rewind ui skipped:", e2 || e); } catch { /* ignore */ }
+				}
 			}
 		}`;
 
