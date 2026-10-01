@@ -9,7 +9,7 @@ enabled: true
 ## 方法
 1. 响应头：`Server`、`X-Powered-By`、`Set-Cookie` 特征。
 2. 页面特征：favicon 哈希、静态资源路径、报错页、robots.txt。
-3. 主动探测：nuclei 技术识别模板 `nuclei -u <url> -tags tech`；HTTP 存活与技术栈汇总用 `pd-httpx -l urls.txt -tech-detect -title -status-code -web-server`（**ProjectDiscovery 版必须用 pd-httpx，系统里名叫 `httpx` 的可能是 Python 库的 CLI**）。
+3. 主动探测：nuclei 技术识别模板 `nuclei -u <url> -tags tech`；HTTP 存活与技术栈汇总用 `~/.local/bin/pd-httpx -l urls.txt -tech-detect -title -status-code -web-server`（**ProjectDiscovery 版必须用 pd-httpx，`/usr/bin/httpx` 是 Python 库的 CLI**）。
 4. 大网段批量指纹用技能 `gogo-intranet`（`gogo -i <cidr> -p top2 -v --af`，主动指纹要加 `-v`）。
 5. 版本比对：从指纹推断产品与版本，为漏洞检测做准备。
 

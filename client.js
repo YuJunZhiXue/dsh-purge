@@ -129,10 +129,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 28, 32, 43, 50, 53, 54] },
-			{ key: "code", ids: [6, 7, 8, 42, 45, 46, 51, 52, 55, 56] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 28, 32, 43, 50, 53, 54, 61, 63] },
+			{ key: "code", ids: [6, 7, 8, 42, 45, 46, 51, 52, 55, 56, 57, 58, 59, 62, 63, 64, 65] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
-			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48] },
+			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48, 60, 62, 64, 65] },
 			{ key: "compat", ids: [38, 39, 40] },
 			{ key: "dsh20", ids: [47, 49] },
 		];
@@ -180,8 +180,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"own.save": "保存名单",
 			"saved.own": "已保存自己的服务器",
 			"saved.own.dropped": "已保存。有 {n} 行不是单个 IP 或主机名，已丢掉",
-			"metric.purged": "已应用",
-			"metric.purged.skip": "已应用，另有 {n} 项跳过",
+			"metric.purged": "已就绪",
+			"metric.purged.skip": "已就绪，其中 {n} 项本机不需要",
+			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
 			"metric.bak.yes": "有备份",
 			"metric.bak.no": "无备份",
@@ -378,8 +379,20 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.54": "交付物提示去掉多余禁止",
 			"patch.55": "每一步替换第一条系统提示",
 			"patch.56": "回退只藏被撤掉的那一轮",
+			"patch.57": "deepseek.com 系统提示走 system",
+			"patch.58": "回退空标记不进模型请求",
+			"patch.59": "官方 Auto Review 不再拦工具",
+			"patch.60": "官方 run_code 去掉审批教学",
+			"patch.61": "官方沙箱策略不再教拒绝",
+			"patch.62": "无审批通道时放行（用户拒绝仍有效）",
+			"patch.63": "计划模式不再软拦执行",
+			"patch.64": "Stop hook 不再注入假用户话",
+			"patch.65": "UserPromptSubmit deny 不再整轮 reject",
 			"status.unlocated": "未定位",
+			"status.na": "本端不需要",
 			"metric.unlocated": "还没定位到本机 Harness",
+			"metric.sealed": "已找到官方客户端，点应用解开",
+			"metric.sealed.count": "待解开",
 			"rewind.label": "回退",
 			"rewind.aria": "回退",
 			"rewind.busy": "回退中…",
@@ -448,8 +461,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"own.save": "Save list",
 			"saved.own": "Own servers saved",
 			"saved.own.dropped": "Saved. {n} lines were not a single IP or hostname and were dropped",
-			"metric.purged": "Applied",
-			"metric.purged.skip": "Applied, {n} skipped",
+			"metric.purged": "Ready",
+			"metric.purged.skip": "Ready, {n} not needed here",
+			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
 			"metric.bak.yes": "Backup",
 			"metric.bak.no": "No backup",
@@ -646,6 +660,18 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.54": "Deliverable prompt drops extra prohibition",
 			"patch.55": "Replace the first system prompt every step",
 			"patch.56": "Rewind hides only the cut range",
+			"patch.57": "deepseek.com keeps system role",
+			"patch.58": "Rewind markers stay off the model request",
+			"patch.59": "Official Auto Review no longer denies tools",
+			"patch.60": "Official run_code drops approval teaching",
+			"patch.61": "Official sandbox policy no longer teaches refusal",
+			"patch.62": "Fail-open without approval channel (user reject kept)",
+			"patch.63": "Plan mode no longer soft-blocks execution",
+			"patch.64": "Stop hook no longer steers fake user text",
+			"patch.65": "UserPromptSubmit deny no longer rejects turn",
+			"status.na": "Not for this host",
+			"metric.sealed": "Official client found. Apply to unpack",
+			"metric.sealed.count": "Sealed",
 			"status.unlocated": "Not located",
 			"metric.unlocated": "This install was not found yet",
 			"rewind.label": "Undo",
@@ -810,9 +836,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-dock-body .dshp-root[data-theme="white"] select.dshp-field option,.dshp-dock-body .dshp-root[data-theme="white"] .dshp-field.dshp-ver option{background:#fff;color:#1a1916}
 .dshp-dock-body .dshp-title,.dshp-dock-body .dshp-kicker,.dshp-dock-body .dshp-sub h4,.dshp-dock-body .dshp-group-h strong,.dshp-dock-body .dshp-metric b{color:var(--dshp-ink)}
 .dshp-dock-body .dshp-mute,.dshp-dock-body .dshp-metric span,.dshp-dock-body .dshp-group-h em,.dshp-dock-body .dshp-count,.dshp-dock-body .dshp-rule-meta{color:var(--dshp-mute)}
-.dshp-dock-body .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;min-width:0;display:flex!important;flex-direction:column;box-shadow:none;border:0;transform:none!important;opacity:1!important;pointer-events:auto!important;background:transparent!important;color:#f4f2ec;font-size:13.5px;line-height:1.55;font-weight:450;--rt-ink:#f4f2ec;--rt-mute:#d2ccc0;--rt-surf:color-mix(in srgb,#0c0c0c 42%,transparent);--rt-surf-2:color-mix(in srgb,#0c0c0c 55%,transparent);--rt-line:color-mix(in srgb,#fff 22%,transparent)}
+.dshp-dock-body .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;min-width:0;display:flex!important;flex-direction:column;box-shadow:none;border:0;transform:none!important;opacity:1!important;pointer-events:auto!important;background:transparent!important;color:var(--dsw-alias-label-primary,#f4f2ec);font-size:13.5px;line-height:1.55;font-weight:450;--rt-ink:var(--dsw-alias-label-primary,#f4f2ec);--rt-mute:var(--dsw-alias-label-secondary,#d2ccc0);--rt-surf:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#2a2a2a) 42%,transparent);--rt-surf-2:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 55%,transparent);--rt-line:color-mix(in srgb,var(--dsw-alias-border-l1,#555) 72%,transparent)}
 .dshp-dock-body .rt-grip{display:none!important}
-.dshp-dock-body .rt-embedded>.rt-head,.dshp-dock-body .rt-tabs,.dshp-dock-body .rt-foot{flex:none;background:color-mix(in srgb,#0c0c0c 28%,transparent)!important;color:var(--rt-ink);border-color:var(--rt-line)}
+.dshp-dock-body .rt-embedded>.rt-head,.dshp-dock-body .rt-tabs,.dshp-dock-body .rt-foot{flex:none;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 38%,transparent)!important;color:var(--rt-ink);border-color:var(--rt-line)}
 .dshp-dock-body .rt-body{flex:1;min-height:0;overflow:hidden!important;background:transparent!important;color:var(--rt-ink)}
 .dshp-dock-body .rt-main{min-height:0;flex:1;overflow:hidden}
 .dshp-dock-body .rt-pane{min-height:0;overflow:auto!important}
@@ -918,6 +944,23 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 .dshp-tab-btn:hover{color:var(--dsw-alias-label-primary,currentColor)}
 .dshp-tab-btn.on{color:var(--dsw-alias-brand-primary,#6dbf8c)}
 .dshp-tab-btn.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--dsw-alias-brand-primary,#6dbf8c)}
+/* 玻璃：低透明度 + 冷色偏色 + 高光边，背后的界面要能透出来。清洗和演练台共用 dock 上的主题。 */
+.dshp-dock{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+.dshp-dock[data-theme="dusk"]{background:linear-gradient(165deg,rgba(255,255,255,.22),rgba(120,160,220,.10) 42%,rgba(20,28,48,.18))!important;backdrop-filter:blur(28px) saturate(1.7)!important;-webkit-backdrop-filter:blur(28px) saturate(1.7)!important;color:#f7f4ee!important;border:1px solid rgba(255,255,255,.42)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 20px 50px rgba(0,0,0,.28)!important}
+.dshp-dock[data-theme="white"]{background:linear-gradient(165deg,rgba(255,255,255,.62),rgba(186,214,255,.28) 48%,rgba(255,255,255,.16))!important;backdrop-filter:blur(28px) saturate(1.6)!important;-webkit-backdrop-filter:blur(28px) saturate(1.6)!important;color:#16140f!important;border:1px solid rgba(255,255,255,.78)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 40px rgba(40,50,70,.16)!important}
+.dshp-dock[data-theme="dusk"] .dshp-dock-head,.dshp-dock[data-theme="dusk"] .dshp-dock-tabs,.dshp-dock[data-theme="white"] .dshp-dock-head,.dshp-dock[data-theme="white"] .dshp-dock-tabs{background:transparent!important}
+.dshp-dock[data-theme="dusk"] .dshp-dock-head,.dshp-dock[data-theme="dusk"] .dshp-dock-head b,.dshp-dock[data-theme="dusk"] .dshp-dock-head button,.dshp-dock[data-theme="dusk"] .dshp-dock-tab,.dshp-dock[data-theme="dusk"] .dshp-dock-tab.on{color:#f7f4ee!important;text-shadow:none!important;font-weight:600}
+.dshp-dock[data-theme="white"] .dshp-dock-head,.dshp-dock[data-theme="white"] .dshp-dock-head b,.dshp-dock[data-theme="white"] .dshp-dock-head button,.dshp-dock[data-theme="white"] .dshp-dock-tab,.dshp-dock[data-theme="white"] .dshp-dock-tab.on{color:#16140f!important;text-shadow:none!important;font-weight:600}
+.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-dock{font-size:14px!important;line-height:1.6!important;font-weight:500!important;color:#f7f4ee!important;--rt-ink:#f7f4ee;--rt-mute:#efe8dc;--rt-surf:color-mix(in srgb,#1e1c19 46%,transparent);--rt-surf-2:color-mix(in srgb,#2c2925 58%,transparent);--rt-line:color-mix(in srgb,#fff 22%,transparent)}
+.dshp-dock[data-theme="white"] .dshp-dock-body .rt-dock{font-size:14px!important;line-height:1.6!important;font-weight:500!important;color:#16140f!important;--rt-ink:#16140f;--rt-mute:#2c261f;--rt-surf:color-mix(in srgb,#fffdf8 52%,transparent);--rt-surf-2:color-mix(in srgb,#fff 64%,transparent);--rt-line:color-mix(in srgb,#2a241c 22%,transparent)}
+.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-title,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-tab,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-tab.on,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-card,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-card h4,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-row,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-vrow,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-kv,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-kv b,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-kv span,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-mono,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-empty,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-foot,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-tag,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-item,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-item-name,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-item-desc,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-sec-sub,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-kb-sub,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-seg-cidr,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-seg-meta,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-section,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-note,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-hint{color:#f3eee6!important;text-shadow:none!important;opacity:1!important}
+.dshp-dock[data-theme="white"] .dshp-dock-body .rt-title,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-tab,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-tab.on,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-card h4,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-row,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-vrow,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-kv,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-kv b,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-kv span,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-mono,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-empty,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-foot,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-tag,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-item,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-item-name,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-item-desc,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-sec-sub,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-kb-sub,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-seg-cidr,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-seg-meta,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-section,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-note,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-hint{color:#1a1612!important;text-shadow:none!important;opacity:1!important}
+body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-card,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-pane,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-side,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-table,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-toolbar,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-embedded>.rt-head,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-tabs,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-panel,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-metric,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-group,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-editor,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-rulelist,body .dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-root .dshp-active{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.28)!important;backdrop-filter:blur(18px) saturate(1.4)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important;color:#f7f4ee!important}
+body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-pane,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-side,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-table,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-toolbar,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-embedded>.rt-head,body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-tabs,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-panel,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-metric,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-group,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-editor,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-rulelist,body .dshp-dock[data-theme="white"] .dshp-dock-body .dshp-root .dshp-active{background:rgba(255,255,255,.28)!important;border-color:rgba(255,255,255,.72)!important;backdrop-filter:blur(18px) saturate(1.4)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.85)!important;color:#16140f!important}
+.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-btn,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-input,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-eng-select,.dshp-dock[data-theme="dusk"] .dshp-dock-body textarea,.dshp-dock[data-theme="dusk"] .dshp-field,.dshp-dock[data-theme="dusk"] .dshp-area{background:rgba(12,16,28,.35)!important;color:#f7f4ee!important;border-color:rgba(255,255,255,.32)!important}
+.dshp-dock[data-theme="white"] .dshp-dock-body .rt-btn,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-input,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-eng-select,.dshp-dock[data-theme="white"] .dshp-dock-body textarea,.dshp-dock[data-theme="white"] .dshp-field,.dshp-dock[data-theme="white"] .dshp-area{background:rgba(255,255,255,.45)!important;color:#16140f!important;border-color:rgba(255,255,255,.8)!important}
+.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-title,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-rule-name,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-metric b,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-btn,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-field,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-area,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-mute,.dshp-dock[data-theme="dusk"] .dshp-dock-body .dshp-hint{color:#f7f4ee!important;text-shadow:none!important}
+.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-title,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-rule-name,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-metric b,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-btn,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-field,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-area,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-mute,.dshp-dock[data-theme="white"] .dshp-dock-body .dshp-hint{color:#16140f!important;text-shadow:none!important}
 `;
 
 		function formatSize(bytes) {
@@ -930,6 +973,7 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 		function statusKind(st) {
 			if (st === "applied" || st === "already") return "ok";
 			if (st === "pending") return "wait";
+			if (st === "na") return "ok";
 			if (st === "missing_file" || st === "skipped" || st === "unlocated") return "miss";
 			return "bad";
 		}
@@ -940,11 +984,13 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			if (st === "skipped") return t("status.skipped");
 			if (st === "missing_file") return t("skip");
 			if (st === "unlocated") return t("status.unlocated");
+			if (st === "na") return t("status.na");
 			return st || t("unknown");
 		}
 
 		function statusApplied(st) {
-			return st === "applied" || st === "already";
+			// 与后端 soft-ok 对齐：跳过 / 缺文件也算就绪，避免 48/63 这种假未完成。
+			return st === "applied" || st === "already" || st === "skipped" || st === "missing_file";
 		}
 
 		function shimKind(v) {
@@ -975,13 +1021,15 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			const [open, setOpen] = useState({});
 			if (!state || !state.patch_status) return h("div", { className: "dshp-skel", style: { height: 120 } });
 			const located = !!state.ai_base;
+			if (!located) return null;
 			return PATCH_GROUPS.map((group) => {
 				const rows = group.ids.map((id) => {
-					const st = located
+					const raw = located
 						? (state.patch_status[id] || state.patch_status[String(id)] || "missing_file")
 						: "unlocated";
-					return { id, st, label: t("patch." + id) };
-				});
+					return { id, st: raw, label: t("patch." + id) };
+				}).filter((r) => r.st !== "na");
+				if (!rows.length) return null;
 				const done = rows.filter((r) => statusApplied(r.st)).length;
 				const expanded = !!open[group.key];
 				return h("div", { key: group.key, className: "dshp-group" },
@@ -1137,7 +1185,9 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			const [pick, setPick] = useState({ stable: "", beta: "" });
 			const actionTicket = useRef(0);
 			const overrideRef = useRef("");
+			const defaultOverrideRef = useRef("");
 			overrideRef.current = override;
+			defaultOverrideRef.current = defaultOverride;
 
 			const syncPicks = (d) => {
 				const versions = (d && d.versions) || [];
@@ -1339,15 +1389,18 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					setPatchBusy(true);
 					setAskRestart(false);
 					setNotice({ kind: "idle", text: "" });
+					const applyContent = !promptBoxEmpty(overrideRef.current)
+						? overrideRef.current
+						: (defaultOverrideRef.current || "");
 					fetch("/dsh-purge/" + action, {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify(action === "apply" ? { content: overrideRef.current } : {}),
+						body: JSON.stringify(action === "apply" ? { content: applyContent } : {}),
 					})
 						.then((r) => r.json())
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
-							const posted = action === "apply" ? overrideRef.current : override;
+							const posted = action === "apply" ? applyContent : override;
 							const applyEmptyBlocked = action === "apply" && promptBoxEmpty(posted) && (!d || d.injectSource !== "rule");
 							if (responseNeedsPrompt(d) || applyEmptyBlocked) {
 								rejectNeedPrompt(tr);
@@ -1536,12 +1589,16 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 
 			const s = state;
 			const located = !!(s && s.ai_base);
-			const total = s && s.patches_total ? s.patches_total : 26;
-			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
-			const skipped = located && s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
-			const pct = located && total ? Math.round((applied / total) * 100) : 0;
-
 			const hostSurface = hostSurfaceOf(s);
+			const sealedReady = !located && hostSurface === "desktop" && !!(s && (s.asar_still_sealed || s.desktop_exe));
+			const total = s && s.patches_total ? s.patches_total : 0;
+			const ready = s && typeof s.patches_ready === "number"
+				? s.patches_ready
+				: (s && typeof s.patches_applied === "number" ? s.patches_applied : 0);
+			const applied = ready;
+			const skipped = located && s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
+			const pct = located && total ? Math.round((ready / total) * 100) : 0;
+
 			const versions = (updateInfo && updateInfo.versions) || [];
 			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
 			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
@@ -1623,8 +1680,8 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
-						h("b", null, located ? (applied + " / " + total) : ("0 / " + total)),
-						h("span", null, !located ? t("metric.unlocated") : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
+						h("b", null, located ? (ready + " / " + total) : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count"))),
+						h("span", null, !located ? (sealedReady ? t("metric.sealed") : t("metric.unlocated")) : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
 					),
 					h("div", { className: "dshp-metric" },
 						h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },
@@ -2419,12 +2476,6 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 		}
 
 		function readTheme() {
-			try {
-				if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") {
-					const v = window.localStorage.getItem(THEME_KEY);
-					if (v === "dusk" || v === "white") return v;
-				}
-			} catch { /* ignore */ }
 			return detectHostTheme();
 		}
 
@@ -2442,9 +2493,6 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 				let cancelled = false;
 				let timer = 0;
 				const syncFromHost = () => {
-					try {
-						if (window.localStorage.getItem(THEME_MODE_KEY) === "manual") return;
-					} catch { /* ignore */ }
 					if (!cancelled) setTheme(detectHostTheme());
 				};
 				const syncSoon = () => {
@@ -3151,9 +3199,12 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 :root{--rt-dock-w:620px}
 /* 右侧栏收起时给 frame 加内边距，中栏主动收窄。属性名跨 DSH 版本兼容：\n   旧版 details 栏 data-details-collapsed，新版 rightbar 栏 data-rightbar-collapsed。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-details-collapsed],\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-rightbar-collapsed]{padding-right:var(--rt-dock-w)}
 .rt-dock{position:absolute;top:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;
-  background:var(--dsw-alias-bg-layer-1);border-left:1px solid var(--dsw-alias-border-l1);
-  box-shadow:-12px 0 32px rgba(0,0,0,.14);pointer-events:auto;color:var(--dsw-alias-label-primary);
+  background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 52%,transparent);
+  backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+  border-left:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,#444) 70%,transparent);
+  box-shadow:-12px 0 32px color-mix(in srgb,#000 22%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary);
   font-size:13px;line-height:1.5;transition:transform .18s ease,opacity .18s ease}
+.rt-dock.rt-embedded{position:relative;background:transparent!important;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 /* 右侧栏打开（或新版全屏）时让位：滑出隐藏。必须同时否定两个属性名——\n   旧写法只用 :not([data-details-collapsed])，在新 shell 里该属性不存在会导致条件恒真、面板永远打不开。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]):not([data-details-collapsed]):not([data-rightbar-collapsed]) .rt-dock,\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-rightbar-fullscreen] .rt-dock{
   transform:translateX(100%);opacity:0;pointer-events:none}
 .rt-grip{position:absolute;left:-3px;top:0;bottom:0;width:6px;cursor:col-resize;background:transparent;z-index:2}
@@ -3214,7 +3265,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 .rt-kv b{color:var(--dsw-alias-label-primary);font-weight:600;min-width:64px;flex:none}
 /* 图谱视图已移除（见 AssetsTab：资产关系由「域名维度」与 redteam_attack_path 工具承担） */
 .rt-pane{flex:1;min-height:0;overflow:auto;padding:12px}
-.rt-card{border:1px solid var(--dsw-alias-border-l1);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--dsw-alias-bg-layer-2)}
+.rt-card{border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,#444) 75%,transparent);border-radius:8px;padding:10px;margin-bottom:10px;
+  background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#2a2a2a) 48%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .rt-card h4{margin:0 0 6px;font-size:13px}
 .rt-textarea{width:100%;min-height:260px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);
   color:inherit;border-radius:6px;padding:8px;font-size:12.5px;font-family:ui-monospace,Menlo,monospace;
@@ -3246,6 +3298,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 .rt-test-blocked{color:#fff;background:#ef4444;border-color:#ef4444}
 .rt-test-abandoned{color:#94a3b8;border-color:#94a3b855;background:#94a3b81a}
 .rt-test-no_surface{color:#6366f1;border-color:#6366f155;background:#6366f11a}
+.rt-scope-testing{color:#5b21b6;background:#ddd6fe}
 .rt-pri{display:inline-block;padding:0 6px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap}
 .rt-pri-high{color:#fff;background:#ef4444}
 .rt-pri-medium{color:#fff;background:#f59e0b}
@@ -3901,10 +3954,18 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
       const sideChildren = []
       sideChildren.push(h('div', Object.assign({
-        key: 'all', className: 'rt-seg' + (cidr ? '' : ' on'),
-      }, clickable(() => setCidr(null), { label: '全部 C 段' })),
+        key: 'all', className: 'rt-seg' + (cidr === null && view !== 'testing' ? ' on' : ''),
+      }, clickable(() => { setView('list'); setCidr(null) }, { label: '全部 C 段', expanded: cidr === null && view !== 'testing' })),
         h('div', { className: 'rt-seg-cidr' }, '全部 C 段'),
         h('div', { className: 'rt-seg-meta' }, segs.length + ' 个网段')))
+      sideChildren.push(h('div', Object.assign({
+        key: 'testing', className: 'rt-seg' + (view === 'testing' ? ' on' : ''),
+        title: '正在跑的扫描 / 探测与进度（5 秒自动刷新）',
+      }, clickable(() => { setView('testing'); setCidr(null) }, { label: '当前测试', expanded: view === 'testing' })),
+        h('div', { className: 'rt-seg-cidr', style: { display: 'flex', alignItems: 'baseline', gap: 5 } },
+          h('span', { className: 'rt-scope rt-scope-testing', title: '当前测试（既非内网也非外网）' }, '测'),
+          h('span', { style: { flex: 1 } }, '当前测试')),
+        h('div', { className: 'rt-seg-meta' }, '正在跑的扫描与探测')))
       /* C 段按内外网分组：先外网（互联网可达，通常是入口）再内网（打进去之后才看得到） */
       const segBlock = (title, list, kind) => {
         /* 外网 / 内网两组各自可折叠（状态按靶标记住），默认展开 */
@@ -3913,9 +3974,9 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         const out = [h('div', {
           key: 'h' + kind, className: 'rt-sidehead rt-sidehead-btn',
           role: 'button', tabIndex: 0, 'aria-expanded': open ? 'true' : 'false',
-          title: open ? '收起本组' : '展开本组',
-          onClick: toggle,
-          onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e) } },
+          title: (open ? '收起本组' : '展开本组') + '（并切回资产列表）',
+          onClick: () => { setView('list'); toggle() },
+          onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setView('list'); toggle(e) } },
         },
           h('span', { className: 'rt-sec-caret' }, open ? '▾' : '▸'),
           h('span', { className: 'rt-scope rt-scope-' + kind }, kind === 'internal' ? '内网' : '外网'),
@@ -3928,7 +3989,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           out.push(h('div', Object.assign({
             key: s.cidr, className: 'rt-seg' + (cidr === s.cidr ? ' on' : ''),
             title: (s.org || '未知归属') + ' · 存活 ' + (s.live || 0) + '/' + (s.assets || 0) + ' 台',
-          }, clickable(() => setCidr(s.cidr), { label: '筛选 C 段 ' + s.cidr, expanded: cidr === s.cidr })),
+          }, clickable(() => { setView('list'); setCidr(s.cidr) },
+            { label: '筛选 C 段 ' + s.cidr, expanded: cidr === s.cidr && view !== 'testing' })),
             h('div', { className: 'rt-seg-cidr', style: { display: 'flex', alignItems: 'baseline', gap: 5 } },
               h('span', { className: 'rt-scope rt-scope-' + kind }, kind === 'internal' ? '内' : '外'),
               h('span', { style: { flex: 1 } }, s.cidr),
@@ -4175,13 +4237,14 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
 
       let pane = listPane
-      if (view === 'domain') pane = domainPane
+      if (view === 'testing') pane = h(TestingTab, { engagement: eng, refreshKey: refreshKey })
+      else if (view === 'domain') pane = domainPane
       else if (view === 'web') pane = webPane
       /* 发现时间视图自带滚动容器，直接放进 rt-main 的 flex 里 */
       else if (view === 'timeline') pane = h(DiscoveryView, { engagement: eng, refreshKey: refreshKey })
 
       return h('div', { className: 'rt-split' }, side,
-        h('div', { className: 'rt-main' }, toolbar,
+        h('div', { className: 'rt-main' }, view === 'testing' ? null : toolbar,
           conclusion,
           state.error ? h('div', { className: 'rt-err' }, state.error) : null,
           pane))
@@ -4591,6 +4654,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [state, setState] = React.useState({ loading: false, error: null, total: 0, items: [], stats: null })
       const [creds, setCreds] = React.useState([])
       const [accesses, setAccesses] = React.useState([])
+      const [files, setFiles] = React.useState([])
       const [openId, setOpenId] = React.useState(null)
       const [msg, setMsg] = React.useState(null)
       /* 子页签：漏洞 / 凭据 / 访问会话（凭据不再铺在漏洞页底部） */
@@ -4613,6 +4677,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         }, (e) => setState({ loading: false, error: String((e && e.message) || e), total: 0, items: [], stats: null }))
         api({ op: 'credentials', engagement: eng }).then((r) => setCreds((r && r.items) || []), () => {})
         api({ op: 'access', engagement: eng }).then((r) => setAccesses((r && r.items) || []), () => {})
+        api({ op: 'attackFiles', engagement: eng }).then((r) => setFiles((r && r.items) || []), () => {})
       }
       React.useEffect(load, [eng, sev, status, qApplied, refreshKey])
 
@@ -4627,6 +4692,16 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
       const stats = (state.stats && state.stats.bySeverity) ? state.stats : { bySeverity: {}, byStatus: {} }
       const needRestart = state.error !== null && String(state.error).indexOf('unknown op') >= 0
+
+      const allFiles = (files || []).flatMap((g) => (g.files || []).map((f) => Object.assign({ target: g.target }, f)))
+      const filesByVuln = new Map()
+      const orphanFiles = []
+      for (const f of allFiles) {
+        const vid = f.vuln_id === null || f.vuln_id === undefined ? null : Number(f.vuln_id)
+        if (vid === null) { orphanFiles.push(f); continue }
+        if (!filesByVuln.has(vid)) filesByVuln.set(vid, [])
+        filesByVuln.get(vid).push(f)
+      }
 
       /* ── 结论行：只给结论，数字点一下就是筛选 ─────────────────────── */
       const concl = (key, label, value, active, onClick) => h('span', Object.assign({
@@ -4682,6 +4757,17 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           h('div', { className: 'rt-kv' }, h('b', null, '资产'), h('span', null, (v.asset_ip || '—') + ' · ' + (v.segment_cidr || ''))),
           h('div', { className: 'rt-kv' }, h('b', null, '来源'), h('span', null, (v.source || '—') + ' · ' + (v.found_by_agent || '—') + ' · ' + fmt(v.found_at))),
           detailEvidence(v),
+          (() => {
+            const mine = filesByVuln.get(Number(v.id)) || []
+            return h('div', { className: 'rt-kv' }, h('b', null, '攻击文件'),
+              mine.length
+                ? h('span', null, mine.map((f, fi) => h('div', { key: 'af' + fi, style: { marginBottom: 3 } },
+                    '· ' + (f.kind ? '[' + f.kind + '] ' : '') + (f.name || '(未命名)')
+                    + (f.description ? ' — ' + f.description : ''),
+                    h('div', { className: 'rt-mono', style: { fontSize: 11, marginLeft: 12, color: 'var(--dsw-alias-label-secondary)', overflowWrap: 'anywhere' } }, f.path || ''))))
+                : h('span', { style: { color: 'var(--dsw-alias-label-secondary)' } },
+                    '（无）用 redteam_attack_file_add 把这条漏洞打通的脚本/马/EXP 归档，并带上 vuln_id'))
+          })(),
           h('div', { className: 'rt-actions' },
             h('button', { className: 'rt-btn', onClick: (e) => { e.stopPropagation(); setVulnStatus(v.id, 'confirmed') } }, '确认'),
             h('button', { className: 'rt-btn', onClick: (e) => { e.stopPropagation(); setVulnStatus(v.id, 'exploited') } }, '已利用'),
@@ -4800,6 +4886,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       return h('div', { className: 'rt-main' }, toolbar, conclusion,
         h('div', { className: 'rt-subtabs' },
           subTabBtn('vulns', '漏洞', state.total || 0),
+          subTabBtn('files', '攻击文件', allFiles.length),
           subTabBtn('creds', '凭据', creds.length),
           subTabBtn('access', '访问会话', accesses.length),
           h('div', { className: 'rt-spacer' }),
@@ -4819,7 +4906,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         msg ? h('div', { className: msg.err ? 'rt-err' : 'rt-foot' }, msg.err || msg.ok) : null,
         needRestart ? h('div', { className: 'rt-empty' }, '该模块的宿主代码已更新，需重启一次当前宿主（官方 exe / 社区版 / dsh web）后生效') : null,
         state.error && !needRestart ? h('div', { className: 'rt-err' }, state.error) : null,
-        subTab === 'creds'
+        subTab === 'files'
+          ? h('div', { className: 'rt-body', style: { overflow: 'auto' } },
+              h('div', { className: 'rt-hint', style: { marginBottom: 8 } },
+                '攻击文件按靶标目录组织（原「攻击文件」页签）；每条漏洞的关联文件也能在该漏洞详情里直接看到。'
+                + (orphanFiles.length ? ' 目前有 ' + orphanFiles.length + ' 个文件没挂 vuln_id，建议补上以便与漏洞对应。' : '')),
+              h(AttackFilesTab, { engagement: eng, refreshKey: refreshKey }))
+          : subTab === 'creds'
           ? h('div', { className: 'rt-body', style: { overflow: 'auto' } }, credSection)
           : subTab === 'access'
             ? h('div', { className: 'rt-body', style: { overflow: 'auto' } }, accessSection)
@@ -6552,13 +6645,12 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const refreshKey = props.refreshKey || 0
       const [roles, setRoles] = React.useState(null)
       const [err, setErr] = React.useState(null)
-      const [openRole, setOpenRole] = React.useState('plan')
       const [concurrency, setConcurrency] = React.useState(null)
       const [busy, setBusy] = React.useState(false)
 
       const load = () => {
         setBusy(true)
-        api(eng ? { op: 'prompts', engagement: eng } : { op: 'prompts' }).then((r) => {
+        api({ op: eng ? 'prompts' : 'bootstrap', engagement: eng || undefined }).then((r) => {
           setBusy(false)
           if (!r || r.ok === false) { setErr((r && r.error) || '读取失败'); return }
           setErr(null)
@@ -6571,8 +6663,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       }
       React.useEffect(load, [eng, refreshKey])
 
-      const list = roles || []
-      const current = list.find((x) => x.role === openRole) || list[0]
       const used = concurrency ? concurrency.used : null
       const max = concurrency ? concurrency.max : 3
       return h('div', { className: 'rt-main' },
@@ -6603,18 +6693,57 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
               '④ 漏洞利用 `exploit` —— 先拿服务器权限（冰蝎/哥斯拉马）+ 建 suo5 隧道，再打其它得分项', h('br'),
               '⑤ 内网渗透 `internal` —— 走隧道，依次拉起 ①②③④ 做内网', h('br'),
               '⑥ 主会话 `plan` —— 只做计划、派活、汇总、汇报，不动手')),
+          h(ConcurrencyCard, { concurrency, onSaved: load }),
           h('div', { className: 'rt-card' },
-            h('h4', null, '角色提示词（按靶标存，可在这里查看）'),
+            h('h4', null, '角色提示词（按靶标存，可在这里编辑）'),
             h('div', { style: { fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', marginBottom: 6 } },
-              '完整编辑在「智能体提示词」页签；这里是速览。'),
-            h('div', { style: { display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 } },
-              list.map((x) => h('button', {
-                key: x.role, className: 'rt-btn' + (current && current.role === x.role ? ' rt-btn-primary' : ''),
-                onClick: () => setOpenRole(x.role),
-              }, (ROLE_LABEL[x.role] || x.role) + (x.planner ? '（不派活）' : '')))),
-            current
-              ? h('pre', { className: 'rt-rep-http', style: { maxHeight: 340 } }, current.content || '（还没有正文）')
-              : h('div', { className: 'rt-empty' }, eng ? '加载中…' : '先选一个靶标'))))
+              '「智能体提示词」已并入本页；下面是完整编辑器（改完点保存，只影响当前靶标）。'),
+            h(PromptsTab, { engagement: eng, refreshKey: refreshKey }))))
+    }
+
+    function ConcurrencyCard(props) {
+      const info = props.concurrency || {}
+      const [draft, setDraft] = React.useState('')
+      const [busy, setBusy] = React.useState(false)
+      const [msg, setMsg] = React.useState(null)
+      React.useEffect(() => { if (info.max) setDraft(String(info.max)) }, [info.max])
+
+      const limit = info.limit || 10
+      const used = typeof info.used === 'number' ? info.used : null
+      const source = info.source === 'settings' ? '面板中设置'
+        : info.source === 'env' ? '环境变量 REDTEAM_MAX_AGENTS' : '默认值'
+      const n = Number(draft)
+      const invalid = !Number.isFinite(n) || Math.floor(n) !== n || n < 1 || n > limit
+      const save = () => {
+        if (invalid) return
+        setBusy(true); setMsg(null)
+        api({ op: 'setAgentsMax', max: n }).then((r) => {
+          setBusy(false)
+          if (!r || r.ok === false) { setMsg({ err: (r && r.error) || '保存失败' }); return }
+          setMsg({ ok: '已保存：并发上限 ' + r.max + '（立即生效，不用重启）' })
+          if (props.onSaved) props.onSaved()
+        }, (e) => { setBusy(false); setMsg({ err: String((e && e.message) || e) }) })
+      }
+      return h('div', { className: 'rt-card' },
+        h('h4', null, '并发数量'),
+        h('div', { style: { fontSize: 12, lineHeight: 1.8, marginBottom: 8 } },
+          '同一靶标**同时最多几个执行智能体**。当前生效：**' + (info.max || '?') + '**'
+          + (used === null ? '' : '（在跑 ' + used + '，剩余 ' + Math.max((info.max || 0) - used, 0) + '）')
+          + '，来源：' + source + '。改完**立即生效**，不用重启。'),
+        h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } },
+          h('input', {
+            className: 'rt-input', style: { width: 90 }, type: 'number', min: 1, max: limit,
+            value: draft, onChange: (e) => setDraft(e.target.value),
+          }),
+          h('span', { style: { fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)' } }, '范围 1 – ' + limit),
+          h('button', { className: 'rt-btn rt-btn-primary', disabled: busy || invalid, onClick: save },
+            busy ? '保存中…' : '保存'),
+          msg && msg.err ? h('span', { style: { fontSize: 12, color: 'var(--rt-danger, #d33)' } }, msg.err) : null,
+          msg && msg.ok ? h('span', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)' } }, msg.ok) : null),
+        h('div', { className: 'rt-note', style: { marginTop: 8 } },
+          '⚠️ 调大不等于更快：**同一个模型 API Key 的并发/速率上限是共享的**，同时派太多会互相挤占，'
+          + '表现为排队等待、超时、返回被截断甚至限流报错 —— 反而让测试结果不稳定（漏测、半途而废）。'
+          + '建议从 2–3 开始，只有在确认 Key 的额度足够、任务之间确实互不依赖时才调大。'))
     }
 
     /**
@@ -6896,11 +7025,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
       const stats = (snapshot && snapshot.stats) || {}
       const tabs = [
-        ['assets', '资产测绘'], ['env', '环境适配'], ['testing', '当前测试'], ['agents', '智能体'], ['sessions', '会话隧道'],
+        ['assets', '资产测绘'], ['env', '环境适配'], ['agents', '智能体'], ['sessions', '会话隧道'],
         ['findings', '漏洞战果'],
         ['chain', '攻击链'], ['scores', '得分目标'], ['report', '报告'],
-        ['attackfiles', '攻击文件'], ['knowledge', '知识库'],
-        ['prompts', '智能体提示词'], ['skills', '技能库'],
+        ['knowledge', '知识库'],
+        ['skills', '技能库'],
       ]
       const full = isFullWindow()
       const openFull = () => {
@@ -6925,12 +7054,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
       let body
       if (err) body = h('div', { className: 'rt-err' }, err)
-      /* 全局页：没有靶标也能看（知识库 / 环境适配 / 技能库 / 提示词 / 智能体概览） */
+      /* 全局页：没有靶标也能看（知识库 / 环境适配 / 技能库 / 智能体概览） */
       else if (st.tab === 'knowledge') body = h(KnowledgeTab, { refreshKey: refreshKey })
       else if (st.tab === 'env') body = h(EnvTab, { refreshKey: refreshKey })
       else if (st.tab === 'skills') body = h(SkillsTab, { refreshKey: refreshKey })
-      else if (st.tab === 'prompts') body = h(PromptsTab, { engagement: eng, refreshKey: refreshKey })
-      else if (st.tab === 'agents') body = h(AgentsTab, { engagement: eng, refreshKey: refreshKey })
+      else if (st.tab === 'agents' || st.tab === 'prompts') body = h(AgentsTab, { engagement: eng, refreshKey: refreshKey })
       else if (!eng) {
         body = h('div', { className: 'rt-pane' },
           h('div', { className: 'rt-card' },
@@ -6945,13 +7073,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
               }),
               h('button', { className: 'rt-btn rt-btn-primary', disabled: creating, onClick: () => openEngagement() },
                 creating ? '创建中…' : '创建靶标'))))
-      }       else if (st.tab === 'assets') body = h(AssetsTab, { engagement: eng, snapshot: snapshot, refreshKey: refreshKey, onRefresh: refreshAll, onData: () => loadSnapshot(eng) })
-      else if (st.tab === 'testing') body = h(TestingTab, { engagement: eng, refreshKey: refreshKey })
+      } else if (st.tab === 'assets') body = h(AssetsTab, { engagement: eng, snapshot: snapshot, refreshKey: refreshKey, onRefresh: refreshAll, onData: () => loadSnapshot(eng) })
+      else if (st.tab === 'testing') body = h(AssetsTab, { engagement: eng, snapshot: snapshot, refreshKey: refreshKey, onRefresh: refreshAll, onData: () => loadSnapshot(eng) })
       else if (st.tab === 'sessions') body = h(SessionTab, { engagement: eng, refreshKey: refreshKey })
       else if (st.tab === 'findings') body = h(FindingsTab, { engagement: eng, refreshKey: refreshKey })
       else if (st.tab === 'chain') body = h(ChainTab, { engagement: eng, refreshKey: refreshKey })
       else if (st.tab === 'report') body = h(ReportTab, { engagement: eng, refreshKey: refreshKey })
-      else if (st.tab === 'attackfiles') body = h(AttackFilesTab, { engagement: eng, refreshKey: refreshKey })
+      else if (st.tab === 'attackfiles') body = h(FindingsTab, { engagement: eng, refreshKey: refreshKey })
       else if (st.tab === 'scores') body = h(ScoreTab, { engagement: eng, refreshKey: refreshKey })
       else body = h('div', { className: 'rt-empty' }, '未知页签')
 
@@ -7554,6 +7682,17 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			const t = useT();
 			const st = useDock();
 			const [geom, setGeom] = useState(() => loadDockGeom());
+			const [dockTheme, setDockTheme] = useState(detectHostTheme);
+			useEffect(() => {
+				const sync = () => setDockTheme(detectHostTheme());
+				sync();
+				const obs = new MutationObserver(sync);
+				if (document.body) obs.observe(document.body, { attributes: true, attributeFilter: ["data-ds-dark-theme", "class"] });
+				const onStorage = (e) => { if (!e.key || e.key === THEME_KEY || e.key === THEME_MODE_KEY) sync(); };
+				window.addEventListener("storage", onStorage);
+				const timer = window.setInterval(sync, 1500);
+				return () => { obs.disconnect(); window.removeEventListener("storage", onStorage); window.clearInterval(timer); };
+			}, []);
 			useEffect(() => {
 				let uiTag = document.querySelector('style[data-dsh-purge-ui="1"]');
 				if (!uiTag) {
@@ -7693,6 +7832,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					: h("div", { style: { padding: 16, color: "var(--dsw-alias-label-secondary)" } }, t("dock.unauthorized")));
 			const panel = h("div", {
 				className: "dshp-dock",
+				"data-theme": dockTheme === "white" ? "white" : "dusk",
 				"data-open": st.open ? "1" : "0",
 				style: {
 					left: geom.x + "px",

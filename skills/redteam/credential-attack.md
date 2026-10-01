@@ -16,11 +16,12 @@ enabled: true
 
 | 工具 | 路径 | 版本 | 用途 |
 | --- | --- | --- | --- |
-| **hydra** | `hydra`（PATH，或 `$DSH_HOME/redteam/toolkit/hydra/`） | 在线爆破，覆盖 50+ 协议 |
-| **hashcat** | `hashcat`（PATH，或 `$DSH_HOME/redteam/toolkit/hashcat/`） | 离线哈希破解（GPU/CPU） |
-| **john** | `john`（PATH，或 `$DSH_HOME/redteam/toolkit/john/`） | 离线破解（自动识别格式，配置简单） |
+| **hydra** | `/usr/bin/hydra` | 9.7 | 在线爆破，覆盖 50+ 协议 |
+| **hashcat** | `/usr/bin/hashcat` | 7.1.2 | 离线哈希破解（GPU/CPU） |
+| **john** | `/usr/sbin/john` | — | 离线破解（自动识别格式，配置简单） |
 
-字典放在 `$DSH_HOME/redteam/toolkit/wordlists/`（例如 `rockyou.txt`）。没有这份字典就换目录里已有的词表，不要写死 `/usr/share`。
+字典：`/usr/share/wordlists/`（含 `rockyou.txt` 需 gunzip）、`/usr/share/seclists/Passwords/`。
+**没有 rockyou 时先解压**：`sudo gunzip /usr/share/wordlists/rockyou.txt.gz`（需授权，没有就换 seclists 里的）。
 
 ## 一、在线爆破（hydra）
 
@@ -75,7 +76,7 @@ hydra -L users.txt -P pass.txt -s 443 -S target.example.com http-post-form \
    用 `redteam_asset_query` 里的 title/单位信息现造。
 2. **默认口令字典**：产品默认口令（`admin/admin`、`tomcat/tomcat`、`weblogic/weblogic1`、`sa/sa`），
    参考 nuclei 模板 `http/default-logins/`（307 个），**先查 `redteam_poc_search`**。
-3. **常见弱口令 TOP**：`$DSH_HOME/redteam/toolkit/wordlists/` 下的 10-million / top-100 等。
+3. **常见弱口令 TOP**：`/usr/share/seclists/Passwords/Common-Credentials/` 下的 10-million / top-100 等。
 4. 通用大字典（rockyou）放最后——慢且噪声大。
 
 ### 用户名从哪来
@@ -92,20 +93,20 @@ hydra -L users.txt -P pass.txt -s 443 -S target.example.com http-post-form \
 hashcat --identify hashes.txt
 
 # 2) NTLM（Windows）
-hashcat -m 1000 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt -O -w 3
+hashcat -m 1000 hashes.txt /usr/share/wordlists/rockyou.txt -O -w 3
 
 # 3) NetNTLMv2（Responder 抓到的）
-hashcat -m 5600 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt
+hashcat -m 5600 hashes.txt /usr/share/wordlists/rockyou.txt
 
 # 4) MD5 / SHA1（Web 应用库）
-hashcat -m 0 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt
-hashcat -m 100 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt
+hashcat -m 0 hashes.txt /usr/share/wordlists/rockyou.txt
+hashcat -m 100 hashes.txt /usr/share/wordlists/rockyou.txt
 
 # 5) bcrypt（WordPress / PHP）
-hashcat -m 3200 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt
+hashcat -m 3200 hashes.txt /usr/share/wordlists/rockyou.txt
 
 # 6) 加规则（用规则把字典放大 10 倍，性价比最高）
-hashcat -m 1000 hashes.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt -r $DSH_HOME/redteam/toolkit/wordlists/best64.rule
+hashcat -m 1000 hashes.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
 
 # 7) 掩码爆破（已知口令策略，如 8 位数字 + 大写字母）
 hashcat -m 1000 hashes.txt -a 3 '?u?l?l?l?l?d?d?d?d'
@@ -113,7 +114,7 @@ hashcat -m 1000 hashes.txt -a 3 '?u?l?l?l?l?d?d?d?d'
 
 ```bash
 # john：格式识别省事，配置在 ~/.john/john.conf
-john --wordlist=$DSH_HOME/redteam/toolkit/wordlists/rockyou.txt hashes.txt
+john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt
 john --show hashes.txt
 ```
 

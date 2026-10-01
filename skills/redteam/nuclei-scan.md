@@ -15,8 +15,8 @@ enabled: true
 
 | 项 | 值 |
 | --- | --- |
-| 二进制 | `nuclei`（PATH，或 `$DSH_HOME/redteam/toolkit/nuclei/nuclei`） |
-| 模板库 | `$DSH_HOME/redteam/toolkit/nuclei-templates` |
+| 二进制 | `/usr/bin/nuclei`（v3.11.1） |
+| 模板库 | `~/.local/nuclei-templates`（**13,742 个模板**） |
 | 模板版本 | v10.4.9（更新于 2026-09-18） |
 | 配置 | `~/.config/nuclei/config.yaml`、`.templates-config.json` |
 

