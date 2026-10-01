@@ -3,7 +3,7 @@
 ## 中文
 
 - 版本升级到 1.1.44。
-- 官方桌面解开 `app.asar` 时先写到旁边的目录，解开完成才换上 `resources/app`。解包卡住或这一轮补丁没写完，原来的目录还在。
+- 官方桌面解开 `app.asar` 时先写到旁边的目录，解开完成才换上 `resources/app`。解包卡住、升级前挪走的目录，或这一轮补丁没写完，原来的目录都会放回去。升级补丁没写完时保留标记，下次启动再试。
 - 平常重启不再重新解包。只有官方升级换了新归档时才解一次，然后像 Web 一样把补丁补回去。
 - 回退上一轮只撤掉最后一条已经发出的消息和它的回复，更早的轮次留在对话里，也从模型请求里拿掉。
 - 可编辑提示词整份放在系统提示最前，同一份正文不再拼第二遍。每一步用当前这一份替换第一条系统提示。
@@ -11,7 +11,7 @@
 ## English
 
 - Version 1.1.44.
-- Unpacking `app.asar` writes beside `resources/app` and swaps in only after the unpack finishes. If unpacking sticks or that round of patches does not finish, the previous directory stays.
+- Unpacking `app.asar` writes beside `resources/app` and swaps in only after the unpack finishes. If unpacking sticks, the directory moved aside before an upgrade is put back, and an unfinished patch round is put back too. The upgrade marker stays until that round finishes, so the next start tries again.
 - A normal restart does not unpack again. A new archive from an official upgrade is unpacked once, then patches are applied the same way as on Web.
 - Rewinding the previous round removes only that sent message and its reply. Earlier rounds stay on screen and leave the next model request.
 - The editable prompt is placed once at the front of the system prompt. Each step replaces the first system prompt with that current text.
