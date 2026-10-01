@@ -6,7 +6,8 @@
 - 修复注入不稳定：第二轮或任务做到一半人设失效、被当成 `project_instructions` 拆掉的问题。
 - 工作区替换稿免责声明补丁不再被主 intro 的完成标记冒充跳过；替换稿与作用域 intro 与主 intro 对齐。
 - 进模型前剥掉外层 ChatML / `<project_instructions>` 壳，避免模型把真实 system 注入当成项目说明。
-- 同一会话内系统提示段首次注入成功后钉死，减少每步改写触发的二次读人设。
+- 组装后的系统提示段统一保证 `text` 为字符串；不再会话钉死整段 sections，避免第二轮 `renderPrompt` 读 `undefined.length` 直接死掉并报 `(gateway/internal)`。
+- `agent/pre-step` 始终把 `decision.messages` 规范成数组，避免第二轮发送时读空 messages 炸掉。
 - 清洗进度：未定位宿主时不再显示吓人的 `0/63`；本机不需要或组件未装的项计入已就绪，避免假的 `48/63`。
 - 点「应用」就会写入默认提示词并注入，框空时用内置默认，不必先点保存。
 - 更新并重新加密默认提示词。
@@ -18,7 +19,8 @@
 - Fix unstable inject: persona dropping on the second turn or mid-task, including cases where the model treated the system inject as `project_instructions` and rejected it.
 - The replacement workspace-intro patch no longer skips because of the main intro's completion marker; replacement and scope intros match the main intro.
 - Strip outer ChatML / `<project_instructions>` wrappers before the text reaches the model, so a real system inject is not read as project instructions.
-- Pin system-prompt sections for a session after the first successful inject, so per-step rewrites are less likely to trigger a second identity read.
+- Sanitize assembled system-prompt sections so `text` is always a string; stop pinning full sections for a session, which could make the second turn crash in `renderPrompt` on `undefined.length` with `(gateway/internal)`.
+- Always normalize `decision.messages` to an array in `agent/pre-step`, so a second send does not die on a missing messages list.
 - Clean progress: do not show a scary `0/63` before the host is located; items not needed on this install count as ready, so a fake `48/63` no longer appears.
 - Apply writes and injects the default prompt; an empty box uses the bundled default, so a separate Save is not required.
 - Refresh and re-encrypt the bundled default prompt.
