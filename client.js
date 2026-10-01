@@ -129,8 +129,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 27, 28, 32, 43, 50, 53, 54] },
-			{ key: "code", ids: [6, 7, 8, 42, 44, 45, 46, 51, 52, 55, 56] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 28, 32, 43, 50, 53, 54] },
+			{ key: "code", ids: [6, 7, 8, 42, 45, 46, 51, 52, 55, 56] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
 			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48] },
 			{ key: "compat", ids: [38, 39, 40] },
@@ -191,12 +191,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.applied": "已应用",
 			"status.pending": "待应用",
 			"status.skipped": "跳过",
-			"apply.hint": "待应用=原文还在。跳过=当前版本不需要或组件未安装，再点也不会变。",
+			"apply.hint": "点应用会把提示词框里的全文写入并打补丁，不必再点保存。待应用=原文还在。跳过=当前版本不需要或组件未安装。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
 			"warn.noRoot.desktop": "官方客户端的代码在 app.asar 里。点「应用」会解开并自动重启，不用另跑脚本。第三方 DSH Desktop 直接点「应用」。",
 			"unpack.restarting": "补丁已写入。点「重启」后客户端会自己重新打开。",
 			"restart.fullQuit": "正在重启，客户端会自己重新打开。",
-			"warn.noInject": "默认只注入可编辑提示词。启用规则集后以规则集为主。两边都空会提示必须添加。Skill 不顶替提示词。",
+			"warn.noInject": "官方始终用默认提示词。红队开了规则集就只用规则集；没开时用去掉 CTF 的默认提示词，再接红队操作。两边都空会提示必须添加。",
 			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
 			"saved.restoreInject": "已填入默认提示词，点保存写入",
@@ -351,7 +351,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.24": "preset fetch 启用",
 			"patch.25": "去掉官方默认身份（功能提示词不动）",
 			"patch.26": "minimal：去掉默认身份并打开 inject",
-			"patch.27": "dsh-liangshen（梁神）：去掉默认身份（可选）",
 			"patch.28": "dsh-liangshen（梁神）：phase-1 保留注入段",
 			"patch.29": "dsh-tool-web：外部 untrusted 拦截→可执行",
 			"patch.30": "dsh-hooks-claude-code：deny→allow",
@@ -367,7 +366,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.40": "complete 预设仍保留注入",
 			"patch.42": "设置页旧接口",
 			"patch.43": "网页预设去掉默认身份",
-			"patch.44": "压缩设置仍看本机范围",
 			"patch.45": "官方桌面更新交接",
 			"patch.46": "官方更新脚本只用英文",
 			"patch.47": "OAuth 不再插入 Claude 身份",
@@ -461,12 +459,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.applied": "Applied",
 			"status.pending": "Pending",
 			"status.skipped": "Skipped",
-			"apply.hint": "Pending = original text still present. Skipped = not needed for this version or component not installed.",
+			"apply.hint": "Apply writes the prompt in the box and the patches. A separate save is unnecessary. Pending = original text still present. Skipped = not needed for this version or the component is not installed.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
 			"warn.noRoot.desktop": "Official Harness keeps its code in app.asar. Apply unpacks it and restarts the app. Third-party DSH Desktop: just Apply.",
 			"unpack.restarting": "Patches are written. Click Restart and the client opens again by itself.",
 			"restart.fullQuit": "Restarting. The client will open again by itself.",
-			"warn.noInject": "By default only the editable prompt is injected. An enabled rule set takes over. If both are empty you will be asked to add a prompt. Skills do not replace the prompt.",
+			"warn.noInject": "Official mode always uses the default prompt. Red team uses only the active rule set; otherwise it uses the default prompt without the CTF section, then the red team steps. If both are empty you will be asked to add a prompt.",
 			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
 			"saved.restoreInject": "Default prompt loaded. Save to write.",
@@ -621,7 +619,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.24": "preset fetch on",
 			"patch.25": "Strip official default identity (keep feature prompts)",
 			"patch.26": "minimal: strip identity, open inject",
-			"patch.27": "dsh-liangshen: strip default identity (optional)",
 			"patch.28": "dsh-liangshen: keep inject in phase-1",
 			"patch.29": "dsh-tool-web: untrusted framing → usable data",
 			"patch.30": "dsh-hooks-claude-code: deny→allow",
@@ -637,7 +634,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.40": "Keep inject when a complete prompt is set",
 			"patch.42": "Settings legacy API",
 			"patch.43": "Strip identity from web presets",
-			"patch.44": "Compaction keeps local scope",
 			"patch.45": "Official desktop update handoff",
 			"patch.46": "Official update script stays ASCII",
 			"patch.47": "OAuth no longer inserts Claude identity",
@@ -1140,6 +1136,8 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			const [channel, setChannel] = useState("stable");
 			const [pick, setPick] = useState({ stable: "", beta: "" });
 			const actionTicket = useRef(0);
+			const overrideRef = useRef("");
+			overrideRef.current = override;
 
 			const syncPicks = (d) => {
 				const versions = (d && d.versions) || [];
@@ -1344,12 +1342,13 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					fetch("/dsh-purge/" + action, {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify(action === "apply" ? { content: override } : {}),
+						body: JSON.stringify(action === "apply" ? { content: overrideRef.current } : {}),
 					})
 						.then((r) => r.json())
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
-							const applyEmptyBlocked = action === "apply" && promptBoxEmpty(override) && (!d || d.injectSource !== "rule");
+							const posted = action === "apply" ? overrideRef.current : override;
+							const applyEmptyBlocked = action === "apply" && promptBoxEmpty(posted) && (!d || d.injectSource !== "rule");
 							if (responseNeedsPrompt(d) || applyEmptyBlocked) {
 								rejectNeedPrompt(tr);
 								return;
@@ -1424,7 +1423,7 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					run();
 					return;
 				}
-				bothInjectEmpty(override).then((empty) => {
+				bothInjectEmpty(overrideRef.current).then((empty) => {
 					if (ticket !== actionTicket.current) return;
 					if (empty) {
 						rejectNeedPrompt(tr);
@@ -1432,7 +1431,7 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					}
 					run();
 				});
-			}, [loadAll, override, rejectNeedPrompt]);
+			}, [loadAll, rejectNeedPrompt]);
 
 			const saveOverride = useCallback(() => {
 				const tr = t;
@@ -1444,12 +1443,12 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					fetch("/dsh-purge/override", {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify({ content: override }),
+						body: JSON.stringify({ content: overrideRef.current }),
 					})
 						.then((r) => r.json())
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
-							if (!d.ok || responseNeedsPrompt(d) || (promptBoxEmpty(override) && d.injectSource !== "rule")) {
+							if (!d.ok || responseNeedsPrompt(d) || (promptBoxEmpty(overrideRef.current) && d.injectSource !== "rule")) {
 								rejectNeedPrompt(tr);
 								return;
 							}
@@ -1464,7 +1463,7 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 							if (ticket === actionTicket.current) setPatchBusy(false);
 						});
 				};
-				bothInjectEmpty(override).then((empty) => {
+				bothInjectEmpty(overrideRef.current).then((empty) => {
 					if (ticket !== actionTicket.current) return;
 					if (empty) {
 						rejectNeedPrompt(tr);
@@ -1472,10 +1471,11 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 					}
 					go();
 				});
-			}, [override, t, rejectNeedPrompt]);
+			}, [t, rejectNeedPrompt]);
 
 			const restoreOverride = useCallback(() => {
 				if (!defaultOverride) return;
+				overrideRef.current = defaultOverride;
 				setOverride(defaultOverride);
 				setNotice({ kind: "ok", text: t("saved.restoreInject") });
 			}, [defaultOverride, t]);
@@ -1715,7 +1715,10 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 				h("textarea", {
 					className: "dshp-area",
 					value: override,
-					onChange: (e) => setOverride(e.target.value),
+					onChange: (e) => {
+						overrideRef.current = e.target.value;
+						setOverride(e.target.value);
+					},
 					spellCheck: false,
 					placeholder: "",
 				}),
@@ -7250,8 +7253,9 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			const text = String(value || "").trim();
 			if (!text) return false;
 			if (text === "redteam") return true;
-			if (/红队/.test(text)) return true;
 			if (/^red[\s_-]*team$/i.test(text)) return true;
+			const label = text.replace(/不是红队/g, "").replace(/非红队/g, "");
+			if (/红队/.test(label)) return true;
 			return false;
 		}
 
@@ -7302,7 +7306,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			try {
 				const labels = document.querySelectorAll("[class*='PfFEtG_label'], [title*='红队'], [title*='RedTeam']");
 				for (const el of labels) {
-					if (isRedteamPresetId(el.textContent) || /红队/.test(String(el.textContent || ""))) return true;
+					if (isRedteamPresetId(el.textContent)) return true;
 				}
 			} catch { /* ignore */ }
 			return false;

@@ -3,18 +3,22 @@
 ## 中文
 
 - 版本升级到 1.1.44。
-- 官方桌面解开 `app.asar` 时先写到旁边的目录，解开完成才换上 `resources/app`。解包卡住、升级前挪走的目录，或这一轮补丁没写完，原来的目录都会放回去。升级补丁没写完时保留标记，下次启动再试。
-- 平常重启不再重新解包。只有官方升级换了新归档时才解一次，然后像 Web 一样把补丁补回去。
+- 官方桌面解开 `app.asar` 时先写到旁边的目录，解开完成才换上 `resources/app`。目录里已经有宿主之后只改这些文件。同一份归档又出现时只把它挪开。归档的大小或时间变了，或目录不在了，才再解一次。解包卡住或补丁没写完，把上一份放回去，升级标记留到下次再试。
 - 回退上一轮只撤掉最后一条已经发出的消息和它的回复，更早的轮次留在对话里，也从模型请求里拿掉。
 - 可编辑提示词整份放在系统提示最前，同一份正文不再拼第二遍。每一步用当前这一份替换第一条系统提示。
+- deepseek.com 的系统提示固定走 system，思维链照旧发送。
+- 地区拦截只看这次任务里的目标。自己的服务器只认名单上的那一个地址或主机名。禁止句写上之后才结束这一轮。
+- 官方始终用带 CTF 的默认提示词。红队开了规则集就只用规则集；否则用去掉 CTF 的默认提示词，再接红队操作。子代理跟主会话吃同一份。
 
 ## English
 
 - Version 1.1.44.
-- Unpacking `app.asar` writes beside `resources/app` and swaps in only after the unpack finishes. If unpacking sticks, the directory moved aside before an upgrade is put back, and an unfinished patch round is put back too. The upgrade marker stays until that round finishes, so the next start tries again.
-- A normal restart does not unpack again. A new archive from an official upgrade is unpacked once, then patches are applied the same way as on Web.
+- Unpacking `app.asar` writes beside `resources/app` and swaps in only after the unpack finishes. Once that directory is usable, later starts only edit those files. The same archive showing up again is moved aside. A new size or mtime, or a missing directory, is unpacked once. If unpacking sticks or that patch round does not finish, the previous directory is put back and the upgrade marker stays for the next start.
 - Rewinding the previous round removes only that sent message and its reply. Earlier rounds stay on screen and leave the next model request.
 - The editable prompt is placed once at the front of the system prompt. Each step replaces the first system prompt with that current text.
+- Instructions for deepseek.com stay on the system role. Thinking is still sent.
+- The region check looks only at this task's target. An own server is allowed only when that exact address or hostname is on the list. The turn ends after the denial sentence is written.
+- Official mode always uses the default prompt, including CTF. Red team uses only the active rule set, or the default prompt without CTF followed by the red team steps. Subagents receive the same inject as the main session.
 
 # 1.1.43
 
