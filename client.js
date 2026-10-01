@@ -130,7 +130,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
 			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 27, 28, 32, 43, 50, 53, 54] },
-			{ key: "code", ids: [6, 7, 8, 42, 44, 45, 46, 51, 52] },
+			{ key: "code", ids: [6, 7, 8, 42, 44, 45, 46, 51, 52, 55, 56] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
 			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48] },
 			{ key: "compat", ids: [38, 39, 40] },
@@ -378,6 +378,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.52": "会话日志默认不上传",
 			"patch.53": "网页提示去掉禁止另开服务器",
 			"patch.54": "交付物提示去掉多余禁止",
+			"patch.55": "每一步替换第一条系统提示",
+			"patch.56": "回退只藏被撤掉的那一轮",
 			"status.unlocated": "未定位",
 			"metric.unlocated": "还没定位到本机 Harness",
 			"rewind.label": "回退",
@@ -646,6 +648,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.52": "Session log upload off by default",
 			"patch.53": "Web prompt drops do-not-start",
 			"patch.54": "Deliverable prompt drops extra prohibition",
+			"patch.55": "Replace the first system prompt every step",
+			"patch.56": "Rewind hides only the cut range",
 			"status.unlocated": "Not located",
 			"metric.unlocated": "This install was not found yet",
 			"rewind.label": "Undo",
