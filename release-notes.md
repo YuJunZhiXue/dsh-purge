@@ -10,6 +10,7 @@
 - 清洗进度：未定位宿主时不再显示吓人的 `0/63`；本机不需要或组件未装的项计入已就绪，避免假的 `48/63`。
 - 点「应用」就会写入默认提示词并注入，框空时用内置默认，不必先点保存。
 - 更新并重新加密默认提示词。
+- 修复回退：`snapshotEvents()` 为空时不再读 `undefined.length`，避免 `(gateway/internal)` 报错导致回退无效。
 
 ## English
 
@@ -21,6 +22,7 @@
 - Clean progress: do not show a scary `0/63` before the host is located; items not needed on this install count as ready, so a fake `48/63` no longer appears.
 - Apply writes and injects the default prompt; an empty box uses the bundled default, so a separate Save is not required.
 - Refresh and re-encrypt the bundled default prompt.
+- Fix rewind: empty `snapshotEvents()` no longer reads `undefined.length`, so undo no longer fails with `(gateway/internal)`.
 
 # 1.1.44
 
