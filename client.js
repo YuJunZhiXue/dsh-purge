@@ -129,11 +129,12 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 27, 28, 32] },
-			{ key: "code", ids: [6, 7, 8] },
+			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 27, 28, 32, 43, 50, 53, 54] },
+			{ key: "code", ids: [6, 7, 8, 42, 44, 45, 46, 51, 52] },
 			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
-			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37] },
+			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48] },
 			{ key: "compat", ids: [38, 39, 40] },
+			{ key: "dsh20", ids: [47, 49] },
 		];
 
 		const zh = {
@@ -324,6 +325,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"group.engine": "引擎",
 			"group.tools": "工具",
 			"group.compat": "0.1.5 兼容",
+			"group.dsh20": "0.2.0",
 			"patch.1": "全局免责 → 强指令",
 			"patch.2": "替换式免责 → 强指令",
 			"patch.3": "作用域免责 → 强指令",
@@ -363,6 +365,21 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.38": "persona text→prefix（0.1.2 预设）",
 			"patch.39": "会话 v0 plugin summary（mnemon）",
 			"patch.40": "complete 预设仍保留注入",
+			"patch.42": "设置页旧接口",
+			"patch.43": "网页预设去掉默认身份",
+			"patch.44": "压缩设置仍看本机范围",
+			"patch.45": "官方桌面更新交接",
+			"patch.46": "官方更新脚本只用英文",
+			"patch.47": "OAuth 不再插入 Claude 身份",
+			"patch.48": "shell 去掉删除前的额外确认",
+			"patch.49": "OAuth 不再伪装 claude-cli",
+			"patch.50": "跨会话引用不再标不可信",
+			"patch.51": "新会话保持完全权限",
+			"patch.52": "会话日志默认不上传",
+			"patch.53": "网页提示去掉禁止另开服务器",
+			"patch.54": "交付物提示去掉多余禁止",
+			"status.unlocated": "未定位",
+			"metric.unlocated": "还没定位到本机 Harness",
 			"rewind.label": "回退",
 			"rewind.aria": "回退",
 			"rewind.busy": "回退中…",
@@ -576,6 +593,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"group.engine": "Engine",
 			"group.tools": "Tools",
 			"group.compat": "0.1.5 compat",
+			"group.dsh20": "0.2.0",
 			"patch.1": "Global disclaimer → mandate",
 			"patch.2": "Replacement disclaimer → mandate",
 			"patch.3": "Scope disclaimer → mandate",
@@ -615,6 +633,21 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.38": "persona text→prefix (0.1.2 presets)",
 			"patch.39": "session v0 plugin summary (mnemon)",
 			"patch.40": "Keep inject when a complete prompt is set",
+			"patch.42": "Settings legacy API",
+			"patch.43": "Strip identity from web presets",
+			"patch.44": "Compaction keeps local scope",
+			"patch.45": "Official desktop update handoff",
+			"patch.46": "Official update script stays ASCII",
+			"patch.47": "OAuth no longer inserts Claude identity",
+			"patch.48": "Shell drops extra delete caution",
+			"patch.49": "OAuth no longer mimics claude-cli",
+			"patch.50": "Session references are not marked untrusted",
+			"patch.51": "Fresh session stays on full access",
+			"patch.52": "Session log upload off by default",
+			"patch.53": "Web prompt drops do-not-start",
+			"patch.54": "Deliverable prompt drops extra prohibition",
+			"status.unlocated": "Not located",
+			"metric.unlocated": "This install was not found yet",
 			"rewind.label": "Undo",
 			"rewind.aria": "Undo",
 			"rewind.busy": "Undoing…",
@@ -897,7 +930,7 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 		function statusKind(st) {
 			if (st === "applied" || st === "already") return "ok";
 			if (st === "pending") return "wait";
-			if (st === "missing_file" || st === "skipped") return "miss";
+			if (st === "missing_file" || st === "skipped" || st === "unlocated") return "miss";
 			return "bad";
 		}
 
@@ -906,11 +939,12 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			if (st === "pending") return t("status.pending");
 			if (st === "skipped") return t("status.skipped");
 			if (st === "missing_file") return t("skip");
+			if (st === "unlocated") return t("status.unlocated");
 			return st || t("unknown");
 		}
 
-		function statusSettled(st) {
-			return st === "applied" || st === "already" || st === "skipped" || st === "missing_file";
+		function statusApplied(st) {
+			return st === "applied" || st === "already";
 		}
 
 		function shimKind(v) {
@@ -940,12 +974,15 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			const t = useT();
 			const [open, setOpen] = useState({});
 			if (!state || !state.patch_status) return h("div", { className: "dshp-skel", style: { height: 120 } });
+			const located = !!state.ai_base;
 			return PATCH_GROUPS.map((group) => {
 				const rows = group.ids.map((id) => {
-					const st = state.patch_status[id] || state.patch_status[String(id)] || "missing_file";
+					const st = located
+						? (state.patch_status[id] || state.patch_status[String(id)] || "missing_file")
+						: "unlocated";
 					return { id, st, label: t("patch." + id) };
 				});
-				const done = rows.filter((r) => statusSettled(r.st)).length;
+				const done = rows.filter((r) => statusApplied(r.st)).length;
 				const expanded = !!open[group.key];
 				return h("div", { key: group.key, className: "dshp-group" },
 					h("button", {
@@ -1494,10 +1531,11 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 			}, [state, waitHostAfterUninstall]);
 
 			const s = state;
+			const located = !!(s && s.ai_base);
 			const total = s && s.patches_total ? s.patches_total : 26;
 			const applied = s && typeof s.patches_applied === "number" ? s.patches_applied : 0;
-			const skipped = s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
-			const pct = total ? Math.round((applied / total) * 100) : 0;
+			const skipped = located && s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
+			const pct = located && total ? Math.round((applied / total) * 100) : 0;
 
 			const hostSurface = hostSurfaceOf(s);
 			const versions = (updateInfo && updateInfo.versions) || [];
@@ -1581,8 +1619,8 @@ body .dshp-dock:has(.dshp-root[data-theme="dusk"]) .dshp-dock-body .dshp-switch 
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
-						h("b", null, applied + " / " + total),
-						h("span", null, skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged")),
+						h("b", null, located ? (applied + " / " + total) : ("0 / " + total)),
+						h("span", null, !located ? t("metric.unlocated") : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
 					),
 					h("div", { className: "dshp-metric" },
 						h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },

@@ -1,3 +1,19 @@
+# 1.1.43
+
+## 中文
+
+- 版本升级到 1.1.43。
+- 还没定位到本机 Harness 时，不再把每一条显示成跳过，分组计数也不再把跳过算成已完成。
+- 补丁列表补齐到全部 52 条，总数和分组对得上。
+- 启动时如果暂时找不到宿主目录，不再把这个空结果缓存住。
+
+## English
+
+- Version 1.1.43.
+- Before this install is located, rows are no longer shown as skipped, and a skip no longer counts as done in the group total.
+- The patch list now includes all 52 items, so the total matches the groups.
+- A miss while looking up the host directory is not cached for the rest of the process.
+
 # 1.1.42
 
 ## 中文
