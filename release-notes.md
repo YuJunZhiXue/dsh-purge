@@ -1,3 +1,21 @@
+# 1.1.52
+
+## 中文
+
+- 版本升级到 1.1.52。
+- 官方桌面「应用/重启」不再自动跑官方 installer（#57）：宿主版本由用户自行升级；插件只解包打补丁，避免落盘前误判失败清掉 `resources\\app`。
+- 有 `applied.json` 但宿主又回到 sealed / 找不到插件根时，判定未对齐并自愈重打；面板提示「补丁已丢失，请重新应用」。
+- 插件启动路径永不自动更新，仅面板手动更新。
+- 默认提示词按本地 `default-prompt-inject.md` 重新加密写入 `asset-table.js`。
+
+## English
+
+- Version 1.1.52.
+- Official desktop Apply/Restart no longer auto-runs the official installer (#57); users upgrade the host themselves; the plugin only unpacks and patches.
+- If `applied.json` exists but the host is sealed again / plugin root is missing, treat as mismatched and reapply; UI shows patches-lost.
+- Plugin startup never auto-updates; update only from the panel.
+- Reseal the default prompt from local `default-prompt-inject.md` into `asset-table.js`.
+
 # 1.1.51
 
 ## 中文

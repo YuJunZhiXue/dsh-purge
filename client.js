@@ -406,6 +406,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.unlocated": "还没定位到本机 Harness",
 			"metric.sealed": "已找到官方客户端，点应用解开",
 			"metric.sealed.count": "待解开",
+			"metric.lost": "补丁已丢失，请重新应用",
+			"metric.lost.count": "已丢失",
 			"rewind.label": "回退",
 			"rewind.aria": "回退",
 			"rewind.busy": "回退中…",
@@ -697,6 +699,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.na": "Not for this host",
 			"metric.sealed": "Official client found. Apply to unpack",
 			"metric.sealed.count": "Sealed",
+			"metric.lost": "Patches lost — Apply again",
+			"metric.lost.count": "Lost",
 			"status.unlocated": "Not located",
 			"metric.unlocated": "This install was not found yet",
 			"rewind.label": "Undo",
@@ -1617,6 +1621,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 			const hostSurface = hostSurfaceOf(s);
 			const desktopLikely = hostSurface === "desktop" || clientGuessSurface() === "desktop";
 			const sealedReady = !located && desktopLikely && !!(s && (s.asar_still_sealed || s.desktop_exe || s.desktop_install));
+			const patchesLost = !located && !!(s && s.patches_lost);
 			const total = s && s.patches_total ? s.patches_total : 0;
 			const ready = s && typeof s.patches_ready === "number"
 				? s.patches_ready
@@ -1706,8 +1711,8 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
-						h("b", null, located ? (ready + " / " + total) : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count"))),
-						h("span", null, !located ? (sealedReady ? t("metric.sealed") : t("metric.unlocated")) : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
+						h("b", null, located ? (ready + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
+						h("span", null, !located ? (patchesLost ? t("metric.lost") : (sealedReady ? t("metric.sealed") : t("metric.unlocated"))) : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
 					),
 					h("div", { className: "dshp-metric" },
 						h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },
