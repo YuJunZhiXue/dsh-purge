@@ -1,3 +1,21 @@
+# 1.1.49-beta.1
+
+## 中文
+
+- 版本升级到 1.1.49-beta.1（#53 测试版）。
+- 修复 macOS 官方桌面点「应用」后假失败「失败: 正在重启。」：`scheduleRestart` helper/runtime 分支补回 `restarting: true`；Darwin 重启改为 osascript 优雅退出 + SIGTERM/SIGKILL，排除 CLI 进程后再 `open` 重开（剥掉 ELECTRON_RUN_AS_NODE）。
+- 解包 app.asar 后自动修补官方 `dsh` CLI 入口（asar/`app/` 回退）并补 `app/runtime -> ../runtime`，避免 `dsh web` 等全部 MODULE_NOT_FOUND。
+- `/purge status` 对多路径文件清单按数组逐项判断，不再把已打补丁文件标成 ✗。
+- 前端重启失败文案不再把成功分支的 note 当成 error。
+
+## English
+
+- Version 1.1.49-beta.1 (prerelease for #53).
+- Fix macOS official desktop Apply false failure "Failed: Restarting.": helper/runtime branches of scheduleRestart return restarting:true; Darwin restart uses osascript quit then SIGTERM/SIGKILL, skips CLI processes, relaunches via open without ELECTRON_RUN_AS_NODE.
+- After unpacking app.asar, auto-patch the official dsh CLI entry (asar/app fallback) and add app/runtime -> ../runtime so dsh web and other subcommands keep working.
+- /purge status treats multi-path file lists correctly instead of marking patched files as missing.
+- Restart failure UI no longer uses the success note as the error detail.
+
 # 1.1.48
 
 ## 中文

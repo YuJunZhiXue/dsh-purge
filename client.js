@@ -2462,7 +2462,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 					if (!d.ok) throw new Error(d.error || "restart failed");
 					const next = (d && d.surface) || surf;
 					if ((next === "desktop" || d.fullApp) && d.restarting === false) {
-						setNotice({ kind: "error", text: t("restart.fail", { error: d.note || "not started" }) });
+						setNotice({ kind: "error", text: t("restart.fail", { error: d.error || "not started" }) });
 						setBusy(false);
 						return;
 					}
