@@ -8,6 +8,7 @@
 - 插件启动路径永不自动更新，仅面板手动更新。
 - 默认提示词按本地 `default-prompt-inject.md` 重新加密写入 `asset-table.js`。
 - 用户自改提示词不会被「应用」盖回加密默认：磁盘正文与内置不同时一律保留；运行时内置默认只读加密槽。
+- 回退切点扩到整轮并在替换后清空 derive 缓存，避免下次发送仍带上被撤掉的内容。
 
 ## English
 
@@ -17,6 +18,7 @@
 - Plugin startup never auto-updates; update only from the panel.
 - Reseal the default prompt from local `default-prompt-inject.md` into `asset-table.js`.
 - Keep user-replaced prompts: never overwrite disk text that differs from the bundled sealed default; runtime bundled default comes only from the sealed slot.
+- Rewind cuts the whole last turn and invalidates derive cache so the next send does not keep undone content.
 
 # 1.1.51
 
