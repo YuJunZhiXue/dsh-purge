@@ -3,7 +3,6 @@
 ## 中文
 
 - 版本升级到 1.1.48。
-- 官方桌面有 Web profile 时改读 profiles/web，渠道/插件与 Web 端对齐（仍是 exe，不是 3080）。
 - 修复红队指挥「只派活」约束被组装时误删，导致不派 subagent；预设在 Agent Teams 下强制重开 classic subagent。
 - 增加按任务选用 skill/MCP 的协议（先读目录，再按任务调用；子代理与红队同样）；不改官方注册与工具面。
 - 子代理 maxDepth 适配 0.2 无 default 的 schema，补回默认 10。
@@ -11,7 +10,6 @@
 ## English
 
 - Version 1.1.48.
-- Official desktop prefers profiles/web when present so channels/plugins match Web (still the exe, not port 3080).
 - Fix redteam lead dispatch-only SOP being stripped during assemble; re-enable classic subagent under Agent Teams in the redteam preset.
 - Add task-matched skill/MCP selection protocol (read catalog, then call what the task needs; same for subagents and redteam). Does not change official registration.
 - Raise subagent maxDepth default to 10 on 0.2 schemas that dropped .default().
