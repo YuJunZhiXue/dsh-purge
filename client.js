@@ -196,6 +196,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.purged.skip": "已就绪，其中 {n} 项本机不需要",
 			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
+			"metric.shim.na": "本端不需要",
 			"metric.bak.yes": "有备份",
 			"metric.bak.no": "无备份",
 			"metric.bak.hint": "备份",
@@ -488,6 +489,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.purged.skip": "Ready, {n} not needed here",
 			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
+			"metric.shim.na": "Not needed here",
 			"metric.bak.yes": "Backup",
 			"metric.bak.no": "No backup",
 			"metric.bak.hint": "Backup",
@@ -1017,9 +1019,9 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 		}
 
 		function shimKind(v) {
-			if (v === "patched") return "ok";
+			if (v === "patched" || v === "n/a") return "ok";
 			if (v === "original") return "wait";
-			if (v === "missing" || v === "n/a" || !v) return "miss";
+			if (v === "missing" || !v) return "miss";
 			return "bad";
 		}
 
@@ -1715,7 +1717,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 							" ",
 							h("span", { className: "dshp-pill is-" + shimKind(s.shim_bin || "missing") }, "unix"),
 						),
-						h("span", null, t("metric.shim")),
+						h("span", null, (s.shim_cmd === "n/a" && s.shim_ps1 === "n/a" && (s.shim_bin === "n/a" || !s.shim_bin)) ? t("metric.shim.na") : t("metric.shim")),
 					),
 					h("div", { className: "dshp-metric" },
 						h("b", null, s.has_backup ? t("metric.bak.yes") : t("metric.bak.no")),

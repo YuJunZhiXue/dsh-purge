@@ -67,8 +67,14 @@ if (!ok) {
   if (copiedAsar && fso.FileExists(asar)) {
     try { fso.DeleteFile(asar, true); log('rehid-asar'); } catch (hideErr) { log('rehid-asar ' + hideErr); }
   }
-  if (movedApp && prev && fso.FolderExists(prev) && !fso.FolderExists(appDir)) {
-    try { fso.MoveFolder(prev, appDir); log('restored-app'); } catch (backErr) { log('restored-app ' + backErr); }
+  // 并发解包 helper 可能已重建 resources\app；更新失败时仍要把打过补丁的目录搬回来。
+  if (movedApp && prev && fso.FolderExists(prev)) {
+    if (fso.FolderExists(appDir)) {
+      try { fso.DeleteFolder(appDir, true); log('cleared-recreated-app'); } catch (clearErr) { log('cleared-recreated-app ' + clearErr); }
+    }
+    if (!fso.FolderExists(appDir)) {
+      try { fso.MoveFolder(prev, appDir); log('restored-app'); } catch (backErr) { log('restored-app ' + backErr); }
+    }
   }
   try { sh.Environment('PROCESS').Remove('ELECTRON_RUN_AS_NODE'); } catch (ignore) {}
   sh.Run('"' + exe + '"', 1, false);
