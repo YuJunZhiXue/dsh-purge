@@ -7,6 +7,7 @@
 - 有 `applied.json` 但宿主又回到 sealed / 找不到插件根时，判定未对齐并自愈重打；面板提示「补丁已丢失，请重新应用」。
 - 插件启动路径永不自动更新，仅面板手动更新。
 - 默认提示词按本地 `default-prompt-inject.md` 重新加密写入 `asset-table.js`。
+- 用户自改提示词不会被「应用」盖回加密默认：磁盘正文与内置不同时一律保留；运行时内置默认只读加密槽。
 
 ## English
 
@@ -15,6 +16,7 @@
 - If `applied.json` exists but the host is sealed again / plugin root is missing, treat as mismatched and reapply; UI shows patches-lost.
 - Plugin startup never auto-updates; update only from the panel.
 - Reseal the default prompt from local `default-prompt-inject.md` into `asset-table.js`.
+- Keep user-replaced prompts: never overwrite disk text that differs from the bundled sealed default; runtime bundled default comes only from the sealed slot.
 
 # 1.1.51
 
