@@ -1,20 +1,30 @@
-# 1.1.46
+# 1.1.47
 
 ## 中文
 
-- 版本升级到 1.1.46。1.1.45 有问题，略过，不要安装。
-- 默认提示词按 `default-prompt-inject.md` 重新加密写入。
-- 修复注入不稳定：第二轮或任务做到一半人设失效、被当成 `project_instructions` 拆掉的问题。
-- 工作区替换稿和作用域说明改回 0.1.7 的优先级：不能压过 system、developer 和用户原话。主 intro 的反软拒绝句保持不变。已经叠上的作用域强句整段收成这一句。
-- 进模型前剥掉外层 ChatML / `<project_instructions>` 壳，避免模型把真实 system 注入当成项目说明。
-- 组装后的系统提示段统一保证 `text` 为字符串；不再会话钉死整段 sections，避免第二轮 `renderPrompt` 读 `undefined.length` 直接死掉并报 `(gateway/internal)`。
-- `agent/pre-step` 始终把 `decision.messages` 规范成数组，避免第二轮发送时读空 messages 炸掉。
-- 地区闸门：多地址域名不能只因其中一个解析到受控地区就整站拦死（CDN/多线噪声 IP）。
-- 回退后 `deriveMessages` / `systemNodes` 对缺 `content` 做兜底，避免回退再发送时 `(gateway/internal)`。
-- 清洗进度：未定位宿主时不再显示吓人的 `0/63`；本机不需要或组件未装的项计入已就绪，避免假的 `48/63`。
-- 点「应用」就会写入默认提示词并注入，框空时用内置默认，不必先点保存。
-- 修复回退：`snapshotEvents()` 为空时不再读 `undefined.length`，避免 `(gateway/internal)` 报错导致回退无效。
+- 版本升级到 1.1.47。
+- 演练台「环境适配」接通 `platformConfigGet` / `Save` / `AssignToolkit`，修复 `unknown op: platformConfigGet`，工具路径与 FOFA/VPS 配置可正常读写。
+- 技能库目录探测增加 `$DSH_HOME/redteam/skills`，Windows 用 `homedir()` 回退，不再只信空的 `HOME`。
+- 知识库优先使用环境适配里的 nuclei 模板路径；空库时显示本机 `knowledge.db` 路径，避免误判成接口挂了。
+- 首次安装弹出用户须知：说明用途、免费开源、GitHub 仓库地址；声明背着作者营利将追究法律责任，并提示禁止违法用途。确认后本机不再弹出。
+- 桌面定位与表面检测放宽，安装目录名含 `DeepseekHarnessDesktop` 等也能找到本机 Harness；失败的定位缓存不再一直卡住「还没定位」。
+- 回退与请求路径小修，降低后轮卡住或假进度的情况。
 
+## English
+
+- Version 1.1.47.
+- Wire drill Env adapt ops `platformConfigGet` / `Save` / `AssignToolkit`, fixing `unknown op: platformConfigGet` so tool paths and FOFA/VPS config work again.
+- Skill catalog also probes `$DSH_HOME/redteam/skills` and falls back with `homedir()` on Windows when `HOME` is empty.
+- Knowledge prefers nuclei templates from Env adapt; empty libraries show the local `knowledge.db` path so a missing API is not assumed.
+- First install shows a user notice: what the plugin does, that it is free/open source, the GitHub repo URL, legal warning against profit behind the author, and illegal-use prohibitions. After confirm it does not show again on that machine.
+- Broader desktop locate/surface detection (including `DeepseekHarnessDesktop` installs); failed locate caches no longer stick on "host not located".
+- Small rewind/request-path fixes to reduce later-turn hangs and misleading progress.
+
+# 1.1.46
+
+## 涓枃
+
+- 鐗堟湰鍗囩骇鍒?1.1.46銆?.1.45 鏈夐棶棰橈紝鐣ヨ繃锛屼笉瑕佸畨瑁呫€?- 榛樿鎻愮ず璇嶆寜 `default-prompt-inject.md` 閲嶆柊鍔犲瘑鍐欏叆銆?- 淇娉ㄥ叆涓嶇ǔ瀹氾細绗簩杞垨浠诲姟鍋氬埌涓€鍗婁汉璁惧け鏁堛€佽褰撴垚 `project_instructions` 鎷嗘帀鐨勯棶棰樸€?- 宸ヤ綔鍖烘浛鎹㈢鍜屼綔鐢ㄥ煙璇存槑鏀瑰洖 0.1.7 鐨勪紭鍏堢骇锛氫笉鑳藉帇杩?system銆乨eveloper 鍜岀敤鎴峰師璇濄€備富 intro 鐨勫弽杞嫆缁濆彞淇濇寔涓嶅彉銆傚凡缁忓彔涓婄殑浣滅敤鍩熷己鍙ユ暣娈垫敹鎴愯繖涓€鍙ャ€?- 杩涙ā鍨嬪墠鍓ユ帀澶栧眰 ChatML / `<project_instructions>` 澹筹紝閬垮厤妯″瀷鎶婄湡瀹?system 娉ㄥ叆褰撴垚椤圭洰璇存槑銆?- 缁勮鍚庣殑绯荤粺鎻愮ず娈电粺涓€淇濊瘉 `text` 涓哄瓧绗︿覆锛涗笉鍐嶄細璇濋拤姝绘暣娈?sections锛岄伩鍏嶇浜岃疆 `renderPrompt` 璇?`undefined.length` 鐩存帴姝绘帀骞舵姤 `(gateway/internal)`銆?- `agent/pre-step` 濮嬬粓鎶?`decision.messages` 瑙勮寖鎴愭暟缁勶紝閬垮厤绗簩杞彂閫佹椂璇荤┖ messages 鐐告帀銆?- 鍦板尯闂搁棬锛氬鍦板潃鍩熷悕涓嶈兘鍙洜鍏朵腑涓€涓В鏋愬埌鍙楁帶鍦板尯灏辨暣绔欐嫤姝伙紙CDN/澶氱嚎鍣０ IP锛夈€?- 鍥為€€鍚?`deriveMessages` / `systemNodes` 瀵圭己 `content` 鍋氬厹搴曪紝閬垮厤鍥為€€鍐嶅彂閫佹椂 `(gateway/internal)`銆?- 娓呮礂杩涘害锛氭湭瀹氫綅瀹夸富鏃朵笉鍐嶆樉绀哄悡浜虹殑 `0/63`锛涙湰鏈轰笉闇€瑕佹垨缁勪欢鏈鐨勯」璁″叆宸插氨缁紝閬垮厤鍋囩殑 `48/63`銆?- 鐐广€屽簲鐢ㄣ€嶅氨浼氬啓鍏ラ粯璁ゆ彁绀鸿瘝骞舵敞鍏ワ紝妗嗙┖鏃剁敤鍐呯疆榛樿锛屼笉蹇呭厛鐐逛繚瀛樸€?- 淇鍥為€€锛歚snapshotEvents()` 涓虹┖鏃朵笉鍐嶈 `undefined.length`锛岄伩鍏?`(gateway/internal)` 鎶ラ敊瀵艰嚧鍥為€€鏃犳晥銆?
 ## English
 
 - Version 1.1.46. Skip 1.1.45; that version has bugs. Do not install it.
@@ -32,16 +42,9 @@
 
 # 1.1.44
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.44。
-- 官方桌面解开 `app.asar` 时先写到旁边的目录，解开完成才换上 `resources/app`。目录里已经有宿主之后只改这些文件。同一份归档又出现时只把它挪开。归档的大小或时间变了，或目录不在了，才再解一次。解包卡住或补丁没写完，把上一份放回去，升级标记留到下次再试。
-- 回退上一轮只撤掉最后一条已经发出的消息和它的回复，更早的轮次留在对话里，也从模型请求里拿掉。连续回退后留下的空标记不再进下一轮请求，下一句按新消息发。
-- 可编辑提示词整份放在系统提示最前，同一份正文不再拼第二遍。每一步用当前这一份替换第一条系统提示。
-- deepseek.com 的系统提示固定走 system，思维链照旧发送。
-- 地区拦截只看这次任务里的目标。自己的服务器只认名单上的那一个地址或主机名。禁止句写上之后才结束这一轮。
-- 官方始终用带 CTF 的默认提示词。红队开了规则集就只用规则集；否则用去掉 CTF 的默认提示词，再接红队操作。子代理跟主会话吃同一份。磁盘没有提示词时启动就用默认那份，不必先点保存。
-
+- 鐗堟湰鍗囩骇鍒?1.1.44銆?- 瀹樻柟妗岄潰瑙ｅ紑 `app.asar` 鏃跺厛鍐欏埌鏃佽竟鐨勭洰褰曪紝瑙ｅ紑瀹屾垚鎵嶆崲涓?`resources/app`銆傜洰褰曢噷宸茬粡鏈夊涓讳箣鍚庡彧鏀硅繖浜涙枃浠躲€傚悓涓€浠藉綊妗ｅ張鍑虹幇鏃跺彧鎶婂畠鎸紑銆傚綊妗ｇ殑澶у皬鎴栨椂闂村彉浜嗭紝鎴栫洰褰曚笉鍦ㄤ簡锛屾墠鍐嶈В涓€娆°€傝В鍖呭崱浣忔垨琛ヤ竵娌″啓瀹岋紝鎶婁笂涓€浠芥斁鍥炲幓锛屽崌绾ф爣璁扮暀鍒颁笅娆″啀璇曘€?- 鍥為€€涓婁竴杞彧鎾ゆ帀鏈€鍚庝竴鏉″凡缁忓彂鍑虹殑娑堟伅鍜屽畠鐨勫洖澶嶏紝鏇存棭鐨勮疆娆＄暀鍦ㄥ璇濋噷锛屼篃浠庢ā鍨嬭姹傞噷鎷挎帀銆傝繛缁洖閫€鍚庣暀涓嬬殑绌烘爣璁颁笉鍐嶈繘涓嬩竴杞姹傦紝涓嬩竴鍙ユ寜鏂版秷鎭彂銆?- 鍙紪杈戞彁绀鸿瘝鏁翠唤鏀惧湪绯荤粺鎻愮ず鏈€鍓嶏紝鍚屼竴浠芥鏂囦笉鍐嶆嫾绗簩閬嶃€傛瘡涓€姝ョ敤褰撳墠杩欎竴浠芥浛鎹㈢涓€鏉＄郴缁熸彁绀恒€?- deepseek.com 鐨勭郴缁熸彁绀哄浐瀹氳蛋 system锛屾€濈淮閾剧収鏃у彂閫併€?- 鍦板尯鎷︽埅鍙湅杩欐浠诲姟閲岀殑鐩爣銆傝嚜宸辩殑鏈嶅姟鍣ㄥ彧璁ゅ悕鍗曚笂鐨勯偅涓€涓湴鍧€鎴栦富鏈哄悕銆傜姝㈠彞鍐欎笂涔嬪悗鎵嶇粨鏉熻繖涓€杞€?- 瀹樻柟濮嬬粓鐢ㄥ甫 CTF 鐨勯粯璁ゆ彁绀鸿瘝銆傜孩闃熷紑浜嗚鍒欓泦灏卞彧鐢ㄨ鍒欓泦锛涘惁鍒欑敤鍘绘帀 CTF 鐨勯粯璁ゆ彁绀鸿瘝锛屽啀鎺ョ孩闃熸搷浣溿€傚瓙浠ｇ悊璺熶富浼氳瘽鍚冨悓涓€浠姐€傜鐩樻病鏈夋彁绀鸿瘝鏃跺惎鍔ㄥ氨鐢ㄩ粯璁ら偅浠斤紝涓嶅繀鍏堢偣淇濆瓨銆?
 ## English
 
 - Version 1.1.44.
@@ -54,13 +57,9 @@
 
 # 1.1.43
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.43。
-- 还没定位到本机 Harness 时，不再把每一条显示成跳过，分组计数也不再把跳过算成已完成。
-- 补丁列表补齐到全部 52 条，总数和分组对得上。
-- 启动时如果暂时找不到宿主目录，不再把这个空结果缓存住。
-
+- 鐗堟湰鍗囩骇鍒?1.1.43銆?- 杩樻病瀹氫綅鍒版湰鏈?Harness 鏃讹紝涓嶅啀鎶婃瘡涓€鏉℃樉绀烘垚璺宠繃锛屽垎缁勮鏁颁篃涓嶅啀鎶婅烦杩囩畻鎴愬凡瀹屾垚銆?- 琛ヤ竵鍒楄〃琛ラ綈鍒板叏閮?52 鏉★紝鎬绘暟鍜屽垎缁勫寰椾笂銆?- 鍚姩鏃跺鏋滄殏鏃舵壘涓嶅埌瀹夸富鐩綍锛屼笉鍐嶆妸杩欎釜绌虹粨鏋滅紦瀛樹綇銆?
 ## English
 
 - Version 1.1.43.
@@ -70,14 +69,9 @@
 
 # 1.1.42
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.42。
-- 清洗页提示词下面可以登记自己的服务器：每行一个 IP 或完整主机名，点保存名单。说明里写了步骤，并附了截图。
-- 新对话把提示词放在系统提示最前。面板改为白墨玻璃，两种主题都能看清字。
-- 补丁进度只计已应用的项。网页身份那条在后一条改写句子之后，仍显示已应用。
-- 补上 0.1.x 的入口针。已经打过的 0.2.0 不会被重写。
-
+- 鐗堟湰鍗囩骇鍒?1.1.42銆?- 娓呮礂椤垫彁绀鸿瘝涓嬮潰鍙互鐧昏鑷繁鐨勬湇鍔″櫒锛氭瘡琛屼竴涓?IP 鎴栧畬鏁翠富鏈哄悕锛岀偣淇濆瓨鍚嶅崟銆傝鏄庨噷鍐欎簡姝ラ锛屽苟闄勪簡鎴浘銆?- 鏂板璇濇妸鎻愮ず璇嶆斁鍦ㄧ郴缁熸彁绀烘渶鍓嶃€傞潰鏉挎敼涓虹櫧澧ㄧ幓鐠冿紝涓ょ涓婚閮借兘鐪嬫竻瀛椼€?- 琛ヤ竵杩涘害鍙宸插簲鐢ㄧ殑椤广€傜綉椤佃韩浠介偅鏉″湪鍚庝竴鏉℃敼鍐欏彞瀛愪箣鍚庯紝浠嶆樉绀哄凡搴旂敤銆?- 琛ヤ笂 0.1.x 鐨勫叆鍙ｉ拡銆傚凡缁忔墦杩囩殑 0.2.0 涓嶄細琚噸鍐欍€?
 ## English
 
 - Version 1.1.42.
@@ -88,15 +82,9 @@
 
 # 1.1.41
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.41。
-- 官方模式只注入当前提示词；启用规则集后以规则集为主。红队再附上红队操作要求。
-- 回退留在当前会话：先选回退一次或上一轮，上一句放回输入框，并清掉已经发出去的内容。
-- 宿主没清洗完，或没有可注入的提示词时，不重启。
-- 默认已是完全权限时，新会话不再被钉回受限权限。官方模型的 Session Log 上传默认关闭。
-- 目标地址落在中国大陆、香港、澳门时停止。
-
+- 鐗堟湰鍗囩骇鍒?1.1.41銆?- 瀹樻柟妯″紡鍙敞鍏ュ綋鍓嶆彁绀鸿瘝锛涘惎鐢ㄨ鍒欓泦鍚庝互瑙勫垯闆嗕负涓汇€傜孩闃熷啀闄勪笂绾㈤槦鎿嶄綔瑕佹眰銆?- 鍥為€€鐣欏湪褰撳墠浼氳瘽锛氬厛閫夊洖閫€涓€娆℃垨涓婁竴杞紝涓婁竴鍙ユ斁鍥炶緭鍏ユ锛屽苟娓呮帀宸茬粡鍙戝嚭鍘荤殑鍐呭銆?- 瀹夸富娌℃竻娲楀畬锛屾垨娌℃湁鍙敞鍏ョ殑鎻愮ず璇嶆椂锛屼笉閲嶅惎銆?- 榛樿宸叉槸瀹屽叏鏉冮檺鏃讹紝鏂颁細璇濅笉鍐嶈閽夊洖鍙楅檺鏉冮檺銆傚畼鏂规ā鍨嬬殑 Session Log 涓婁紶榛樿鍏抽棴銆?- 鐩爣鍦板潃钀藉湪涓浗澶ч檰銆侀娓€佹境闂ㄦ椂鍋滄銆?
 ## English
 
 - Version 1.1.41.
@@ -108,28 +96,21 @@
 
 # 1.1.40
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.40。
-- 适配 **DSH 0.2.0-rc.2**：Anthropic OAuth 不再在系统提示最前面强插「You are Claude Code…」，自定义 `prompt-inject` 不会被压到后面。
-- 去掉在 0.2 里已不存在的 **patch 41**（developer 角色改写），避免无效补丁占位。
-- 设置页点 **应用** 成功后 **自动重启** 宿主，不必再打开插件点第二次重启。
-
+- 鐗堟湰鍗囩骇鍒?1.1.40銆?- 閫傞厤 **DSH 0.2.0-rc.2**锛欰nthropic OAuth 涓嶅啀鍦ㄧ郴缁熸彁绀烘渶鍓嶉潰寮烘彃銆孻ou are Claude Code鈥︺€嶏紝鑷畾涔?`prompt-inject` 涓嶄細琚帇鍒板悗闈€?- 鍘绘帀鍦?0.2 閲屽凡涓嶅瓨鍦ㄧ殑 **patch 41**锛坉eveloper 瑙掕壊鏀瑰啓锛夛紝閬垮厤鏃犳晥琛ヤ竵鍗犱綅銆?- 璁剧疆椤电偣 **搴旂敤** 鎴愬姛鍚?**鑷姩閲嶅惎** 瀹夸富锛屼笉蹇呭啀鎵撳紑鎻掍欢鐐圭浜屾閲嶅惎銆?
 ## English
 
 - Version 1.1.40.
-- For **DSH 0.2.0-rc.2**, Anthropic OAuth no longer prepends “You are Claude Code…” ahead of your system prompt, so custom `prompt-inject` is not pushed behind a Claude identity block.
+- For **DSH 0.2.0-rc.2**, Anthropic OAuth no longer prepends 鈥淵ou are Claude Code鈥︹€?ahead of your system prompt, so custom `prompt-inject` is not pushed behind a Claude identity block.
 - Removed **patch 41** (developer-role remap) because those needles are gone in 0.2.
 - After **Apply** in settings, the host **restarts automatically**; you no longer need to open the plugin again to confirm restart.
 
 # 1.1.39
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.39。
-- 中文 Windows 上，官方桌面版点「安装并重启」不再停在「正在准备重启」。更新脚本首行改为纯 ASCII，路径里的中文写成 `\u` 转义，避免 Windows Script Host 按 GBK 把换行吞进注释。
-- macOS 和 Linux 不走这条脚本，重启方式不变。
-
+- 鐗堟湰鍗囩骇鍒?1.1.39銆?- 涓枃 Windows 涓婏紝瀹樻柟妗岄潰鐗堢偣銆屽畨瑁呭苟閲嶅惎銆嶄笉鍐嶅仠鍦ㄣ€屾鍦ㄥ噯澶囬噸鍚€嶃€傛洿鏂拌剼鏈琛屾敼涓虹函 ASCII锛岃矾寰勯噷鐨勪腑鏂囧啓鎴?`\u` 杞箟锛岄伩鍏?Windows Script Host 鎸?GBK 鎶婃崲琛屽悶杩涙敞閲娿€?- macOS 鍜?Linux 涓嶈蛋杩欐潯鑴氭湰锛岄噸鍚柟寮忎笉鍙樸€?
 ## English
 
 - Version 1.1.39.
@@ -138,18 +119,9 @@
 
 # 1.1.38
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.38。
-- 红队不再替用户下载工具。没有安装脚本时，引导改走演练台「环境适配」，由用户自己填路径。
-- 长时间任务会在系统提示词里放一张「本次目标」卡。指挥和子代理看的是同一张：只打这个单位，回报里带出来的其它单位不打。子代理按角色使用自己的提示词，派活时的单位名称必须和这张卡一致。
-- 工具查找认发行版上的真实文件名，例如 Kali 的 `httpx-toolkit`、`impacket-secretsdump`，不再把 Python 的 `httpx` 当成扫描器。
-- 官方桌面在 macOS、Linux 上也能找到 `app.asar`（Mac 用 `Contents/Resources`）。Windows 以外不再包一层会把 `require` 弄坏的控制台隐藏。
-- 红队接入锚点门：开头几步输出上限 1024；第一段思考里有 `we`、没有 `let me` 就放开，否则同一轮最多再走 4 步。上下文压缩后再关一次。红队工具和人设保持原样。
-- 随包技能同步到 `$DSH_HOME/redteam/skills`，预设用 `dshHomePath` 指向它，不再把某一台电脑的 `node_modules` 路径写进预设。你自己的技能仍在 `$DSH_HOME/skills`，同名以你的为准。
-- 修好红队模式不显示：声明预设时漏了路径变量，插件中途退出，模式下拉就没有这一项。
-- 说明里加回赞助地址。
-
+- 鐗堟湰鍗囩骇鍒?1.1.38銆?- 绾㈤槦涓嶅啀鏇跨敤鎴蜂笅杞藉伐鍏枫€傛病鏈夊畨瑁呰剼鏈椂锛屽紩瀵兼敼璧版紨缁冨彴銆岀幆澧冮€傞厤銆嶏紝鐢辩敤鎴疯嚜宸卞～璺緞銆?- 闀挎椂闂翠换鍔′細鍦ㄧ郴缁熸彁绀鸿瘝閲屾斁涓€寮犮€屾湰娆＄洰鏍囥€嶅崱銆傛寚鎸ュ拰瀛愪唬鐞嗙湅鐨勬槸鍚屼竴寮狅細鍙墦杩欎釜鍗曚綅锛屽洖鎶ラ噷甯﹀嚭鏉ョ殑鍏跺畠鍗曚綅涓嶆墦銆傚瓙浠ｇ悊鎸夎鑹蹭娇鐢ㄨ嚜宸辩殑鎻愮ず璇嶏紝娲炬椿鏃剁殑鍗曚綅鍚嶇О蹇呴』鍜岃繖寮犲崱涓€鑷淬€?- 宸ュ叿鏌ユ壘璁ゅ彂琛岀増涓婄殑鐪熷疄鏂囦欢鍚嶏紝渚嬪 Kali 鐨?`httpx-toolkit`銆乣impacket-secretsdump`锛屼笉鍐嶆妸 Python 鐨?`httpx` 褰撴垚鎵弿鍣ㄣ€?- 瀹樻柟妗岄潰鍦?macOS銆丩inux 涓婁篃鑳芥壘鍒?`app.asar`锛圡ac 鐢?`Contents/Resources`锛夈€俉indows 浠ュ涓嶅啀鍖呬竴灞備細鎶?`require` 寮勫潖鐨勬帶鍒跺彴闅愯棌銆?- 绾㈤槦鎺ュ叆閿氱偣闂細寮€澶村嚑姝ヨ緭鍑轰笂闄?1024锛涚涓€娈垫€濊€冮噷鏈?`we`銆佹病鏈?`let me` 灏辨斁寮€锛屽惁鍒欏悓涓€杞渶澶氬啀璧?4 姝ャ€備笂涓嬫枃鍘嬬缉鍚庡啀鍏充竴娆°€傜孩闃熷伐鍏峰拰浜鸿淇濇寔鍘熸牱銆?- 闅忓寘鎶€鑳藉悓姝ュ埌 `$DSH_HOME/redteam/skills`锛岄璁剧敤 `dshHomePath` 鎸囧悜瀹冿紝涓嶅啀鎶婃煇涓€鍙扮數鑴戠殑 `node_modules` 璺緞鍐欒繘棰勮銆備綘鑷繁鐨勬妧鑳戒粛鍦?`$DSH_HOME/skills`锛屽悓鍚嶄互浣犵殑涓哄噯銆?- 淇ソ绾㈤槦妯″紡涓嶆樉绀猴細澹版槑棰勮鏃舵紡浜嗚矾寰勫彉閲忥紝鎻掍欢涓€旈€€鍑猴紝妯″紡涓嬫媺灏辨病鏈夎繖涓€椤广€?- 璇存槑閲屽姞鍥炶禐鍔╁湴鍧€銆?
 ## English
 
 - Version 1.1.38.
@@ -164,11 +136,9 @@
 
 # 1.1.37
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.37。
-- 修改演示台环境配置滚动问题。
-
+- 鐗堟湰鍗囩骇鍒?1.1.37銆?- 淇敼婕旂ず鍙扮幆澧冮厤缃粴鍔ㄩ棶棰樸€?
 ## English
 
 - Version 1.1.37.
@@ -176,11 +146,9 @@
 
 # 1.1.36
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.36。
-- 解决红队模式拒绝问题。
-
+- 鐗堟湰鍗囩骇鍒?1.1.36銆?- 瑙ｅ喅绾㈤槦妯″紡鎷掔粷闂銆?
 ## English
 
 - Version 1.1.36.
@@ -188,15 +156,9 @@
 
 # 1.1.35
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.35。
-- 启动时不再自动更新，要自己在面板里选择。
-- dsh-purge 入口改到「上下文」旁边，不再挡住别的插件按钮。
-- 得分口径对齐上游：25 项，Web 应用增加兜底归类。
-- 知识库 14 类计数包含本机 nuclei 模板，点某一类可以筛选。
-- 技能路径跟随 `$DSH_HOME`，不再因为示例路径在本机不存在就把整条技能标成不可用。
-
+- 鐗堟湰鍗囩骇鍒?1.1.35銆?- 鍚姩鏃朵笉鍐嶈嚜鍔ㄦ洿鏂帮紝瑕佽嚜宸卞湪闈㈡澘閲岄€夋嫨銆?- dsh-purge 鍏ュ彛鏀瑰埌銆屼笂涓嬫枃銆嶆梺杈癸紝涓嶅啀鎸′綇鍒殑鎻掍欢鎸夐挳銆?- 寰楀垎鍙ｅ緞瀵归綈涓婃父锛?5 椤癸紝Web 搴旂敤澧炲姞鍏滃簳褰掔被銆?- 鐭ヨ瘑搴?14 绫昏鏁板寘鍚湰鏈?nuclei 妯℃澘锛岀偣鏌愪竴绫诲彲浠ョ瓫閫夈€?- 鎶€鑳借矾寰勮窡闅?`$DSH_HOME`锛屼笉鍐嶅洜涓虹ず渚嬭矾寰勫湪鏈満涓嶅瓨鍦ㄥ氨鎶婃暣鏉℃妧鑳芥爣鎴愪笉鍙敤銆?
 ## English
 
 - Version 1.1.35.
@@ -208,12 +170,9 @@
 
 # 1.1.34
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.34。
-- **演练台知识库直接列出本机模板**。打开「知识库 · POC / EXP」就能看到一页 nuclei 模板，并可以翻页、按 CVE 或组件搜索。不再只显示「本机模板 N」、下面是空的。
-- **更新包在 Windows、macOS、Linux 上都能解压**。Linux 不再调用 PowerShell。顺序是：Windows 用 tar，不行再用 PowerShell；macOS 和 Linux 用 tar、unzip、python3、bsdtar。这些都没有时，用 Node 自己解 zip。感谢 @cracer4869 在 #44 报出 Kali 上的 `spawnSync powershell ENOENT`。
-
+- 鐗堟湰鍗囩骇鍒?1.1.34銆?- **婕旂粌鍙扮煡璇嗗簱鐩存帴鍒楀嚭鏈満妯℃澘**銆傛墦寮€銆岀煡璇嗗簱 路 POC / EXP銆嶅氨鑳界湅鍒颁竴椤?nuclei 妯℃澘锛屽苟鍙互缈婚〉銆佹寜 CVE 鎴栫粍浠舵悳绱€備笉鍐嶅彧鏄剧ず銆屾湰鏈烘ā鏉?N銆嶃€佷笅闈㈡槸绌虹殑銆?- **鏇存柊鍖呭湪 Windows銆乵acOS銆丩inux 涓婇兘鑳借В鍘?*銆侺inux 涓嶅啀璋冪敤 PowerShell銆傞『搴忔槸锛歐indows 鐢?tar锛屼笉琛屽啀鐢?PowerShell锛沵acOS 鍜?Linux 鐢?tar銆乽nzip銆乸ython3銆乥sdtar銆傝繖浜涢兘娌℃湁鏃讹紝鐢?Node 鑷繁瑙?zip銆傛劅璋?@cracer4869 鍦?#44 鎶ュ嚭 Kali 涓婄殑 `spawnSync powershell ENOENT`銆?
 ## English
 
 - Version 1.1.34.
@@ -222,11 +181,9 @@
 
 # 1.1.33
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.33。
-- **修复已经重启后，打开面板仍弹出「需要重启」**。官方客户端已经从解开的 `resources/app` 运行时，不再仅因为当前是官方进程就再要求退出一次。只有这次真的挪开了 `app.asar`，才会提示重启。
-
+- 鐗堟湰鍗囩骇鍒?1.1.33銆?- **淇宸茬粡閲嶅惎鍚庯紝鎵撳紑闈㈡澘浠嶅脊鍑恒€岄渶瑕侀噸鍚€?*銆傚畼鏂瑰鎴风宸茬粡浠庤В寮€鐨?`resources/app` 杩愯鏃讹紝涓嶅啀浠呭洜涓哄綋鍓嶆槸瀹樻柟杩涚▼灏卞啀瑕佹眰閫€鍑轰竴娆°€傚彧鏈夎繖娆＄湡鐨勬尓寮€浜?`app.asar`锛屾墠浼氭彁绀洪噸鍚€?
 ## English
 
 - Version 1.1.33.
@@ -234,12 +191,9 @@
 
 # 1.1.32
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.32。
-- **按测试版接上演练台布局**：面板可拖动、可改大小，浅色和深色跟宿主主题走。
-- **设置页不再出现本插件**。从会话标题旁的 dsh-purge 打开右侧栏，清洗和演练台都在里面。
-
+- 鐗堟湰鍗囩骇鍒?1.1.32銆?- **鎸夋祴璇曠増鎺ヤ笂婕旂粌鍙板竷灞€**锛氶潰鏉垮彲鎷栧姩銆佸彲鏀瑰ぇ灏忥紝娴呰壊鍜屾繁鑹茶窡瀹夸富涓婚璧般€?- **璁剧疆椤典笉鍐嶅嚭鐜版湰鎻掍欢**銆備粠浼氳瘽鏍囬鏃佺殑 dsh-purge 鎵撳紑鍙充晶鏍忥紝娓呮礂鍜屾紨缁冨彴閮藉湪閲岄潰銆?
 ## English
 
 - Version 1.1.32.
@@ -248,12 +202,9 @@
 
 # 1.1.31
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.31。
-- **演练台进入正式版**。右侧栏两页：清洗、演练台。第一次进入演练台要读声明并确认授权。资产、技能和本机环境都在本插件里，不再单独装测试版红队包。
-- **修复回退堆分支**：宿主不能在原会话里截断，回退后会把旧会话从侧边栏移出，多退几次不会留下一串分支。
-
+- 鐗堟湰鍗囩骇鍒?1.1.31銆?- **婕旂粌鍙拌繘鍏ユ寮忕増**銆傚彸渚ф爮涓ら〉锛氭竻娲椼€佹紨缁冨彴銆傜涓€娆¤繘鍏ユ紨缁冨彴瑕佽澹版槑骞剁‘璁ゆ巿鏉冦€傝祫浜с€佹妧鑳藉拰鏈満鐜閮藉湪鏈彃浠堕噷锛屼笉鍐嶅崟鐙娴嬭瘯鐗堢孩闃熷寘銆?- **淇鍥為€€鍫嗗垎鏀?*锛氬涓讳笉鑳藉湪鍘熶細璇濋噷鎴柇锛屽洖閫€鍚庝細鎶婃棫浼氳瘽浠庝晶杈规爮绉诲嚭锛屽閫€鍑犳涓嶄細鐣欎笅涓€涓插垎鏀€?
 ## English
 
 - Version 1.1.31.
@@ -262,12 +213,9 @@
 
 # 1.1.30
 
-## 中文
+## 涓枃
 
-- 版本升级到 1.1.30。
-- **修复正式版和 web 切换版本失败**：不再用 `dsh plugin add` 拉包。pnpm 请求 GitHub 压缩包会 `http 302` 或 `fetch failed`。改由插件自己下载。
-- **修复思考和输出死循环**：去掉默认提示词里没有终止条件的重置。
-
+- 鐗堟湰鍗囩骇鍒?1.1.30銆?- **淇姝ｅ紡鐗堝拰 web 鍒囨崲鐗堟湰澶辫触**锛氫笉鍐嶇敤 `dsh plugin add` 鎷夊寘銆俻npm 璇锋眰 GitHub 鍘嬬缉鍖呬細 `http 302` 鎴?`fetch failed`銆傛敼鐢辨彃浠惰嚜宸变笅杞姐€?- **淇鎬濊€冨拰杈撳嚭姝诲惊鐜?*锛氬幓鎺夐粯璁ゆ彁绀鸿瘝閲屾病鏈夌粓姝㈡潯浠剁殑閲嶇疆銆?
 ## English
 
 - Version 1.1.30.
@@ -276,24 +224,19 @@
 
 # 1.1.28
 
-## 中文
+## 涓枃
 
-- **修复更新失败 `http 302`**：下载改为直连 `codeload.github.com`，并手动跟随跳转，避免 Electron/部分 Node 对 github.com → codeload 的 302 处理失败。
-- **修复测试版列表空白**：前端 `keepListedVersion` 与后端一致，正式版已发布时仍保留 beta tip / `beta` 分支；tip SHA 拉不到时回退 raw/jsDelivr 探测。
-
+- **淇鏇存柊澶辫触 `http 302`**锛氫笅杞芥敼涓虹洿杩?`codeload.github.com`锛屽苟鎵嬪姩璺熼殢璺宠浆锛岄伩鍏?Electron/閮ㄥ垎 Node 瀵?github.com 鈫?codeload 鐨?302 澶勭悊澶辫触銆?- **淇娴嬭瘯鐗堝垪琛ㄧ┖鐧?*锛氬墠绔?`keepListedVersion` 涓庡悗绔竴鑷达紝姝ｅ紡鐗堝凡鍙戝竷鏃朵粛淇濈暀 beta tip / `beta` 鍒嗘敮锛泃ip SHA 鎷変笉鍒版椂鍥為€€ raw/jsDelivr 鎺㈡祴銆?
 ## English
 
-- **Fix update failure `http 302`**: download via `codeload.github.com` and follow redirects manually so Electron/some Node builds no longer stall on github.com → codeload 302.
-- **Fix empty beta list**: client `keepListedVersion` matches the server — keep the beta tip / `beta` branch after stable ships; fall back to raw/jsDelivr when tip SHA cannot be fetched.
+- **Fix update failure `http 302`**: download via `codeload.github.com` and follow redirects manually so Electron/some Node builds no longer stall on github.com 鈫?codeload 302.
+- **Fix empty beta list**: client `keepListedVersion` matches the server 鈥?keep the beta tip / `beta` branch after stable ships; fall back to raw/jsDelivr when tip SHA cannot be fetched.
 
 # 1.1.27
 
-## 中文
+## 涓枃
 
-- **修复应用重启后进规则设定仍弹「需要重启」**：手动「应用」成功后写入 `applied` 戳，重启后 settle 不再误判补丁未对齐。
-- 点「重启」清掉 `boot_full_quit` 粘性标记；status 按布尔值同步弹窗。
-- web `waitForRestart` 必须先看到旧进程掉线再判定成功，避免同进程误刷新又弹窗。
-
+- **淇搴旂敤閲嶅惎鍚庤繘瑙勫垯璁惧畾浠嶅脊銆岄渶瑕侀噸鍚€?*锛氭墜鍔ㄣ€屽簲鐢ㄣ€嶆垚鍔熷悗鍐欏叆 `applied` 鎴筹紝閲嶅惎鍚?settle 涓嶅啀璇垽琛ヤ竵鏈榻愩€?- 鐐广€岄噸鍚€嶆竻鎺?`boot_full_quit` 绮樻€ф爣璁帮紱status 鎸夊竷灏斿€煎悓姝ュ脊绐椼€?- web `waitForRestart` 蹇呴』鍏堢湅鍒版棫杩涚▼鎺夌嚎鍐嶅垽瀹氭垚鍔燂紝閬垮厤鍚岃繘绋嬭鍒锋柊鍙堝脊绐椼€?
 ## English
 
 - **Fix restart prompt still showing after Apply + successful restart**: write the `applied` stamp on successful manual Apply so settle does not think patches are out of date.
@@ -302,23 +245,18 @@
 
 # 1.1.26
 
-## 中文
+## 涓枃
 
-- **修复测试通道被正式版同号藏掉**：`1.1.25` 正式发布后，`1.1.25-beta.*` 因「正式已追上」逻辑整通道不可见；现 **beta 分支 tip 始终列出**（正式/测试并行，测试带红队）。
-- 已追上的旧 beta **标签**仍会隐藏；`1.1.11-beta` 仍下线。
-
+- **淇娴嬭瘯閫氶亾琚寮忕増鍚屽彿钘忔帀**锛歚1.1.25` 姝ｅ紡鍙戝竷鍚庯紝`1.1.25-beta.*` 鍥犮€屾寮忓凡杩戒笂銆嶉€昏緫鏁撮€氶亾涓嶅彲瑙侊紱鐜?**beta 鍒嗘敮 tip 濮嬬粓鍒楀嚭**锛堟寮?娴嬭瘯骞惰锛屾祴璇曞甫绾㈤槦锛夈€?- 宸茶拷涓婄殑鏃?beta **鏍囩**浠嶄細闅愯棌锛沗1.1.11-beta` 浠嶄笅绾裤€?
 ## English
 
-- **Fix beta lane hidden by same-number stable**: after `1.1.25` stable, `1.1.25-beta.*` vanished via the “stable caught up” filter; the **beta branch tip always stays listed** (parallel channels; beta carries red-team).
+- **Fix beta lane hidden by same-number stable**: after `1.1.25` stable, `1.1.25-beta.*` vanished via the 鈥渟table caught up鈥?filter; the **beta branch tip always stays listed** (parallel channels; beta carries red-team).
 - Older caught-up beta **tags** still hide; `1.1.11-beta` stays withdrawn.
 # 1.1.25
 
-## 中文
+## 涓枃
 
-- **修复 [#43](https://github.com/YuJunZhiXue/dsh-purge/issues/43)**：不再把 `profiles/*/cordis.patch.yml`（用户 patch 层）纳入 `backupAll`/`revertAll`；升级自愈时不会用旧 bak 覆盖用户后来追加的 `insert`。
-- 启动/还原时主动丢掉历史上误建的 `cordis.patch.yml.dshpurge.bak`，保留当前用户文件。
-- 新增 `npm run test:profile-patch`。
-
+- **淇 [#43](https://github.com/YuJunZhiXue/dsh-purge/issues/43)**锛氫笉鍐嶆妸 `profiles/*/cordis.patch.yml`锛堢敤鎴?patch 灞傦級绾冲叆 `backupAll`/`revertAll`锛涘崌绾ц嚜鎰堟椂涓嶄細鐢ㄦ棫 bak 瑕嗙洊鐢ㄦ埛鍚庢潵杩藉姞鐨?`insert`銆?- 鍚姩/杩樺師鏃朵富鍔ㄤ涪鎺夊巻鍙蹭笂璇缓鐨?`cordis.patch.yml.dshpurge.bak`锛屼繚鐣欏綋鍓嶇敤鎴锋枃浠躲€?- 鏂板 `npm run test:profile-patch`銆?
 ## English
 
 - **Fix [#43](https://github.com/YuJunZhiXue/dsh-purge/issues/43)**: stop including `profiles/*/cordis.patch.yml` (user patch layer) in `backupAll`/`revertAll`, so upgrade reapply no longer restores an old bak over later user `insert`s.
@@ -326,12 +264,9 @@
 - Add `npm run test:profile-patch`.
 # 1.1.24
 
-## 中文
+## 涓枃
 
-- **修复 [#40](https://github.com/YuJunZhiXue/dsh-purge/issues/40)**：`pathLooksDesktop` 不再仅凭路径里的 `deepseek-harness` 子串把源码版判成桌面端；需带 `resources/` / `.exe` / `.app` 等安装形态。
-- **修复 [#41](https://github.com/YuJunZhiXue/dsh-purge/issues/41)**：源码部署的 `apps/cli`（tsdown 构建产物）禁止 hide-console 注入；`revertAll` 在无 `.dshpurge.bak` 时只跳过、绝不删除目标文件。
-- 新增 `npm run test:surface` 回归。
-
+- **淇 [#40](https://github.com/YuJunZhiXue/dsh-purge/issues/40)**锛歚pathLooksDesktop` 涓嶅啀浠呭嚟璺緞閲岀殑 `deepseek-harness` 瀛愪覆鎶婃簮鐮佺増鍒ゆ垚妗岄潰绔紱闇€甯?`resources/` / `.exe` / `.app` 绛夊畨瑁呭舰鎬併€?- **淇 [#41](https://github.com/YuJunZhiXue/dsh-purge/issues/41)**锛氭簮鐮侀儴缃茬殑 `apps/cli`锛坱sdown 鏋勫缓浜х墿锛夌姝?hide-console 娉ㄥ叆锛沗revertAll` 鍦ㄦ棤 `.dshpurge.bak` 鏃跺彧璺宠繃銆佺粷涓嶅垹闄ょ洰鏍囨枃浠躲€?- 鏂板 `npm run test:surface` 鍥炲綊銆?
 ## English
 
 - **Fix [#40](https://github.com/YuJunZhiXue/dsh-purge/issues/40)**: `pathLooksDesktop` no longer treats source trees as desktop just because the path contains `deepseek-harness`; require install shapes (`resources/`, `.exe`, `.app`).
@@ -339,29 +274,21 @@
 - Add `npm run test:surface`.
 # 1.1.23
 
-## 中文
+## 涓枃
 
-- **修复 [#38](https://github.com/YuJunZhiXue/dsh-purge/issues/38)**：`#1`/`#2`/`#3` 提示词补丁每次 `apply` 叠加约 +841 字符、永不收敛。
-- **原因**：替换产物仍以前一版文本为前缀，且未设 `skipIfMarked`，`autoApplyOnStart` 每轮都会再写一层。
-- **修复**：为 `#1`/`#2`/`#3` 补 `skipIfMarked: true`（[#42](https://github.com/YuJunZhiXue/dsh-purge/pull/42)），并加 `npm run test:idempotence` 回归。
-- 已膨胀的宿主文件不会自动缩回，需还原 `.dshpurge.bak` 或重装 dsh 后再 apply。
-
+- **淇 [#38](https://github.com/YuJunZhiXue/dsh-purge/issues/38)**锛歚#1`/`#2`/`#3` 鎻愮ず璇嶈ˉ涓佹瘡娆?`apply` 鍙犲姞绾?+841 瀛楃銆佹案涓嶆敹鏁涖€?- **鍘熷洜**锛氭浛鎹骇鐗╀粛浠ュ墠涓€鐗堟枃鏈负鍓嶇紑锛屼笖鏈 `skipIfMarked`锛宍autoApplyOnStart` 姣忚疆閮戒細鍐嶅啓涓€灞傘€?- **淇**锛氫负 `#1`/`#2`/`#3` 琛?`skipIfMarked: true`锛圼#42](https://github.com/YuJunZhiXue/dsh-purge/pull/42)锛夛紝骞跺姞 `npm run test:idempotence` 鍥炲綊銆?- 宸茶啫鑳€鐨勫涓绘枃浠朵笉浼氳嚜鍔ㄧ缉鍥烇紝闇€杩樺師 `.dshpurge.bak` 鎴栭噸瑁?dsh 鍚庡啀 apply銆?
 ## English
 
 - **Fix [#38](https://github.com/YuJunZhiXue/dsh-purge/issues/38)**: prompt patches `#1`/`#2`/`#3` grew by ~+841 chars on every `apply` and never converged.
 - **Cause**: replacement text still starts with the previous pattern, and `skipIfMarked` was missing, so `autoApplyOnStart` rewrote every boot.
 - **Fix**: set `skipIfMarked: true` on `#1`/`#2`/`#3` ([#42](https://github.com/YuJunZhiXue/dsh-purge/pull/42)); add `npm run test:idempotence`.
-- Already-bloated host files are not auto-shrunk — restore `.dshpurge.bak` or reinstall dsh, then apply again.
+- Already-bloated host files are not auto-shrunk 鈥?restore `.dshpurge.bak` or reinstall dsh, then apply again.
 
 # 1.1.22
 
-## 中文
+## 涓枃
 
-- **修复官方桌面点「应用」报 ENOENT**。`app.asar` 还在时，新建 `dsh-purge-child-process-hide.mjs` 会失败，路径被写成 `resources\app.asar\...\dsh-purge-child-process-hide.mjs`，补丁停在待应用。
-- **原因**：官方客户端还带着 `app.asar` 时，Electron 会把 `resources\app` 映射进这个归档。归档里没有的新文件，用普通文件接口去创建就会 ENOENT。
-- **两种写法都保留**。归档还在时，改写真实磁盘上的 `resources\app`。没有 `app.asar` 时仍用原来的 `node:fs`，包括 Web、社区桌面，以及官方包已经解开并把归档挪成 `app.asar.bak` 的情况。
-- 安装目录不写死盘符。Web 和社区桌面的应用、重启保持原样。宿主仍对准 **dsh 0.1.7-rc.2**。
-
+- **淇瀹樻柟妗岄潰鐐广€屽簲鐢ㄣ€嶆姤 ENOENT**銆俙app.asar` 杩樺湪鏃讹紝鏂板缓 `dsh-purge-child-process-hide.mjs` 浼氬け璐ワ紝璺緞琚啓鎴?`resources\app.asar\...\dsh-purge-child-process-hide.mjs`锛岃ˉ涓佸仠鍦ㄥ緟搴旂敤銆?- **鍘熷洜**锛氬畼鏂瑰鎴风杩樺甫鐫€ `app.asar` 鏃讹紝Electron 浼氭妸 `resources\app` 鏄犲皠杩涜繖涓綊妗ｃ€傚綊妗ｉ噷娌℃湁鐨勬柊鏂囦欢锛岀敤鏅€氭枃浠舵帴鍙ｅ幓鍒涘缓灏变細 ENOENT銆?- **涓ょ鍐欐硶閮戒繚鐣?*銆傚綊妗ｈ繕鍦ㄦ椂锛屾敼鍐欑湡瀹炵鐩樹笂鐨?`resources\app`銆傛病鏈?`app.asar` 鏃朵粛鐢ㄥ師鏉ョ殑 `node:fs`锛屽寘鎷?Web銆佺ぞ鍖烘闈紝浠ュ強瀹樻柟鍖呭凡缁忚В寮€骞舵妸褰掓。鎸垚 `app.asar.bak` 鐨勬儏鍐点€?- 瀹夎鐩綍涓嶅啓姝荤洏绗︺€俉eb 鍜岀ぞ鍖烘闈㈢殑搴旂敤銆侀噸鍚繚鎸佸師鏍枫€傚涓讳粛瀵瑰噯 **dsh 0.1.7-rc.2**銆?
 ## English
 
 - **Fixes ENOENT when Apply runs on the official desktop.** While `app.asar` is still present, creating `dsh-purge-child-process-hide.mjs` failed. The path was rewritten to `resources\app.asar\...\dsh-purge-child-process-hide.mjs`, and patches stayed pending.
@@ -371,17 +298,9 @@
 
 # 1.1.21
 
-## 中文
+## 涓枃
 
-- **修复必需补丁失败 #43、#9、#15、#23、#42**。点「应用」不再因为这 5 条报「清洗未完成」。提示词本来就会写入；这 5 条没写上时，界面却把整次应用判失败，看起来像插件失效。
-- **原因**：上级文件夹名叫 DeepSeek Harness 时，整棵目录被当成官方桌面。Web 的 npm 包因此被排除，这 5 条对得上的原文也没写进去。安装路径不写死盘符。现在只有旁边真有桌面程序，或路径在该安装的 `resources/app` 里，才算桌面安装。Web、社区桌面、官方桌面各自打自己的包。
-- **#43**：去掉 Web 四个内置预设（standard、ptc、cordis、minimal）里的身份句。没写上时，预设里的原身份句会留在注入旁边。
-- **#9**：审批请求自动放行。
-- **#15**：沙箱 `confine` 不再包一层，命令按原样执行。
-- **#23**：子代理默认深度从 1 提到 10。
-- **#42**：给设置服务补回旧的 `register` / `get`，还在调旧接口的插件才能加载。
-- 文件在、但这份原文不在当前版本里时，显示跳过，不再把整次应用判失败。原文还在时仍会写上。
-
+- **淇蹇呴渶琛ヤ竵澶辫触 #43銆?9銆?15銆?23銆?42**銆傜偣銆屽簲鐢ㄣ€嶄笉鍐嶅洜涓鸿繖 5 鏉℃姤銆屾竻娲楁湭瀹屾垚銆嶃€傛彁绀鸿瘝鏈潵灏变細鍐欏叆锛涜繖 5 鏉℃病鍐欎笂鏃讹紝鐣岄潰鍗存妸鏁存搴旂敤鍒ゅけ璐ワ紝鐪嬭捣鏉ュ儚鎻掍欢澶辨晥銆?- **鍘熷洜**锛氫笂绾ф枃浠跺す鍚嶅彨 DeepSeek Harness 鏃讹紝鏁存５鐩綍琚綋鎴愬畼鏂规闈€俉eb 鐨?npm 鍖呭洜姝よ鎺掗櫎锛岃繖 5 鏉″寰椾笂鐨勫師鏂囦篃娌″啓杩涘幓銆傚畨瑁呰矾寰勪笉鍐欐鐩樼銆傜幇鍦ㄥ彧鏈夋梺杈圭湡鏈夋闈㈢▼搴忥紝鎴栬矾寰勫湪璇ュ畨瑁呯殑 `resources/app` 閲岋紝鎵嶇畻妗岄潰瀹夎銆俉eb銆佺ぞ鍖烘闈€佸畼鏂规闈㈠悇鑷墦鑷繁鐨勫寘銆?- **#43**锛氬幓鎺?Web 鍥涗釜鍐呯疆棰勮锛坰tandard銆乸tc銆乧ordis銆乵inimal锛夐噷鐨勮韩浠藉彞銆傛病鍐欎笂鏃讹紝棰勮閲岀殑鍘熻韩浠藉彞浼氱暀鍦ㄦ敞鍏ユ梺杈广€?- **#9**锛氬鎵硅姹傝嚜鍔ㄦ斁琛屻€?- **#15**锛氭矙绠?`confine` 涓嶅啀鍖呬竴灞傦紝鍛戒护鎸夊師鏍锋墽琛屻€?- **#23**锛氬瓙浠ｇ悊榛樿娣卞害浠?1 鎻愬埌 10銆?- **#42**锛氱粰璁剧疆鏈嶅姟琛ュ洖鏃х殑 `register` / `get`锛岃繕鍦ㄨ皟鏃ф帴鍙ｇ殑鎻掍欢鎵嶈兘鍔犺浇銆?- 鏂囦欢鍦ㄣ€佷絾杩欎唤鍘熸枃涓嶅湪褰撳墠鐗堟湰閲屾椂锛屾樉绀鸿烦杩囷紝涓嶅啀鎶婃暣娆″簲鐢ㄥ垽澶辫触銆傚師鏂囪繕鍦ㄦ椂浠嶄細鍐欎笂銆?
 ## English
 
 - **Fixes required-patch failures #43, #9, #15, #23, and #42.** Apply no longer reports the cleanse as incomplete because of these five. The prompt was already written; the failure made the plugin look dead.
@@ -395,13 +314,9 @@
 
 # 1.1.20
 
-## 中文
+## 涓枃
 
-- **宿主版本**：当前对准 **dsh 0.1.7-rc.2**。上一档 **0.1.7-rc.1**（含 `0.1.7-rc.1.20260924.1`）的旧锚点仍可用。
-- **官方桌面升级**：已经下载的新版本会在重启，或在应用里点安装并重启时真正安装，然后解开新版本并重新打补丁。没有新版本时，重启仍是关掉再打开当前客户端。安装目录不写死盘符。
-- **补丁**：#14、#35 跟上 rc.2 的升级写法，不再报必需补丁失败。#29、#33、#36 的新提示句也会打上。
-- Web 和社区版 DSH Desktop 的应用、重启保持原样。
-
+- **瀹夸富鐗堟湰**锛氬綋鍓嶅鍑?**dsh 0.1.7-rc.2**銆備笂涓€妗?**0.1.7-rc.1**锛堝惈 `0.1.7-rc.1.20260924.1`锛夌殑鏃ч敋鐐逛粛鍙敤銆?- **瀹樻柟妗岄潰鍗囩骇**锛氬凡缁忎笅杞界殑鏂扮増鏈細鍦ㄩ噸鍚紝鎴栧湪搴旂敤閲岀偣瀹夎骞堕噸鍚椂鐪熸瀹夎锛岀劧鍚庤В寮€鏂扮増鏈苟閲嶆柊鎵撹ˉ涓併€傛病鏈夋柊鐗堟湰鏃讹紝閲嶅惎浠嶆槸鍏虫帀鍐嶆墦寮€褰撳墠瀹㈡埛绔€傚畨瑁呯洰褰曚笉鍐欐鐩樼銆?- **琛ヤ竵**锛?14銆?35 璺熶笂 rc.2 鐨勫崌绾у啓娉曪紝涓嶅啀鎶ュ繀闇€琛ヤ竵澶辫触銆?29銆?33銆?36 鐨勬柊鎻愮ず鍙ヤ篃浼氭墦涓娿€?- Web 鍜岀ぞ鍖虹増 DSH Desktop 鐨勫簲鐢ㄣ€侀噸鍚繚鎸佸師鏍枫€?
 ## English
 
 - **Host version**: current target is **dsh 0.1.7-rc.2**. Anchors for the previous target, **0.1.7-rc.1** (including `0.1.7-rc.1.20260924.1`), still match.
@@ -411,13 +326,9 @@
 
 # 1.1.19
 
-## 中文
+## 涓枃
 
-- **官方桌面 EXE**：支持官方 DeepSeek Harness。点「应用」解开 `app.asar` 并补上原生模块，再点「重启」，客户端自己关掉并重新打开。Web 和社区版 DSH Desktop 的应用、重启保持原样。
-- **重启**：官方客户端退出不再被外壳当成崩溃，也不会留下后台 PowerShell。重启脚本不再调用 Windows 脚本宿主没有的 `toISOString`，避免弹出运行时错误。新进程不再继承 `ELECTRON_RUN_AS_NODE`，否则会刚打开就退出。
-- **更新**：换版本或回退时，按落地的那一版自动还原再应用，不必每次手动先还原再应用再重启。
-- **补丁列表**：宿主已经自带 `dsh-web-fetch-http` 时，不再显示一条永远跳过的 #20。安装目录不再写死盘符。
-
+- **瀹樻柟妗岄潰 EXE**锛氭敮鎸佸畼鏂?DeepSeek Harness銆傜偣銆屽簲鐢ㄣ€嶈В寮€ `app.asar` 骞惰ˉ涓婂師鐢熸ā鍧楋紝鍐嶇偣銆岄噸鍚€嶏紝瀹㈡埛绔嚜宸卞叧鎺夊苟閲嶆柊鎵撳紑銆俉eb 鍜岀ぞ鍖虹増 DSH Desktop 鐨勫簲鐢ㄣ€侀噸鍚繚鎸佸師鏍枫€?- **閲嶅惎**锛氬畼鏂瑰鎴风閫€鍑轰笉鍐嶈澶栧３褰撴垚宕╂簝锛屼篃涓嶄細鐣欎笅鍚庡彴 PowerShell銆傞噸鍚剼鏈笉鍐嶈皟鐢?Windows 鑴氭湰瀹夸富娌℃湁鐨?`toISOString`锛岄伩鍏嶅脊鍑鸿繍琛屾椂閿欒銆傛柊杩涚▼涓嶅啀缁ф壙 `ELECTRON_RUN_AS_NODE`锛屽惁鍒欎細鍒氭墦寮€灏遍€€鍑恒€?- **鏇存柊**锛氭崲鐗堟湰鎴栧洖閫€鏃讹紝鎸夎惤鍦扮殑閭ｄ竴鐗堣嚜鍔ㄨ繕鍘熷啀搴旂敤锛屼笉蹇呮瘡娆℃墜鍔ㄥ厛杩樺師鍐嶅簲鐢ㄥ啀閲嶅惎銆?- **琛ヤ竵鍒楄〃**锛氬涓诲凡缁忚嚜甯?`dsh-web-fetch-http` 鏃讹紝涓嶅啀鏄剧ず涓€鏉℃案杩滆烦杩囩殑 #20銆傚畨瑁呯洰褰曚笉鍐嶅啓姝荤洏绗︺€?
 ## English
 
 - **Official desktop EXE**: Apply on official DeepSeek Harness unpacks `app.asar`, restores native modules, then Restart closes the client and opens it again. Web and community DSH Desktop keep their existing Apply and restart.
@@ -427,11 +338,9 @@
 
 # 1.1.18
 
-## 中文
+## 涓枃
 
-- **重启**：点「重启」后旧页面的 token 会失效，只刷新等于打不开。现在会等端口释放（必要时结束旧进程），并按新进程打印的地址打开浏览器。请用新打开的页面，再新开一轮对话。
-- **设置**：1.1.17 之前若已把 `legacyApplyPath` 叠进 `dsh-settings`，点「应用」会收成一份，提供商目录才能起来。收好之后再重启一次。
-
+- **閲嶅惎**锛氱偣銆岄噸鍚€嶅悗鏃ч〉闈㈢殑 token 浼氬け鏁堬紝鍙埛鏂扮瓑浜庢墦涓嶅紑銆傜幇鍦ㄤ細绛夌鍙ｉ噴鏀撅紙蹇呰鏃剁粨鏉熸棫杩涚▼锛夛紝骞舵寜鏂拌繘绋嬫墦鍗扮殑鍦板潃鎵撳紑娴忚鍣ㄣ€傝鐢ㄦ柊鎵撳紑鐨勯〉闈紝鍐嶆柊寮€涓€杞璇濄€?- **璁剧疆**锛?.1.17 涔嬪墠鑻ュ凡鎶?`legacyApplyPath` 鍙犺繘 `dsh-settings`锛岀偣銆屽簲鐢ㄣ€嶄細鏀舵垚涓€浠斤紝鎻愪緵鍟嗙洰褰曟墠鑳借捣鏉ャ€傛敹濂戒箣鍚庡啀閲嶅惎涓€娆°€?
 ## English
 
 - **Restart**: the old page token dies with the process, so a refresh looks like restart did nothing. Restart now frees the port and opens the browser at the new `dsh web:` URL. Use that page and start a new chat.
@@ -439,12 +348,9 @@
 
 # 1.1.17
 
-## 中文
+## 涓枃
 
-- **稳定性**：修复设置补丁 #42 在 dsh 0.1.7 上重复插入 `legacyApplyPath` 的问题。此前会导致 `@deepseek-ai/dsh-settings` 无法加载、提供商目录报错、mnemon 等插件连锁 pending。现改为 `skipIfMarked`，且不再与官方已自带的 `legacyApplyPath` 叠写。
-- **工作区强指令**：#1/#2 同时识别 `WORKSPACE_*` 与 `AGENT_*` 常量名，避免「全局/替换式免责」在旧宿主上显示跳过、应用无效。
-- **拒答与软拒**：官方 `agent-instructions` 强指令补充本机授权评测与反软拒话术；插件增加固定 `dsh-purge:rules` 段（与执行规则一致）。**新开会话并重启 dsh 后**生效。
-
+- **绋冲畾鎬?*锛氫慨澶嶈缃ˉ涓?#42 鍦?dsh 0.1.7 涓婇噸澶嶆彃鍏?`legacyApplyPath` 鐨勯棶棰樸€傛鍓嶄細瀵艰嚧 `@deepseek-ai/dsh-settings` 鏃犳硶鍔犺浇銆佹彁渚涘晢鐩綍鎶ラ敊銆乵nemon 绛夋彃浠惰繛閿?pending銆傜幇鏀逛负 `skipIfMarked`锛屼笖涓嶅啀涓庡畼鏂瑰凡鑷甫鐨?`legacyApplyPath` 鍙犲啓銆?- **宸ヤ綔鍖哄己鎸囦护**锛?1/#2 鍚屾椂璇嗗埆 `WORKSPACE_*` 涓?`AGENT_*` 甯搁噺鍚嶏紝閬垮厤銆屽叏灞€/鏇挎崲寮忓厤璐ｃ€嶅湪鏃у涓讳笂鏄剧ず璺宠繃銆佸簲鐢ㄦ棤鏁堛€?- **鎷掔瓟涓庤蒋鎷?*锛氬畼鏂?`agent-instructions` 寮烘寚浠よˉ鍏呮湰鏈烘巿鏉冭瘎娴嬩笌鍙嶈蒋鎷掕瘽鏈紱鎻掍欢澧炲姞鍥哄畾 `dsh-purge:rules` 娈碉紙涓庢墽琛岃鍒欎竴鑷达級銆?*鏂板紑浼氳瘽骞堕噸鍚?dsh 鍚?*鐢熸晥銆?
 ## English
 
 - **Stability**: patch #42 no longer stacks duplicate `legacyApplyPath` on dsh 0.1.7, which broke `@deepseek-ai/dsh-settings`, provider catalog loading, and downstream plugins. Uses `skipIfMarked` and does not re-insert the helper the official package already ships.
@@ -453,19 +359,9 @@
 
 # 1.1.16
 
-## 中文
+## 涓枃
 
-- 对准 **dsh 0.1.7-rc.1**。工作区说明常量改名为 `AGENT_INSTRUCTIONS_INTRO`，句子没变，补丁跟着改。
-- 沙箱 `confine()` 已是 `async confine(argv, policy, signal)`，补丁按新函数写。直通行为与上一版相同。
-- 子代理深度改到 `dsh-subagent`，默认从 1 提到 10。深度检查还在。
-- 设置服务补回旧的 `register` / `get`。`dsh-mnemon`、`dsh-better-reasoning-effort` 这类还在调旧接口的插件可以继续用。官方 `describe` / `update` 不动。补丁只打一次，不会在启动时重复插入。
-- 删掉 0.1.7 里已经对不上的旧条文，包括单独给 `dsh-base` 补 `dsh-web-fetch-http` 依赖的那条。官方包已经自带。
-- Web 四个内置预设（standard、ptc、cordis、minimal）只清空身份句。工作目录、工具列表、`ptc` 模式，以及 minimal 的 `complete: true` 和 `includeRuntimeContext: false` 不动。
-- `complete: true` 时，`prompt-inject.md` 仍接在这段前面。换宿主版本或旧钩子删段之后，注入不会丢。点「应用」之后仍要再点「重启」，新开一轮对话才进当前会话。
-- `dsh-compaction-instant` 网页端从已删除的 `settingsScope` 改到 `configForms`，页面不再停在 Failed to load plugins。
-- 回退在 0.1.7 上会建出新会话，但界面仍停在旧对话，看起来像没反应。0.1.7 已没有 `sessions.open`。现在改用 `uiWorkspace.openSession` 切到新会话，并把上一句填回输入框。失败原因显示在按钮上。
-- README 的赞赏区换成非盈利声明：严禁商业售卖、付费倒卖或黑灰产牟利，仅供技术参考。
-
+- 瀵瑰噯 **dsh 0.1.7-rc.1**銆傚伐浣滃尯璇存槑甯搁噺鏀瑰悕涓?`AGENT_INSTRUCTIONS_INTRO`锛屽彞瀛愭病鍙橈紝琛ヤ竵璺熺潃鏀广€?- 娌欑 `confine()` 宸叉槸 `async confine(argv, policy, signal)`锛岃ˉ涓佹寜鏂板嚱鏁板啓銆傜洿閫氳涓轰笌涓婁竴鐗堢浉鍚屻€?- 瀛愪唬鐞嗘繁搴︽敼鍒?`dsh-subagent`锛岄粯璁や粠 1 鎻愬埌 10銆傛繁搴︽鏌ヨ繕鍦ㄣ€?- 璁剧疆鏈嶅姟琛ュ洖鏃х殑 `register` / `get`銆俙dsh-mnemon`銆乣dsh-better-reasoning-effort` 杩欑被杩樺湪璋冩棫鎺ュ彛鐨勬彃浠跺彲浠ョ户缁敤銆傚畼鏂?`describe` / `update` 涓嶅姩銆傝ˉ涓佸彧鎵撲竴娆★紝涓嶄細鍦ㄥ惎鍔ㄦ椂閲嶅鎻掑叆銆?- 鍒犳帀 0.1.7 閲屽凡缁忓涓嶄笂鐨勬棫鏉℃枃锛屽寘鎷崟鐙粰 `dsh-base` 琛?`dsh-web-fetch-http` 渚濊禆鐨勯偅鏉°€傚畼鏂瑰寘宸茬粡鑷甫銆?- Web 鍥涗釜鍐呯疆棰勮锛坰tandard銆乸tc銆乧ordis銆乵inimal锛夊彧娓呯┖韬唤鍙ャ€傚伐浣滅洰褰曘€佸伐鍏峰垪琛ㄣ€乣ptc` 妯″紡锛屼互鍙?minimal 鐨?`complete: true` 鍜?`includeRuntimeContext: false` 涓嶅姩銆?- `complete: true` 鏃讹紝`prompt-inject.md` 浠嶆帴鍦ㄨ繖娈靛墠闈€傛崲瀹夸富鐗堟湰鎴栨棫閽╁瓙鍒犳涔嬪悗锛屾敞鍏ヤ笉浼氫涪銆傜偣銆屽簲鐢ㄣ€嶄箣鍚庝粛瑕佸啀鐐广€岄噸鍚€嶏紝鏂板紑涓€杞璇濇墠杩涘綋鍓嶄細璇濄€?- `dsh-compaction-instant` 缃戦〉绔粠宸插垹闄ょ殑 `settingsScope` 鏀瑰埌 `configForms`锛岄〉闈笉鍐嶅仠鍦?Failed to load plugins銆?- 鍥為€€鍦?0.1.7 涓婁細寤哄嚭鏂颁細璇濓紝浣嗙晫闈粛鍋滃湪鏃у璇濓紝鐪嬭捣鏉ュ儚娌″弽搴斻€?.1.7 宸叉病鏈?`sessions.open`銆傜幇鍦ㄦ敼鐢?`uiWorkspace.openSession` 鍒囧埌鏂颁細璇濓紝骞舵妸涓婁竴鍙ュ～鍥炶緭鍏ユ銆傚け璐ュ師鍥犳樉绀哄湪鎸夐挳涓娿€?- README 鐨勮禐璧忓尯鎹㈡垚闈炵泩鍒╁０鏄庯細涓ョ鍟嗕笟鍞崠銆佷粯璐瑰€掑崠鎴栭粦鐏颁骇鐗熷埄锛屼粎渚涙妧鏈弬鑰冦€?
 ## English
 
 - Aligned with **dsh 0.1.7-rc.1**. The workspace-instruction constant is now `AGENT_INSTRUCTIONS_INTRO`. The sentence is unchanged, and the patch follows it.

@@ -148,6 +148,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.full": "全面浏览",
 			"dock.close": "收起",
 			"dock.unauthorized": "未授权",
+			"welcome.title": "用户须知",
+			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
+			"welcome.warn": "本插件免费开源。任何背着作者私自售卖、付费倒卖或借本项目盈利的行为，作者将依法追究法律责任。",
+			"welcome.body": "dsh-purge 是 DeepSeek Harness 的本机网络安全红队评测与清洗插件：在受控本机环境中调整提示词与补丁、做授权范围内的演练台操作。项目免费、非营利，源码仓库：",
+			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.ban1": "禁止将本项目用于未授权的网络攻击、入侵、窃取数据、破坏系统或任何违法犯罪。",
+			"welcome.ban2": "禁止商业售卖、付费倒卖、黑灰产牟利，以及隐瞒作者的营利性再分发。",
+			"welcome.ban3": "使用者须自行遵守所在地法律法规与平台规范；违法后果由行为人自行承担，与作者无关。",
+			"welcome.bans": "禁止事项",
+			"welcome.check": "我已阅读并理解上述用户须知，同意合法合规使用。",
+			"welcome.ok": "我已知晓并继续",
 			"auth.title": "演练台授权确认",
 			"auth.lead": "清洗不需要这一步。第一次进入演练台，或打开全面浏览，都要先完成本窗。",
 			"auth.warn": "安全警告：演练台只用于你有权管理的本机、离线靶标，或已书面授权的演练环境。未经授权的渗透、攻击、窃取和破坏一律禁止。",
@@ -193,8 +204,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.pending": "待应用",
 			"status.skipped": "跳过",
 			"apply.hint": "点应用会把提示词框里的全文写入并打补丁，不必再点保存。待应用=原文还在。跳过=当前版本不需要或组件未安装。",
-			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符，不要用官方 dsh 去清桌面端。",
-			"warn.noRoot.desktop": "官方客户端的代码在 app.asar 里。点「应用」会解开并自动重启，不用另跑脚本。第三方 DSH Desktop 直接点「应用」。",
+			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符；目录名带 DeepseekHarness / DeepSeek Harness 均可。",
+			"warn.noRoot.desktop": "官方客户端的代码在 app.asar 里。点「应用」会解开并自动重启，不用另跑脚本。若一直显示还没定位，先完全退出客户端再开，再点「应用」。第三方 DSH Desktop 直接点「应用」。",
 			"unpack.restarting": "补丁已写入。点「重启」后客户端会自己重新打开。",
 			"restart.fullQuit": "正在重启，客户端会自己重新打开。",
 			"warn.noInject": "官方始终用默认提示词。红队开了规则集就只用规则集；没开时用去掉 CTF 的默认提示词，再接红队操作。两边都空会提示必须添加。",
@@ -429,6 +440,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.full": "Full view",
 			"dock.close": "Collapse",
 			"dock.unauthorized": "Unauthorized",
+			"welcome.title": "User notice",
+			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
+			"welcome.warn": "This plugin is free and open source. Anyone who sells, resells, or profits from it behind the author's back may face legal action.",
+			"welcome.body": "dsh-purge is a local DeepSeek Harness plugin for security evaluation and cleaning: adjust prompts and patches on a machine you control, and use the drill console only within authorized scope. It is free and non-profit. Repository:",
+			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.ban1": "Do not use this project for unauthorized attacks, intrusion, data theft, sabotage, or any illegal activity.",
+			"welcome.ban2": "Do not commercially sell, resell, or profit from gray-market use, or redistribute for profit without the author.",
+			"welcome.ban3": "You must follow local law and platform rules; illegal use is solely your responsibility.",
+			"welcome.bans": "Prohibitions",
+			"welcome.check": "I have read and understand this notice and will use the plugin lawfully.",
+			"welcome.ok": "I understand — continue",
 			"auth.title": "Drill console authorization",
 			"auth.lead": "Cleaning does not need this step. Opening Drill or Full view the first time requires this dialog.",
 			"auth.warn": "Warning: the drill console is only for hosts you manage, offline targets, or written authorized exercises. Unauthorized intrusion, attack, theft, or sabotage is forbidden.",
@@ -474,8 +496,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"status.pending": "Pending",
 			"status.skipped": "Skipped",
 			"apply.hint": "Apply writes the prompt in the box and the patches. A separate save is unnecessary. Pending = original text still present. Skipped = not needed for this version or the component is not installed.",
-			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; do not use official dsh to purge Desktop.",
-			"warn.noRoot.desktop": "Official Harness keeps its code in app.asar. Apply unpacks it and restarts the app. Third-party DSH Desktop: just Apply.",
+			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; folder names like DeepseekHarnessDesktop or DeepSeek Harness are fine.",
+			"warn.noRoot.desktop": "Official Harness keeps its code in app.asar. Apply unpacks it and restarts the app. If this page stays “not found”, fully quit the client, reopen it, then Apply again. Third-party DSH Desktop: just Apply.",
 			"unpack.restarting": "Patches are written. Click Restart and the client opens again by itself.",
 			"restart.fullQuit": "Restarting. The client will open again by itself.",
 			"warn.noInject": "Official mode always uses the default prompt. Red team uses only the active rule set; otherwise it uses the default prompt without the CTF section, then the red team steps. If both are empty you will be asked to add a prompt.",
@@ -1590,7 +1612,8 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 			const s = state;
 			const located = !!(s && s.ai_base);
 			const hostSurface = hostSurfaceOf(s);
-			const sealedReady = !located && hostSurface === "desktop" && !!(s && (s.asar_still_sealed || s.desktop_exe));
+			const desktopLikely = hostSurface === "desktop" || clientGuessSurface() === "desktop";
+			const sealedReady = !located && desktopLikely && !!(s && (s.asar_still_sealed || s.desktop_exe || s.desktop_install));
 			const total = s && s.patches_total ? s.patches_total : 0;
 			const ready = s && typeof s.patches_ready === "number"
 				? s.patches_ready
@@ -4320,7 +4343,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [busy, setBusy] = React.useState(false)
 
       React.useEffect(() => {
-        /* 无靶标时读内置默认提示词（与 store prompts 无 engagement 分支一致） */
+        /* 无靶标也允许：服务端回内置默认，不再报 engagement required */
         api(eng ? { op: 'prompts', engagement: eng } : { op: 'prompts' }).then((r) => {
           if (!r || r.ok === false) { setMsg({ err: (r && r.error) || '读取失败' }); return }
           setRoles(r.roles || [])
@@ -5631,6 +5654,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
             /* 老 host 还没有知识库接口：讲清怎么恢复，别让人对着 "engagement required" 发懵 */
             ? '知识库接口由 host 侧提供，当前宿主还是旧进程 —— 请完全退出后重新打开（官方 exe / 社区版 / dsh web 任一），再刷新页面。'
             : err) : null,
+        !err && data && data.dbPath
+          ? h('div', { className: 'rt-foot', style: { marginBottom: 6, fontSize: 11 } },
+              '知识库：' + data.dbPath
+              + (data.root ? '（根目录 ' + data.root + '）' : ''))
+          : null,
         h('div', { className: 'rt-table' },
           (() => {
             if (!grouped) return items.map(card)
@@ -5695,6 +5723,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
                         : '知识库还是空的。本机也还没有 nuclei 模板库 —— 在演练机上跑 setup.sh 或 `nuclei -update-templates`，装好后这里会出现「本机模板 N」。'))),
                 h('div', { style: { marginTop: 6, fontSize: 12 } },
                   '打 Nday/1day 的标准顺序：① redteam_poc_search 先查这里（顺带搜本机 nuclei 模板库）→ ② 都没有就互联网搜索（web_search / GitHub / ExploitDB / 厂商公告）或自己手搓 → ③ 在真实目标上验证有效后 redteam_poc_add 回填，后面的靶标直接就能用。'),
+                data.dbPath ? h('div', { style: { marginTop: 6, fontSize: 11 }, className: 'rt-mono' }, '知识库文件：' + data.dbPath) : null,
                 tpl.dir ? h('div', { style: { marginTop: 6, fontSize: 11 }, className: 'rt-mono' }, '模板目录：' + tpl.dir) : null)
             : null),
         h('div', { className: 'rt-foot' },
@@ -7196,7 +7225,15 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 /* __DSH_PURGE_DRILL_END__ */
 
 		const AUTH_KEY = "dsh-purge-drill-auth";
+		const WELCOME_KEY = "dsh-purge-user-notice-v1";
 		const AUTH_LEGAL_HTML = "<h3>严正法律免责与合规使用声明</h3>\r\n    <p>本声明在进入演练台前必须全文阅读。本项目是非营利开源项目，遵守国家法律法规及所在平台的规范，仅供学习与研究、技术参考。严禁任何主体把本项目用于商业售卖、付费倒卖或黑灰产牟利。</p>\r\n    <p>开发者坚决反对并严禁任何形式的违法犯罪，绝不支持、不鼓励、不协助未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统，或生成违法违禁内容。任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。不得以科研、教学、测试、演示或内部学习为由规避下列条款。</p>\r\n    <h3>1. 本仓库不含违法内容</h3>\r\n    <p>dsh-purge 发布的代码、文档、补丁与默认提示词不是木马、后门、未授权渗透工具、勒索软件、撞库脚本，也不是针对公网或第三方系统的攻击载荷。项目不提供违法内容，也不教唆、组织、协助实施违法犯罪。</p>\r\n    <h3>2. 本机操作不构成对外授权</h3>\r\n    <p>应用补丁、写入、回滚、卸载，都在本机文件和本机进程内完成。这些操作不对任何公网主机或未授权系统进行扫描、探测、入侵或攻击发包，也不得把本机当作跳板。</p>\r\n    <p>插件若开启检测更新，仅可能访问本插件自己的 GitHub 仓库以核对版本。该访问与对第三方系统的网络攻击无关，不能被解释为对外渗透的授权。</p>\r\n    <h3>3. 允许使用的范围</h3>\r\n    <p>只允许用在你能证明有权处理的环境：本人有权管理的本机官方 Harness；离线的本地合成靶标；所有者已经出具合法书面授权的网络安全演练靶场；合规实验室里的受控环境。书面授权要能对应具体目标、时间和范围。只填写一个单位名称，或只有口头说法，不构成授权。</p>\r\n    <p>未经所有者合法书面授权的目标、公网在线系统、生产业务，以及能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施，都不得作为演练对象。</p>\r\n    <h3>4. 必须遵守的法律，按条、款</h3>\r\n    <p>《中华人民共和国刑法》第二百八十五条第一款：禁止违反国家规定，侵入国家事务、国防建设、尖端科学技术领域的计算机信息系统。</p>\r\n    <p>同条第二款：禁止侵入前款规定以外的计算机信息系统，或者用其他技术手段，获取该系统中存储、处理或者传输的数据，或者对该系统实施非法控制。</p>\r\n    <p>同条第三款：禁止提供专门用于侵入、非法控制计算机信息系统的程序、工具；明知他人实施侵入、非法控制而为其提供程序、工具，同样禁止。</p>\r\n    <p>第二百八十六条第一款：禁止对计算机信息系统功能进行删除、修改、增加、干扰，造成系统不能正常运行。</p>\r\n    <p>同条第二款：禁止对系统中存储、处理或者传输的数据和应用程序进行删除、修改、增加。</p>\r\n    <p>同条第三款：禁止故意制作、传播计算机病毒等破坏性程序，影响计算机系统正常运行。</p>\r\n    <p>第二百八十七条：禁止利用计算机实施金融诈骗、盗窃、贪污、挪用公款、窃取国家秘密或者其他犯罪。</p>\r\n    <p>第二百八十七条之一第一款第（一）项：禁止设立用于实施诈骗、传授犯罪方法、制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组。</p>\r\n    <p>同款第（二）项：禁止发布有关制作或者销售毒品、枪支、淫秽物品等违禁物品、管制物品或者其他违法犯罪的信息。</p>\r\n    <p>同款第（三）项：禁止为实施诈骗等违法犯罪活动发布信息。</p>\r\n    <p>第二百八十七条之二：禁止明知他人利用信息网络实施犯罪，仍为其提供技术支持，或者提供广告推广、支付结算等帮助。</p>\r\n    <p>第二百五十三条之一第一款、第三款：禁止向他人出售或者提供公民个人信息；禁止窃取或者以其他方法非法获取公民个人信息。</p>\r\n    <p>《中华人民共和国网络安全法》第十三条第二款：使用网络不得危害网络安全，不得利用网络从事危害国家安全、荣誉和利益，煽动颠覆国家政权、推翻社会主义制度，煽动分裂国家、破坏国家统一，宣扬恐怖主义、极端主义，宣扬民族仇恨、民族歧视，传播暴力、淫秽色情信息，编造、传播虚假信息扰乱经济秩序和社会秩序，以及侵害他人名誉、隐私、知识产权和其他合法权益等活动。</p>\r\n    <p>第十四条：禁止利用网络从事危害未成年人身心健康的活动。</p>\r\n    <p>第二十九条：禁止非法侵入他人网络、干扰他人网络正常功能、窃取网络数据；禁止提供专门用于侵入网络、干扰网络正常功能及防护措施、窃取网络数据的程序、工具；明知他人从事危害网络安全的活动，禁止为其提供技术支持、广告推广、支付结算等帮助。</p>\r\n    <p>第三十三条：公共通信和信息服务、能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施实行重点保护。未获合法授权，不得侵入、干扰或破坏。</p>\r\n    <p>第四十六条：禁止窃取或者以其他非法方式获取个人信息，禁止非法出售或者非法向他人提供个人信息。</p>\r\n    <p>第四十八条：禁止设立用于实施诈骗，传授犯罪方法，制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组；禁止利用网络发布涉及上述违法犯罪活动的信息。</p>\r\n    <p>第五十条：发送的电子信息、提供的应用软件不得设置恶意程序，不得含有法律、行政法规禁止发布或者传输的信息。</p>\r\n    <p>《中华人民共和国数据安全法》第八条：开展数据处理活动，不得危害国家安全、公共利益，不得损害个人、组织的合法权益。</p>\r\n    <p>第三十二条第一款：收集数据应当采取合法、正当的方式，不得窃取或者以其他非法方式获取数据。</p>\r\n    <p>同条第二款：法律、行政法规对收集、使用数据的目的和范围有规定的，只能在该目的和范围内收集、使用。</p>\r\n    <p>第五十一条：窃取或者以其他非法方式获取数据，或者因此损害个人、组织合法权益的，依照有关法律、行政法规处罚。</p>\r\n    <p>《中华人民共和国个人信息保护法》第五条：处理个人信息应当合法、正当、必要、诚信，不得通过误导、欺诈、胁迫等方式处理。</p>\r\n    <p>第六条第一款、第二款：处理个人信息应当具有明确、合理的目的，并与该目的直接相关，采取对个人权益影响最小的方式；收集限于实现处理目的的最小范围，不得过度收集。</p>\r\n    <p>第十条：禁止非法收集、使用、加工、传输他人个人信息，禁止非法买卖、提供或者公开他人个人信息；禁止从事危害国家安全、公共利益的个人信息处理活动。</p>\r\n    <p>第十三条：没有取得个人同意，也不属于订立履行合同所必需、履行法定职责、应对突发、公共利益新闻舆论、处理本人已经合法公开的信息，以及法律行政法规规定的其他情形之一的，不得处理个人信息。</p>\r\n    <p>第二十八条、第二十九条：生物识别、医疗健康、金融账户、行踪轨迹，以及不满十四周岁未成年人的个人信息，属于敏感个人信息。没有特定目的、充分必要性和严格保护措施，并且没有取得个人单独同意的，不得处理。</p>\r\n    <p>此外还须遵守其他现行有效的法律、行政法规、监管规定，以及所使用模型的服务条款与滥用政策。</p>\r\n    <h3>5. 据此禁止的方向</h3>\r\n    <p>未授权进入。禁止把没有书面授权的单位、域名、地址、公网系统、生产业务或关键信息基础设施登记为靶标，禁止对其扫描、探测、侵入、控制或发包。对应刑法第二百八十五条第一款、第二款，网络安全法第二十九条、第三十三条。</p>\r\n    <p>破坏与恶意程序。禁止删除、修改、增加、干扰他人系统功能或其中的数据、应用程序；禁止制作、传播病毒、勒索程序或其他破坏性程序；禁止在信息或软件中设置恶意程序。对应刑法第二百八十六条第一款至第三款，网络安全法第五十条。</p>\r\n    <p>工具与帮助。禁止把本项目或本机提供给他人，用于侵入、非法控制或窃取数据；禁止明知对方在实施网络犯罪，仍提供程序、工具、技术支持、广告推广或支付结算。对应刑法第二百八十五条第三款、第二百八十七条之二，网络安全法第二十九条。</p>\r\n    <p>数据。禁止窃取、非法收集、超范围使用、泄露、出售或向他人提供业务数据、账号、口令和其他受保护数据。对应数据安全法第八条、第三十二条、第五十一条。</p>\r\n    <p>个人信息。禁止非法收集、使用、加工、传输、买卖、提供或公开他人个人信息；禁止过度收集；禁止以误导、欺诈、胁迫方式处理；禁止擅自处理生物识别、医疗健康、金融账户、行踪轨迹和儿童个人信息。对应刑法第二百五十三条之一第一款、第三款，网络安全法第四十六条，个人信息保护法第五条、第六条、第十条、第十三条、第二十八条、第二十九条。</p>\r\n    <p>诈骗与违法信息。禁止设立或利用网站、群组实施诈骗、传授犯罪方法、制作或销售违禁物品、管制物品；禁止发布此类信息；禁止利用计算机实施诈骗、盗窃、贪污、挪用公款、窃取国家秘密。对应刑法第二百八十七条、第二百八十七条之一第一款第（一）项至第（三）项，网络安全法第四十八条。</p>\r\n    <p>内容。禁止生成或传播危害国家安全、荣誉和利益的内容，禁止煽动颠覆、分裂，禁止恐怖主义、极端主义、民族仇恨，禁止暴力、淫秽色情、赌博，禁止编造虚假信息扰乱经济秩序和社会秩序，禁止侵害名誉、隐私、知识产权，禁止危害未成年人身心健康的内容。对应网络安全法第十三条第二款、第十四条。</p>\r\n    <p>结果扩散。演练中形成的记录、资产信息和文件，只留在书面授权写明的目标和期限里，不得交给无权获知的人，也不得改作授权以外的用途。</p>\r\n    <h3>6. 责任由使用者承担</h3>\r\n    <p>本项目依据 MIT 协议按现状提供。开发者不就完整性、安全性与适用性作保证。使用者对自己的下载、部署、运行、修改、传播，以及全部输入与输出，承担独立、完全的民事、行政及刑事法律责任。作者与贡献者不承担因滥用产生的直接、间接或连带责任。</p>\r\n    <p>勾选确认的是操作者本人，不能代替没有阅读本声明的人，也不能把别人的系统说成已经授权。</p>\r\n    <h3>7. 违约即终止授权</h3>\r\n    <p>一旦用于非法攻击、恶意活动或上述任一禁止方向，使用许可自该行为发生之日起自动终止，且不可撤销。必须立即停止使用，并销毁本项目的代码、脚本与衍生数据，依法承担责任。授权终止后，演练台不得继续打开或继续使用。</p>\r\n    <h3>8. 与 DeepSeek 官方的关系</h3>\r\n    <p>本项目是独立的开源项目，与 DeepSeek 官方或其关联主体没有隶属、商业合作、授权或官方背书。文中的「官方」只表示评测对象是使用者本机安装的官方 DeepSeek Harness 软件包，不代表 DeepSeek 官方开发、认可或担保本插件。</p>\r\n    <p>文末。倒计时结束、滚到这里并勾选全部三项，才表示你以本人身份认可本声明，并完成本次演练台授权。</p>";
+
+		function readWelcomeAck() {
+			try { return window.localStorage.getItem(WELCOME_KEY) === "1"; } catch { return false; }
+		}
+		function writeWelcomeAck() {
+			try { window.localStorage.setItem(WELCOME_KEY, "1"); } catch { /* ignore */ }
+		}
 
 		function readDrillAuth() {
 			try { return window.localStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
@@ -7286,6 +7323,65 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 		function saveDockGeom(g) {
 			try { window.localStorage.setItem(DOCK_GEOM_KEY, JSON.stringify(clampDockGeom(g))); } catch { /* ignore */ }
+		}
+
+		function WelcomeNotice() {
+			const t = useT();
+			const [open, setOpen] = useState(() => !readWelcomeAck());
+			const [checked, setChecked] = useState(false);
+			if (!open) return null;
+			const repo = t("welcome.repo");
+			const node = h("div", { className: "dshp-auth-mask", role: "dialog", "aria-modal": "true" },
+				h("div", { className: "dshp-auth-modal", style: { width: "min(560px,100%)" } },
+					h("h2", null, t("welcome.title")),
+					h("div", { className: "muted", style: { color: "var(--dsw-alias-label-secondary,#999)", fontSize: 12 } }, t("welcome.lead")),
+					h("div", { className: "dshp-auth-warn" }, t("welcome.warn")),
+					h("div", { className: "dshp-auth-legal", style: { height: "auto", maxHeight: 280 } },
+						h("p", null, t("welcome.body")),
+						h("p", null,
+							h("a", {
+								href: repo,
+								target: "_blank",
+								rel: "noopener noreferrer",
+								style: { color: "var(--dsw-alias-label-brand, #8fbf9a)", wordBreak: "break-all" },
+							}, repo),
+						),
+						h("h3", null, t("welcome.bans")),
+						h("p", null, t("welcome.ban1")),
+						h("p", null, t("welcome.ban2")),
+						h("p", null, t("welcome.ban3")),
+					),
+					h("div", { className: "dshp-auth-checks" },
+						h("label", null,
+							h("input", {
+								type: "checkbox",
+								checked: checked,
+								onChange: (e) => setChecked(!!(e && e.target && e.target.checked)),
+							}),
+							h("span", null, t("welcome.check")),
+						),
+					),
+					h("div", { className: "dshp-auth-ops" },
+						h("button", {
+							type: "button",
+							className: "primary",
+							disabled: !checked,
+							onClick: () => {
+								if (!checked) return;
+								writeWelcomeAck();
+								setOpen(false);
+							},
+						}, t("welcome.ok")),
+					),
+				),
+			);
+			try {
+				const rd = require("react-dom");
+				if (rd && typeof rd.createPortal === "function" && typeof document !== "undefined" && document.body) {
+					return rd.createPortal(node, document.body);
+				}
+			} catch { /* ignore */ }
+			return node;
 		}
 
 		function AuthGate(props) {
@@ -8021,7 +8117,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				name: "shell.overlay",
 				id: "dsh-purge-dock",
 				order: 50,
-			}, () => h(react.Fragment, null, h(PurgeDock), h(HeroNewSessionMount), h(TabRowPurgeMount), h(EnvAdaptSendGate))));
+			}, () => h(react.Fragment, null, h(WelcomeNotice), h(PurgeDock), h(HeroNewSessionMount), h(TabRowPurgeMount), h(EnvAdaptSendGate))));
 			try {
 				if (typeof ctx.inject === "function") {
 					ctx.inject(["sessions", "uiWorkspace", "workspaces", "conversation"], (host) => installRewindUi(host));
