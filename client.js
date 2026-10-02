@@ -94,8 +94,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			return Boolean(active && active.size > 0);
 		}
 
-		async function bothInjectEmpty(overrideText) {
+		async function bothInjectEmpty(overrideText, defaultText) {
 			if (!promptBoxEmpty(overrideText)) return false;
+			if (!promptBoxEmpty(defaultText)) return false;
 			try {
 				return !activeRuleHasBody(await rulesApi("status"));
 			} catch {
@@ -1498,7 +1499,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 					run();
 					return;
 				}
-				bothInjectEmpty(overrideRef.current).then((empty) => {
+				bothInjectEmpty(overrideRef.current, defaultOverrideRef.current).then((empty) => {
 					if (ticket !== actionTicket.current) return;
 					if (empty) {
 						rejectNeedPrompt(tr);
@@ -1538,7 +1539,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 							if (ticket === actionTicket.current) setPatchBusy(false);
 						});
 				};
-				bothInjectEmpty(overrideRef.current).then((empty) => {
+				bothInjectEmpty(overrideRef.current, defaultOverrideRef.current).then((empty) => {
 					if (ticket !== actionTicket.current) return;
 					if (empty) {
 						rejectNeedPrompt(tr);

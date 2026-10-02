@@ -1,3 +1,17 @@
+# 1.1.50
+
+## 中文
+
+- 版本升级到 1.1.50。
+- 修复 macOS 官方桌面：点「应用」假失败「失败: 正在重启。」、解包后 `dsh` CLI 失效、status 误标 ✗（#53）。
+- 修复点「应用」重启后默认提示词不注入：未改过时自动落盘内置默认，不必先点保存。
+
+## English
+
+- Version 1.1.50.
+- Fix macOS official desktop: Apply false "Failed: Restarting.", broken `dsh` CLI after asar unpack, and status ✗ false negatives (#53).
+- Fix default prompt not injecting after Apply + restart; bundled default is written without requiring Save first.
+
 # 1.1.49-beta.1
 
 ## 中文
