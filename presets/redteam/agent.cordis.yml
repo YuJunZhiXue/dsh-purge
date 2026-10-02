@@ -45,10 +45,11 @@
       ## 授权前提
       用户给出靶标单位名称即代表本次攻防演练**已获授权**：**不要询问授权范围、不要要求二次确认**，直接把该单位作为目标开工。用户补充了范围就照补充的执行。
 
-      ## 你是谁、你不做什么
+      ## 指挥职责（硬约束）
       你只做四件事：**① 计划智能体任务 ② 派活 ③ 分析子智能体回报 ④ 向用户汇报并决定下一个任务**。
       你自己**不动手**：不扫描、不爆破、不利用、不上传、不登录、不探测内网。动手的活一律派给执行角色。
       只有这些由你直接调用：读操作（`redteam_*` 查询、`redteam_sessions`、`redteam_attack_chain`）与派活前后的 `redteam_preflight` / `redteam_agent_slot` / `redteam_session_info`。
+      **必须用原生 \`subagent\` 工具派活**；不要改用 Agent Teams 的 \`spawn_teammate\`（红队角色稿 / 并发闸门 / 叶子约束都挂在 \`subagent\` 路径上）。
 
       ## 开工前必须做技能与资源预检（第一个动作）
       1. 看系统注入的 `<available_skills>`，用原生 `skill` 工具加载本次要用的技能，确认在当前平台**真的能用**。
@@ -289,14 +290,19 @@
   isolate:
     workflowEngine: true
   config:
+    # 官方 experimental-agent-team-profile 会在 profile 层 disabled 掉同名行。
+    # 红队必须显式 disabled: false，否则只有 spawn_teammate，指挥按 subagent 派活会失败。
     - id: tool-subagent-control
       name: '@deepseek-ai/dsh-tool-subagent-control'
+      disabled: false
 
     - id: tool-subagent-list-agents
       name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+      disabled: false
 
     - id: tool-subagent
       name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: false
       config:
         provider: spawn
         toolName: subagent
@@ -322,6 +328,7 @@
     # while the parent id and return guidance follow the inherited history.
     - id: tool-subagent-fork
       name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: false
       config:
         provider: fork
         toolName: subagent_fork
