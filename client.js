@@ -1429,9 +1429,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 						.then((r) => r.json())
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
-							const posted = action === "apply" ? applyContent : override;
-							const applyEmptyBlocked = action === "apply" && promptBoxEmpty(posted) && (!d || d.injectSource !== "rule");
-							if (responseNeedsPrompt(d) || applyEmptyBlocked) {
+							if (responseNeedsPrompt(d)) {
 								rejectNeedPrompt(tr);
 								return;
 							}
@@ -1480,7 +1478,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 								loadAll();
 								return;
 							}
-							if (action === "apply" && (d.restart_after_apply || d.restarting || d.unpacked_asar || d.needs_full_quit)) {
+							if (action === "apply" && (d.restart_after_apply || d.restarting)) {
 								setNotice({
 									kind: "ok",
 									text: d.asar_still_sealed ? tr("restart.asarSwap") : tr("update.restarting"),
@@ -1488,6 +1486,14 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 								loadAll();
 								const surf = hostSurfaceOf(state) || clientGuessSurface() || "web";
 								restartDsh(setNotice, setPatchBusy, tr, surf);
+								return;
+							}
+							if (action === "apply" && (d.needs_full_quit || d.unpacked_asar)) {
+								setNotice({
+									kind: "ok",
+									text: d.asar_still_sealed ? tr("restart.asarSwap") : tr("ok.done"),
+								});
+								loadAll();
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
@@ -1501,18 +1507,7 @@ body .dshp-dock[data-theme="white"] .dshp-dock-body .rt-card,body .dshp-dock[dat
 							if (ticket === actionTicket.current) setPatchBusy(false);
 						});
 				};
-				if (action !== "apply") {
-					run();
-					return;
-				}
-				bothInjectEmpty(overrideRef.current, defaultOverrideRef.current).then((empty) => {
-					if (ticket !== actionTicket.current) return;
-					if (empty) {
-						rejectNeedPrompt(tr);
-						return;
-					}
-					run();
-				});
+				run();
 			}, [loadAll, rejectNeedPrompt]);
 
 			const saveOverride = useCallback(() => {
