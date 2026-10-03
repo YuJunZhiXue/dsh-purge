@@ -36,6 +36,7 @@
 ## Contents
 
 - [What this is](#what-this-is)
+- [Attribution required](#attribution-required)
 - [Supported hosts](#supported-hosts)
 - [Install](#install)
 - [Preview](#preview)
@@ -69,6 +70,12 @@ It only touches the official `@deepseek-ai` packages and local config on the use
 
 ## Non-profit public project. Commercial sale, paid resale, and profit from illegal or gray-market activity are forbidden. For technical reference only.
 
+## Attribution required
+
+**If you borrow this project's name, ideas, code, or prompts, you must credit the author and name the source repository:** [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge).
+
+Using them without attribution, hiding the source, or passing them off as your own will be pursued.
+
 ---
 
 <a id="strict-legal--compliance-disclaimer"></a>
@@ -101,6 +108,7 @@ It only touches the official `@deepseek-ai` packages and local config on the use
 7. **The user bears all responsibility.** The project is provided under the MIT license as-is. The authors make no warranty of completeness, security, or fitness. **Users independently bear all civil, administrative, and criminal liability** for download, deploy, run, modify, distribute, and all resulting inputs and outputs. Authors and contributors bear no direct, indirect, or joint liability for abuse.
 8. **The license ends on breach.** Anyone who uses this project for illegal attacks, malicious activity, or other violations has their open-source license **automatically and irrevocably terminated** from the moment of the violation. They must stop using the project, permanently destroy all copies and derivatives, and accept legal sanctions.
 9. **No affiliation.** This is an independent open-source security-eval research project. It has no employment, commercial, authorization, or endorsement relationship with DeepSeek or its affiliates. "Official" here only means the eval target is the official DeepSeek Harness package on the user's machine. It does **not** mean DeepSeek developed, approved, or warrants this plugin.
+10. **Attribution is required.** If you borrow this project's name, ideas, code, or prompts, you must credit the author and name this repository. Failure to attribute will be pursued. See [Attribution required](#attribution-required).
 
 </font>
 
