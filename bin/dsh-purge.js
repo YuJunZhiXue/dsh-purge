@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as core from "../lib/core.js";
+import * as rules from "../lib/rules.js";
 
 const args = process.argv.slice(2);
 
@@ -58,6 +59,11 @@ async function main() {
       console.log("  fix: 把 DSH_BASE 指到含 dsh-agent-instructions/lib 的 @deepseek-ai 目录");
       process.exit(1);
     }
+    const inject = rules.resolveInjectText(state.dsh_home);
+    if (!inject.text) {
+      console.log("[ERROR] 提示词和规则集都是空的，必须先添加提示词");
+      process.exit(1);
+    }
     const { made, errors } = await core.backupAll(state.ai_base);
     for (const b of made) console.log(`  ✓ 备份 / backup → ${b}`);
     for (const [p, e] of errors) console.log(`  ⚠ 备份失败 ${p}: ${e}`);
@@ -68,8 +74,9 @@ async function main() {
     }
     const flash = core.silenceCmdFlash(state.ai_base);
     console.log(`  cmd-flash=${flash.entry} phase-1=${flash.phase1} ok=${flash.ok}`);
-    const ov = await core.installOverride(state.dsh_home, false);
-    console.log(ov === "wrote" ? `  ✓ 写入 ${state.override_path}` : "  - prompt-inject.md 已存在 (你的自定义内容将保留)");
+    console.log(inject.source === "rule"
+      ? "  - 使用当前规则集，不改写提示词文件"
+      : "  - 使用已有提示词文件");
     if (state.shim_dir) {
       const r = await core.patchShim(state.shim_dir);
       for (const [fname, st] of Object.entries(r)) {

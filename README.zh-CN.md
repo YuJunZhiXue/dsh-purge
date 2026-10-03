@@ -132,12 +132,11 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 ## 安装
 
-Web、社区桌面端、官方桌面 EXE **分开装、分开应用**。只装你正在打开的那一个。必须是 **dsh 0.2**。
+现在只维护官方 `dsh web` 和官方桌面 EXE，**分开装、分开应用**。只装你正在打开的那一个。必须是 **dsh 0.2**。社区桌面端暂不维护；需要的话请单独开一个 issue。
 
 | 你正在用 | profile | 安装 |
 |---|---|---|
 | 官方 `dsh web` | `web` | [Web](#web) |
-| 社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `desktop` | [社区桌面端](#desktop) |
 | 官方 Harness 桌面 EXE | `default` | [官方桌面 EXE](#official-exe) |
 
 `dsh` 不在 PATH、或不想走远程安装时，用 [手动安装](#manual)。
@@ -148,7 +147,7 @@ Web、社区桌面端、官方桌面 EXE **分开装、分开应用**。只装�
 
 1. **退出并重新打开**刚装的那个宿主。Web 关掉 `dsh web` 再开；桌面端退出托盘，再打开对应的 exe。
 2. 点会话标题旁的 **dsh-purge**，在右侧栏的 **清洗** 里点 **「应用」**。宿主的设置页里没有这个条目。
-3. 按提示 **再重启一次**。补丁这时才进入当前进程。点「重启」才会重启，不会装完自动重启。
+3. 点「应用」成功后会自动重启一次，让补丁进入当前进程。应用没做完不会重启。
 
 > **macOS 官方桌面**：点「应用」会解开 `app.asar`。本插件会自动修补官方 `dsh` CLI 入口（asar / `app/` 双向兼容）并补上 `app/runtime` 链接；若你仍看到 `MODULE_NOT_FOUND ... app.asar/.../cli.js`，再点一次「应用」，或重装 Harness。
 
@@ -176,50 +175,13 @@ dsh plugin --profile web add .
 
 ### 社区桌面端
 
-打开 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop)，在 **自带终端** 里执行。这里的 `dsh` 是桌面包装脚本，默认 profile 就是 `desktop`。
-
-```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
-```
-
-不要用 PATH 上的官方 `dsh plugin --profile desktop`，这条会被拒绝。不要用 `dsh://`，那是官方 EXE 的协议。
-
-然后退出托盘，重新打开 `DSH Desktop.exe`，点会话标题旁的 **dsh-purge**，在 **清洗** 里点「应用」。
-
-自定义安装目录时，把脚本里的 `$exe` 换成该目录下的 `DSH Desktop.exe`。源用 tar.gz 地址，避免本地路径里的空格把命令拆开。
-
-<details>
-<summary><strong>从系统 PowerShell 安装</strong></summary>
-
-按正在运行的进程，或下面三个默认位置找 `DSH Desktop.exe`。不要全盘搜索。
-
-```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
-$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
-if (-not $exe) {
-  $exe = @(
-    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
-    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
-    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
-  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-}
-if (-not $exe) { throw "未找到 DSH Desktop.exe，请先打开桌面端，或把 `$exe` 设成安装目录里的 exe" }
-$cli = @(
-  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
-  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
-) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$env:ELECTRON_RUN_AS_NODE = "1"
-$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
-& $exe --expose-internals $cli plugin add $zip
-```
-
-</details>
+暂不维护。当前只支持官方 Web 和官方桌面 EXE。以后若要社区版，请单独开一个 issue，不要和这次的行为混在一起。
 
 <a id="official-exe"></a>
 
 ### 官方桌面 EXE
 
-已经安装 **DeepSeek Harness 官方桌面客户端** 时，用下面的命令，或点按钮走 `dsh://`。社区 DSH Desktop **不认** 这个协议，请回到上一节。当前只适配 **0.2.0-rc.2**。
+已经安装 **DeepSeek Harness 官方桌面客户端** 时，用下面的命令，或点按钮走 `dsh://`。社区桌面端不维护，不要用这个协议去装它。当前只适配 **0.2.0-rc.2**。
 
 ```sh
 dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
@@ -318,37 +280,9 @@ dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/re
 
 当前目录已是本仓库时改用 `dsh plugin --profile web add .`。
 
-**桌面端（社区 DSH Desktop）**
+**社区桌面端**
 
-不要用 PATH 上的官方 `dsh plugin --profile desktop`。不要用 `dsh://`。
-
-默认：已在桌面端自带终端里时直接跑：
-
-```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
-```
-
-从系统终端安装时：用正在运行的 `DSH Desktop` 进程 Path，或默认位置 `%LOCALAPPDATA%\Programs\DSH Desktop\DSH Desktop.exe`、`%ProgramFiles%\DSH Desktop\DSH Desktop.exe`。不要全盘扫描。然后：
-
-```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
-$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
-if (-not $exe) {
-  $exe = @(
-    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
-    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
-    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
-  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-}
-if (-not $exe) { Write-Host "未找到 DSH Desktop.exe，请先打开桌面端或给出安装目录"; return }
-$cli = @(
-  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
-  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
-) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$env:ELECTRON_RUN_AS_NODE = "1"
-$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
-& $exe --expose-internals $cli plugin add $zip
-```
+暂不维护。不要安装。需要的话请单独开一个 issue。
 
 **官方 Harness 桌面 EXE**
 
@@ -372,9 +306,8 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 
 | 你实际在用的 | 只改这个目录 | 不要改 |
 |---|---|---|
-| 官方 `dsh web` | `$DSH_HOME/profiles/web` | `desktop`、`default` |
-| 社区 [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `$DSH_HOME/profiles/desktop` | `web`、`default` |
-| 官方 Harness 桌面 EXE | `$DSH_HOME/profiles/default` | `web`、`desktop` |
+| 官方 `dsh web` | `$DSH_HOME/profiles/web` | `default` |
+| 官方 Harness 桌面 EXE | `$DSH_HOME/profiles/default` | `web` |
 
 对应 `profiles/<名>/package.json` 还不存在时，先正常启动一次该宿主，让官方程序自己建好 profile，再继续。
 
@@ -416,8 +349,8 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 怎么确认找对了：
 
 - Web：`$DSH_HOME/profiles/web/package.json` 里 `"name"` 是 `dsh-profile-web`
-- 社区桌面端：`$DSH_HOME/profiles/desktop/package.json` 里 `"name"` 是 `dsh-profile-desktop`
 - 官方 EXE：`$DSH_HOME/profiles/default/package.json` 存在
+- 社区桌面端暂不维护，不要改 `profiles/desktop`
 
 本机常有两份 `.dsh`（用户目录一份、安装目录一份）。便携包、安装目录里的官方 `dsh` **用安装根下那份**，不要改到空的 `%USERPROFILE%\.dsh`。改完下面步骤后，启动的必须是这份主目录对应的宿主。
 
@@ -468,7 +401,6 @@ Rename-Item $src "dsh-purge"
 | 宿主 | 要改的文件 |
 |---|---|
 | Web | `$DSH_HOME/profiles/web/package.json` |
-| 社区桌面端 | `$DSH_HOME/profiles/desktop/package.json` |
 | 官方桌面 EXE | `$DSH_HOME/profiles/default/package.json` |
 
 先复制一份 `package.json.bak`。然后**只追加两处**，原有依赖、原有 bundle、其它字段全部留着：
@@ -529,13 +461,10 @@ Rename-Item $src "dsh-purge"
 
 **4. 只在刚改的那个 profile 目录装依赖**
 
-本机要有 `pnpm`（官方 dsh 一般自带）。进入**上一步改过的那个** profile 目录再执行，不要在仓库根目录、也不要在 `$DSH_HOME` 根目录执行。下面三条命令只跑和你宿主对应的一条，不要三个连着跑。
+本机要有 `pnpm`（官方 dsh 一般自带）。进入**上一步改过的那个** profile 目录再执行，不要在仓库根目录、也不要在 `$DSH_HOME` 根目录执行。下面两条命令只跑和你宿主对应的一条，不要连着跑。
 
 ```sh
 cd "$DSH_HOME/profiles/web"       # Web
-pnpm install
-
-cd "$DSH_HOME/profiles/desktop"   # 社区桌面端
 pnpm install
 
 cd "$DSH_HOME/profiles/default"   # 官方 EXE
@@ -553,7 +482,7 @@ cd "$env:USERPROFILE\.dsh\profiles\web"
 pnpm install
 ```
 
-成功标志：出现 `$DSH_HOME/profiles/<web|desktop|default>/node_modules/dsh-purge/package.json`。
+成功标志：出现 `$DSH_HOME/profiles/<web|default>/node_modules/dsh-purge/package.json`。
 
 常见失败：
 
@@ -565,10 +494,10 @@ pnpm install
 
 只写入 `package.json` **还不会**改 `@deepseek-ai` 包，必须重启后再点「应用」。
 
-1. 完全退出刚装的那个宿主：Web 关掉 `dsh web`；社区桌面端退出托盘再开 `DSH Desktop.exe`；官方 EXE 也要退出托盘
+1. 完全退出刚装的那个宿主：Web 关掉 `dsh web`；官方 EXE 退出托盘
 2. 打开**这个宿主**，会话标题旁应出现 **dsh-purge**。点开后是「清洗」。
 3. 只在这个宿主点「应用」，或聊天 `/purge apply`。不要用 Web 去点桌面端的应用，也不要反过来
-4. 按提示再重启一次，补丁才会进当前进程。桌面端的「重启 / 卸载」会重启桌面应用，不会去拉 `dsh web`
+4. 应用成功后会自动重启一次，补丁才会进当前进程。应用没做完不会重启。官方桌面的「重启 / 卸载」只重启官方桌面，不会去拉 `dsh web`
 
 **6. 怎么确认装上了**
 
@@ -580,7 +509,7 @@ pnpm install
 
 ### 卸载
 
-会话标题旁的 **dsh-purge** →「清洗」→「卸载」。弹窗确认：卸载将还原回原版并清除本插件。如果已经点过「应用」，会先还原补丁，再删插件文件，然后重启当前宿主（Web 重启 `dsh web`；桌面端重启 `DSH Desktop.exe`）。
+会话标题旁的 **dsh-purge** →「清洗」→「卸载」。弹窗确认：卸载将还原回原版并清除本插件。如果已经点过「应用」，会先还原补丁，再删插件文件，然后重启当前宿主（Web 重启 `dsh web`；官方桌面重启官方客户端）。
 
 ```sh
 # 也可以用命令行
@@ -813,7 +742,7 @@ flowchart LR
 4. 嵌套 `@deepseek-ai/dsh/node_modules/@deepseek-ai`
 5. 系统默认 `~/.dsh`
 
-**桌面端：** 只改当前正在运行的桌面安装。官方客户端点「应用」即可（成功后会自动重启）。社区端点「应用」，然后重启即可。
+**官方桌面：** 只改当前正在运行的官方桌面安装。点「应用」成功后会自动重启一次。社区桌面端不维护。
 
 找不到目标时提示设置 `DSH_BASE`，不改文件。
 

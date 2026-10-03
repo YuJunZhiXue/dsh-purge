@@ -6,9 +6,13 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# 只给本机 Cursor 技能看，不进仓库
+docs/agents/
+
 # 本地草稿，不进仓库
 scripts/tmp-*.mjs
 scripts/test-*.mjs
+.scratch/
 dsh-redteam-mode-main/
 
 # 外部参考，不是本插件

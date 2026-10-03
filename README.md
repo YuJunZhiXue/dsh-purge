@@ -132,12 +132,11 @@ The plugin version is **1.1.55**. 1.1.45 is skipped; it has bugs.
 
 ## Install
 
-Web, community Desktop, and the official desktop EXE are **installed and patched separately**. Install only the host you have open. The host must be **dsh 0.2**.
+Only official `dsh web` and the official desktop EXE are maintained. Install and patch them **separately**. Install only the host you have open. The host must be **dsh 0.2**. Community Desktop is not maintained; ask for it in one issue.
 
 | What you run | Profile | Go to |
 |---|---|---|
 | Official `dsh web` | `web` | [Web](#web) |
-| Community [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `desktop` | [Community Desktop](#desktop) |
 | Official Harness desktop EXE | `default` | [Official desktop EXE](#official-exe) |
 
 If `dsh` is not on PATH, or you do not want a remote install, use [Manual install](#manual).
@@ -148,7 +147,7 @@ Adding the plugin to a profile does **not** patch `@deepseek-ai` by itself.
 
 1. **Quit and reopen** the host you just installed into. Stop `dsh web` and start it again, or quit the Desktop tray and open that app's exe.
 2. On **that host**, click **dsh-purge** beside the session title, then click **Apply** on the **Clean** page. This plugin does not appear on the host Settings page.
-3. **Restart once more** when prompted. Patched files load on that next start. Restart happens only when you click it.
+3. A successful **Apply** restarts once so the patches load. Apply does not restart when it did not finish.
 
 Web **Apply / Restart / Uninstall** affect Web only. Desktop controls affect the desktop app only and do not launch `dsh web`. Do not Apply one host from the other.
 
@@ -176,50 +175,13 @@ Then follow the three steps above. Click **dsh-purge** beside the session title 
 
 ### Community Desktop
 
-Open [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) and run this in the **built-in terminal**. That `dsh` is the desktop wrapper; its default profile is `desktop`.
-
-```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
-```
-
-Do not use official `dsh plugin --profile desktop` on PATH (it is rejected). Do not use `dsh://` (that protocol belongs to the official EXE).
-
-Then quit the tray, reopen `DSH Desktop.exe`, click **dsh-purge** beside the session title, and **Apply** on **Clean**.
-
-For a custom install folder, set `$exe` in the script to `DSH Desktop.exe` in that folder. The tarball URL is the source so a local path with spaces cannot split the command.
-
-<details>
-<summary><strong>Install from system PowerShell</strong></summary>
-
-Find `DSH Desktop.exe` from the running process or the default locations below. Do not scan the whole disk.
-
-```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
-$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
-if (-not $exe) {
-  $exe = @(
-    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
-    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
-    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
-  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-}
-if (-not $exe) { throw "DSH Desktop.exe not found. Start the app, or set `$exe` to the exe in the install folder." }
-$cli = @(
-  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
-  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
-) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$env:ELECTRON_RUN_AS_NODE = "1"
-$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
-& $exe --expose-internals $cli plugin add $zip
-```
-
-</details>
+Not maintained. Only official Web and the official desktop EXE are supported. If you want the community build later, open one issue. Do not mix that into this behavior.
 
 <a id="official-exe"></a>
 
 ### Official desktop EXE
 
-If the **official DeepSeek Harness desktop client** is installed, use the command or the button (`dsh://`). Community DSH Desktop does **not** handle that protocol — use the previous section. Current support is **0.2.0-rc.2** only.
+If the **official DeepSeek Harness desktop client** is installed, use the command or the button (`dsh://`). Community Desktop is not maintained; do not use this protocol to install it. Current support is **0.2.0-rc.2** only.
 
 ```sh
 dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
@@ -318,37 +280,9 @@ dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/re
 
 If this directory is already a clone, use `dsh plugin --profile web add .`.
 
-**Desktop (community DSH Desktop)**
+**Community Desktop**
 
-Do not use official `dsh plugin --profile desktop` on PATH. Do not use `dsh://`.
-
-Default: already inside Desktop’s built-in terminal:
-
-```sh
-dsh plugin add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
-```
-
-From a system terminal: use the running `DSH Desktop` process Path, or the default locations `%LOCALAPPDATA%\Programs\DSH Desktop\DSH Desktop.exe`, `%ProgramFiles%\DSH Desktop\DSH Desktop.exe`. Do not scan the whole disk. Then:
-
-```powershell
-$zip = "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz"
-$exe = (Get-Process -Name "DSH Desktop" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Path)
-if (-not $exe) {
-  $exe = @(
-    "$env:LOCALAPPDATA\Programs\DSH Desktop\DSH Desktop.exe",
-    "$env:ProgramFiles\DSH Desktop\DSH Desktop.exe",
-    "${env:ProgramFiles(x86)}\DSH Desktop\DSH Desktop.exe"
-  ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-}
-if (-not $exe) { Write-Host "DSH Desktop.exe not found. Start the app or give the install folder."; return }
-$cli = @(
-  (Join-Path (Split-Path $exe) "resources\app\lib\desktop-cli.js"),
-  (Join-Path (Split-Path $exe) "resources\app.asar.unpacked\lib\desktop-cli.js")
-) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$env:ELECTRON_RUN_AS_NODE = "1"
-$env:DSH_DESKTOP_DEFAULT_PROFILE = "desktop"
-& $exe --expose-internals $cli plugin add $zip
-```
+Not maintained. Do not install it. Ask for it in one issue.
 
 **Official Harness desktop EXE**
 
@@ -372,9 +306,8 @@ Use this when the command fails, `dsh` is not on `PATH`, or you do not want a re
 
 | What you actually run | Edit only this directory | Leave alone |
 |---|---|---|
-| Official `dsh web` | `$DSH_HOME/profiles/web` | `desktop`, `default` |
-| Community [DSH Desktop](https://github.com/anywhere-labs/dsh-desktop) | `$DSH_HOME/profiles/desktop` | `web`, `default` |
-| Official Harness desktop EXE | `$DSH_HOME/profiles/default` | `web`, `desktop` |
+| Official `dsh web` | `$DSH_HOME/profiles/web` | `default` |
+| Official Harness desktop EXE | `$DSH_HOME/profiles/default` | `web` |
 
 If `profiles/<name>/package.json` is missing, start that host once so the official program creates the profile, then continue.
 
@@ -416,8 +349,8 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 How to confirm you found the right one:
 
 - Web: `$DSH_HOME/profiles/web/package.json` has `"name": "dsh-profile-web"`
-- Community Desktop: `$DSH_HOME/profiles/desktop/package.json` has `"name": "dsh-profile-desktop"`
 - Official EXE: `$DSH_HOME/profiles/default/package.json` exists
+- Community Desktop is not maintained. Do not edit `profiles/desktop`
 
 Machines often have two homes (user folder and install folder). A portable / install-dir official `dsh` uses the `.dsh` next to the install root — not an empty `%USERPROFILE%\.dsh`. After the steps below, start the host that belongs to that home.
 
@@ -468,7 +401,6 @@ Check: `$DSH_HOME/plugins/dsh-purge/package.json` opens and `"name": "dsh-purge"
 | Host | File to edit |
 |---|---|
 | Web | `$DSH_HOME/profiles/web/package.json` |
-| Community Desktop | `$DSH_HOME/profiles/desktop/package.json` |
 | Official desktop EXE | `$DSH_HOME/profiles/default/package.json` |
 
 Copy `package.json.bak` first. Then **add only two things**. Keep every existing dependency, bundle, and other field:
@@ -529,13 +461,10 @@ Notes:
 
 **4. Run `pnpm install` only in the profile you just edited**
 
-`pnpm` must be available (official `dsh` usually ships it). `cd` into **that profile directory**, not the repo root and not `$DSH_HOME` itself. Run only the block for your host. Do not run all three.
+`pnpm` must be available (official `dsh` usually ships it). `cd` into **that profile directory**, not the repo root and not `$DSH_HOME` itself. Run only the block for your host. Do not run both.
 
 ```sh
 cd "$DSH_HOME/profiles/web"
-pnpm install
-
-cd "$DSH_HOME/profiles/desktop"
 pnpm install
 
 cd "$DSH_HOME/profiles/default"
@@ -553,7 +482,7 @@ cd "$env:USERPROFILE\.dsh\profiles\web"
 pnpm install
 ```
 
-Success: `$DSH_HOME/profiles/<web|desktop|default>/node_modules/dsh-purge/package.json` exists.
+Success: `$DSH_HOME/profiles/<web|default>/node_modules/dsh-purge/package.json` exists.
 
 Common failures:
 
@@ -565,10 +494,10 @@ Common failures:
 
 Writing `package.json` does **not** patch `@deepseek-ai` by itself. Restart, then click **Apply**.
 
-1. Fully quit the host you just installed into: stop `dsh web`; quit the community Desktop tray and open `DSH Desktop.exe`; quit the official EXE tray as well
+1. Fully quit the host you just installed into: stop `dsh web`, or quit the official EXE tray
 2. Open **that host**. **dsh-purge** should appear beside the session title. Open it to reach Clean.
 3. Click **Apply** on this host only, or run `/purge apply` in chat. Do not Apply Web from Desktop or Desktop from Web
-4. Restart again when prompted so patched packages load in this process. Settings **Restart / Uninstall** relaunch the desktop app; they do not launch `dsh web`
+4. A successful Apply restarts once so patched packages load. Apply does not restart when it did not finish. Official desktop **Restart / Uninstall** relaunch only the official desktop; they do not launch `dsh web`
 
 **6. How to confirm it is installed**
 
@@ -580,7 +509,7 @@ If the card is missing, you likely edited the other `.dsh`, or you edited `web` 
 
 ### Uninstall
 
-**dsh-purge** beside the session title → **Clean** → **Uninstall**. Confirm the dialog: uninstall restores the original Harness and removes this plugin. If patches were applied, they are reverted first. The current host then restarts (Web relaunches `dsh web`; community Desktop relaunches `DSH Desktop.exe`).
+**dsh-purge** beside the session title → **Clean** → **Uninstall**. Confirm the dialog: uninstall restores the original Harness and removes this plugin. If patches were applied, they are reverted first. The current host then restarts (Web relaunches `dsh web`; the official desktop relaunches the official client).
 
 ```sh
 # or from a terminal
@@ -810,13 +739,9 @@ The host surface is detected first: `web` / `desktop` (`gui` / `tui` are reserve
 4. Nested `@deepseek-ai/dsh/node_modules/@deepseek-ai`
 5. `~/.dsh`
 
-**Community DSH Desktop:** only the **running desktop process** install tree (`resources/app` or `app.asar.unpacked` → `@deepseek-ai`). The folder does not have to be named `DSH Desktop`, and the drive letter is not hard-coded. Order:
+**Official desktop EXE:** the running official Harness install (`resources/app` or the unpacked package). The drive letter is not hard-coded. A successful Apply restarts once.
 
-1. Running `DSH Desktop.exe` / `process.resourcesPath` / `host-process-entry.js` / `desktop-cli.js`
-2. A `resources/app` tree whose parent folder actually contains `DSH Desktop.exe`
-3. A path whose name contains `DSH Desktop` / `dsh-desktop`
-4. `DSH_DESKTOP_INSTALL` (install root) or `DSH_BASE` (`@deepseek-ai` under that tree)
-5. Common NSIS locations (`%LOCALAPPDATA%\Programs\DSH Desktop`, `%ProgramFiles%\DSH Desktop`, …)
+Community Desktop is not maintained.
 
 Official npm-global is not patched. Sealed `host-commands` / `runtime-commands` are scrubbed, never injected.
 
