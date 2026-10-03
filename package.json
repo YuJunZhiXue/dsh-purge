@@ -1,6 +1,6 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.52",
+  "version": "1.1.53",
   "description": "DeepSeek Harness 网络安全红队工具：本机官方 Harness 受控评测与清洗，内嵌演练台；不同模型可换不同提示词；默认提示词面向国模「小码酱」。求 Star ⭐",
   "type": "module",
   "main": "lib/index.js",
@@ -74,7 +74,16 @@
         "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-ui-settings"
       ]
+    },
+    "install": {
+      "preferred": "tarball",
+      "tarball": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz",
+      "zip": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip",
+      "git": "https://github.com/YuJunZhiXue/dsh-purge.git"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1"
