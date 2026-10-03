@@ -1,3 +1,19 @@
+# 1.1.56
+
+## 中文
+
+- 版本升级到 1.1.56。
+- 应用按设置框、当前规则集、官方系统提示词的顺序选用。空框且没有规则时停下来要求输入，不再把内置默认写进磁盘。
+- 清洗和演练台跟随 DSH 主题的透明玻璃，去掉手动换色。
+- 说明只保留官方 Web 和官方桌面。
+
+## English
+
+- Version 1.1.56.
+- Apply uses the settings box, then the active rule set, then the official system prompt. An empty box with no rules asks for a prompt and does not write the built-in default to disk.
+- 清洗 and the drill console use transparent glass that follows the DSH theme. The manual theme switch is gone.
+- Docs keep official Web and the official desktop only.
+
 # 1.1.55
 
 ## 中文
