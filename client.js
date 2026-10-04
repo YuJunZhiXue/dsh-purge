@@ -1527,13 +1527,16 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 									text: tr("restart.incomplete", { detail: parts.join("；") }),
 								});
 								loadAll();
-								setAskRestart(true);
+								return;
+							}
+							if (action === "apply" && (d.restarting || d.restart_after_apply)) {
+								loadAll();
+								restartDsh(setNotice, function () {}, tr, hostSurfaceOf(state));
 								return;
 							}
 							if (action === "apply") {
 								setNotice({ kind: "ok", text: tr("ok.done") });
 								loadAll();
-								setAskRestart(true);
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
@@ -1548,7 +1551,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						});
 				};
 				run();
-			}, [loadAll, rejectNeedPrompt]);
+			}, [loadAll, rejectNeedPrompt, state]);
 
 			const saveOverride = useCallback(() => {
 				const tr = t;
