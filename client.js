@@ -129,14 +129,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		}
 
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
-		const PATCH_GROUPS = [
-			{ key: "prompt", ids: [1, 2, 3, 4, 5, 25, 26, 28, 32, 43, 50, 53, 54, 61, 63] },
-			{ key: "code", ids: [6, 7, 8, 42, 45, 46, 51, 52, 55, 56, 57, 58, 59, 62, 63, 64, 65] },
-			{ key: "engine", ids: [9, 10, 11, 12, 13, 14, 15, 16, 35] },
-			{ key: "tools", ids: [17, 18, 19, 21, 22, 23, 24, 29, 30, 31, 33, 34, 36, 37, 48, 60, 62, 64, 65] },
-			{ key: "compat", ids: [38, 39, 40] },
-			{ key: "dsh20", ids: [47, 49] },
-		];
 
 		const zh = {
 			nav: "规则设定",
@@ -192,8 +184,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"own.save": "保存名单",
 			"saved.own": "已保存自己的服务器",
 			"saved.own.dropped": "已保存。有 {n} 行不是单个 IP 或主机名，已丢掉",
-			"metric.purged": "已就绪",
-			"metric.purged.skip": "已就绪，其中 {n} 项本机不需要",
+			"metric.purged": "已写入",
+			"metric.purged.skip": "已写入。跳过 {n} 项，本机没有这些文件",
+			"metric.pendingShort": "待处理 {n}",
+			"metric.unmatchedShort": "没对上 {n}",
+			"metric.skipShort": "跳过 {n}",
 			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
 			"metric.shim.na": "本端不需要",
@@ -204,6 +199,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.status": "状态",
 			"status.applied": "已应用",
 			"status.pending": "待应用",
+			"status.unmatched": "没对上",
 			"status.skipped": "跳过",
 			"apply.hint": "点应用会把提示词框里的全文写入并打补丁，不必再点保存。待应用=原文还在。跳过=当前版本不需要或组件未安装。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符；目录名带 DeepseekHarness / DeepSeek Harness 均可。",
@@ -323,8 +319,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restarting.desktop": "正在重启桌面应用…",
 			"restart.timeout": "超时，请刷新",
 			"restart.fail": "失败: {error}",
+			"restart.notStarted": "重启没有开始，客户端还在。不会自动再试。",
+			"restart.already": "这一次重启已经开始，不会再重启一次。",
 			"restart.confirm": "清洗已完成，重启后生效。",
 			"restart.confirm.desktop": "清洗已完成，重启桌面应用后生效。",
+			"restart.ask.title": "要现在重启吗",
+			"restart.ask.body": "已经写入。重启后才会在当前客户端里生效。",
+			"restart.now": "现在重启",
+			"restart.notNow": "稍后",
 			"restart.asarSwap": "补丁已写入磁盘。正在结束桌面进程并挪开 app.asar，完成后会自动重新打开；若仍无效，请先完全退出 Harness（托盘也关），再点一次应用。",
 			"surface.web": "Web",
 			"surface.desktop": "桌面端",
@@ -403,6 +405,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.63": "计划模式不再软拦执行",
 			"patch.64": "Stop hook 不再注入假用户话",
 			"patch.65": "UserPromptSubmit deny 不再整轮 reject",
+			"patch.66": "空的系统段不再把这一轮打成内部错误",
+			"patch.67": "缺 messages 时这一轮不中断",
+			"patch.68": "回退后缺 content 不中断",
+			"patch.69": "deepseek-flash 保持官方 in-history",
+			"patch.72": "Messages 的 system 用当前系统提示",
 			"status.unlocated": "未定位",
 			"status.na": "本端不需要",
 			"metric.unlocated": "还没定位到本机 Harness",
@@ -489,8 +496,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"own.save": "Save list",
 			"saved.own": "Own servers saved",
 			"saved.own.dropped": "Saved. {n} lines were not a single IP or hostname and were dropped",
-			"metric.purged": "Ready",
-			"metric.purged.skip": "Ready, {n} not needed here",
+			"metric.purged": "Written",
+			"metric.purged.skip": "Written. Skipped {n}; those files are not on this install",
+			"metric.pendingShort": "Pending {n}",
+			"metric.unmatchedShort": "No match {n}",
+			"metric.skipShort": "Skipped {n}",
 			"metric.unlocated.count": "—",
 			"metric.shim": "shim",
 			"metric.shim.na": "Not needed here",
@@ -501,6 +511,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.status": "Status",
 			"status.applied": "Applied",
 			"status.pending": "Pending",
+			"status.unmatched": "No match",
 			"status.skipped": "Skipped",
 			"apply.hint": "Apply writes the prompt in the box and the patches. A separate save is unnecessary. Pending = original text still present. Skipped = not needed for this version or the component is not installed.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; folder names like DeepseekHarnessDesktop or DeepSeek Harness are fine.",
@@ -620,8 +631,14 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restarting.desktop": "Restarting the desktop app…",
 			"restart.timeout": "Timed out; refresh",
 			"restart.fail": "Failed: {error}",
+			"restart.notStarted": "Restart did not start. This client is still open, and it will not try again by itself.",
+			"restart.already": "This restart already started. It will not restart again.",
 			"restart.confirm": "Apply finished. Restart to take effect.",
 			"restart.confirm.desktop": "Apply finished. Restart the desktop app to take effect.",
+			"restart.ask.title": "Restart now?",
+			"restart.ask.body": "It is written. It takes effect in this client after a restart.",
+			"restart.now": "Restart now",
+			"restart.notNow": "Later",
 			"restart.asarSwap": "Patches are on disk. Quitting the desktop app and moving app.asar aside; it will reopen when done. If behavior is unchanged, fully quit Harness (including tray) and Apply again.",
 			"surface.web": "Web",
 			"surface.desktop": "Desktop",
@@ -700,6 +717,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.63": "Plan mode no longer soft-blocks execution",
 			"patch.64": "Stop hook no longer steers fake user text",
 			"patch.65": "UserPromptSubmit deny no longer rejects turn",
+			"patch.66": "Empty system section no longer ends the turn as an internal error",
+			"patch.67": "A missing messages list no longer ends the turn",
+			"patch.68": "Missing content after rewind no longer ends the turn",
+			"patch.69": "deepseek-flash keeps the official in-history flag",
+			"patch.72": "Messages system field uses the current system prompt",
 			"status.na": "Not for this host",
 			"metric.sealed": "Official client found. Apply to unpack",
 			"metric.sealed.count": "Sealed",
@@ -814,6 +836,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-modal h4{margin:0 0 8px;font-family:var(--dshp-display);font-size:18px;font-weight:500}
 .dshp-modal p{margin:0 0 16px;font-size:13.5px;line-height:1.55}
 .dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
+.dshp-restart-mask{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62);font-family:"Yu Gothic UI","Hiragino Sans GB","Source Han Sans SC","Microsoft YaHei UI",system-ui,sans-serif}
+.dshp-restart-card{width:min(420px,100%);box-sizing:border-box;padding:22px 22px 18px;border-radius:14px;background:var(--dsw-alias-bg-layer-1,#fffcf7);color:var(--dsw-alias-label-primary,#16140f);border:1px solid var(--dsw-alias-border-l1,#c9c3b6);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.dshp-restart-card h4{margin:0 0 10px;font-family:inherit;font-size:20px;font-weight:650;line-height:1.35;color:inherit}
+.dshp-restart-card p{margin:0 0 18px;font-size:16px;font-weight:500;line-height:1.65;color:inherit}
+.dshp-restart-card .dshp-modal-ops{display:flex;justify-content:flex-end;gap:10px}
+.dshp-restart-card .dshp-btn{min-height:38px;padding:0 16px;font-size:15px;font-weight:650;color:var(--dsw-alias-label-primary,#16140f);background:var(--dsw-alias-bg-layer-2,#fff);border:1px solid var(--dsw-alias-border-l1,#c9c3b6)}
+.dshp-restart-card .dshp-btn-primary,.dshp-restart-card .dshp-btn-primary:hover:not(:disabled){color:#fff;background:#2f6b4f;border-color:#2f6b4f}
+body[data-ds-dark-theme] .dshp-restart-card,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card{background:#1c1e24;color:#f4f1ea;border-color:#5a5e68}
+body[data-ds-dark-theme] .dshp-restart-card .dshp-btn,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn{color:#f4f1ea;background:#2a2d34;border-color:#5a5e68}
+body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary,body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary:hover:not(:disabled),.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn-primary,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn-primary:hover:not(:disabled){color:#fff;background:#3d8f68;border-color:#3d8f68}
 .dshp-notice{font-size:12.5px;line-height:1.4}
 .dshp-notice.is-ok{color:var(--dshp-ok)}
 .dshp-notice.is-bad{color:var(--dshp-bad)}
@@ -949,6 +981,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 		function statusKind(st) {
 			if (st === "applied" || st === "already") return "ok";
 			if (st === "pending") return "wait";
+			if (st === "unmatched") return "bad";
 			if (st === "na") return "ok";
 			if (st === "missing_file" || st === "skipped" || st === "unlocated") return "miss";
 			return "bad";
@@ -957,16 +990,12 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 		function statusLabel(st, t) {
 			if (st === "applied" || st === "already") return t("status.applied");
 			if (st === "pending") return t("status.pending");
+			if (st === "unmatched") return t("status.unmatched");
 			if (st === "skipped") return t("status.skipped");
 			if (st === "missing_file") return t("skip");
 			if (st === "unlocated") return t("status.unlocated");
 			if (st === "na") return t("status.na");
 			return st || t("unknown");
-		}
-
-		function statusApplied(st) {
-			// 与后端 soft-ok 对齐：跳过 / 缺文件也算就绪，避免 48/63 这种假未完成。
-			return st === "applied" || st === "already" || st === "skipped" || st === "missing_file";
 		}
 
 		function shimKind(v) {
@@ -992,31 +1021,74 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			return h("span", { className: "dshp-pill is-" + statusKind(value) }, label || statusLabel(value, t));
 		}
 
+		const LAYER_GROUP = {
+			"提示词": "prompt",
+			"代码": "code",
+			"工具": "tools",
+			"0.1.5 兼容": "compat",
+			"0.2.0 兼容": "dsh20",
+		};
+		const GROUP_ORDER = ["prompt", "code", "tools", "compat", "dsh20"];
+
+		function patchRowsOf(state) {
+			if (!state || !state.ai_base) return [];
+			const fromList = Array.isArray(state.patches) ? state.patches : null;
+			const rows = fromList
+				? fromList.map((p) => ({
+					id: Number(p.id),
+					st: p.status || "missing_file",
+					layer: p.layer || "",
+				}))
+				: Object.keys(state.patch_status || {}).map((id) => ({
+					id: Number(id),
+					st: state.patch_status[id],
+					layer: "",
+				}));
+			return rows.filter((r) => r.st && r.st !== "na" && Number.isFinite(r.id));
+		}
+
+		function tallyPatches(rows) {
+			const out = { applied: 0, pending: 0, unmatched: 0, skipped: 0, total: 0 };
+			for (const row of rows || []) {
+				out.total += 1;
+				if (row.st === "applied" || row.st === "already") out.applied += 1;
+				else if (row.st === "pending") out.pending += 1;
+				else if (row.st === "unmatched") out.unmatched += 1;
+				else out.skipped += 1;
+			}
+			return out;
+		}
+
 		function PatchGroups({ state }) {
 			const t = useT();
 			const [open, setOpen] = useState({});
 			if (!state || !state.patch_status) return h("div", { className: "dshp-skel", style: { height: 120 } });
 			const located = !!state.ai_base;
 			if (!located) return null;
-			return PATCH_GROUPS.map((group) => {
-				const rows = group.ids.map((id) => {
-					const raw = located
-						? (state.patch_status[id] || state.patch_status[String(id)] || "missing_file")
-						: "unlocated";
-					return { id, st: raw, label: t("patch." + id) };
-				}).filter((r) => r.st !== "na");
+			const grouped = new Map();
+			for (const row of patchRowsOf(state)) {
+				const key = LAYER_GROUP[row.layer] || "code";
+				if (!grouped.has(key)) grouped.set(key, []);
+				grouped.get(key).push(row);
+			}
+			return GROUP_ORDER.filter((key) => grouped.has(key)).map((key) => {
+				const rows = grouped.get(key).slice().sort((a, b) => a.id - b.id);
 				if (!rows.length) return null;
-				const done = rows.filter((r) => statusApplied(r.st)).length;
-				const expanded = !!open[group.key];
-				return h("div", { key: group.key, className: "dshp-group" },
+				const tally = tallyPatches(rows);
+				const notes = [];
+				if (tally.pending) notes.push(t("metric.pendingShort", { n: tally.pending }));
+				if (tally.unmatched) notes.push(t("metric.unmatchedShort", { n: tally.unmatched }));
+				if (tally.skipped) notes.push(t("metric.skipShort", { n: tally.skipped }));
+				const expanded = !!open[key];
+				return h("div", { key: key, className: "dshp-group" },
 					h("button", {
 						type: "button",
 						className: "dshp-group-h",
 						"aria-expanded": expanded ? "true" : "false",
-						onClick: () => setOpen((prev) => Object.assign({}, prev, { [group.key]: !prev[group.key] })),
+						onClick: () => setOpen((prev) => Object.assign({}, prev, { [key]: !prev[key] })),
 					},
-						h("strong", null, t("group." + group.key)),
-						h("span", { className: "dshp-count" }, done + "/" + rows.length),
+						h("strong", null, t("group." + key)),
+						h("span", { className: "dshp-count" }, tally.applied + "/" + tally.total + (notes.length ? " · " + notes.join(" · ") : "")),
 					),
 					expanded ? h("table", { className: "dshp-table" },
 						h("thead", null, h("tr", null,
@@ -1026,7 +1098,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						)),
 						h("tbody", null, rows.map((r) => h("tr", { key: r.id },
 							h("td", { className: "dshp-id" }, "#" + r.id),
-							h("td", null, r.label),
+							h("td", null, t("patch." + r.id)),
 							h("td", null, h(Pill, { value: r.st })),
 						))),
 					) : null,
@@ -1134,6 +1206,33 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					),
 				),
 			);
+		}
+
+		function RestartAsk(props) {
+			const node = h("div", {
+				className: "dshp-restart-mask",
+				"data-theme": props.theme === "dusk" ? "dusk" : "white",
+				role: "dialog",
+				"aria-modal": "true",
+				"aria-labelledby": "dshp-restart-title",
+				onClick: (e) => { if (e.target === e.currentTarget && props.onLater) props.onLater(); },
+			},
+				h("div", { className: "dshp-restart-card" },
+					h("h4", { id: "dshp-restart-title" }, props.t("restart.ask.title")),
+					h("p", null, props.t("restart.ask.body")),
+					h("div", { className: "dshp-modal-ops" },
+						h(Btn, { onClick: props.onLater }, props.t("restart.notNow")),
+						h(Btn, { kind: "primary", onClick: props.onRestart }, props.t("restart.now")),
+					),
+				),
+			);
+			try {
+				const rd = require("react-dom");
+				if (rd && typeof rd.createPortal === "function" && typeof document !== "undefined" && document.body) {
+					return rd.createPortal(node, document.body);
+				}
+			} catch { /* host 可能没暴露 react-dom */ }
+			return node;
 		}
 
 		function PurgifySection() {
@@ -1357,7 +1456,11 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					.catch(() => {});
 			}, []);
 
-			useEffect(() => { loadAll(); }, [loadAll]);
+			useEffect(() => {
+				loadAll();
+				const timer = setTimeout(() => { loadAll(); }, 5000);
+				return () => clearTimeout(timer);
+			}, [loadAll]);
 
 			const rejectNeedPrompt = useCallback((tr) => {
 				setAskRestart(false);
@@ -1424,29 +1527,13 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 									text: tr("restart.incomplete", { detail: parts.join("；") }),
 								});
 								loadAll();
+								setAskRestart(true);
 								return;
 							}
-							if (action === "apply" && d.asar_swap_started) {
-								setNotice({ kind: "ok", text: tr("restart.asarSwap") });
+							if (action === "apply") {
+								setNotice({ kind: "ok", text: tr("ok.done") });
 								loadAll();
-								return;
-							}
-							if (action === "apply" && (d.restart_after_apply || d.restarting)) {
-								setNotice({
-									kind: "ok",
-									text: d.asar_still_sealed ? tr("restart.asarSwap") : tr("update.restarting"),
-								});
-								loadAll();
-								const surf = hostSurfaceOf(state) || clientGuessSurface() || "web";
-								restartDsh(setNotice, setPatchBusy, tr, surf);
-								return;
-							}
-							if (action === "apply" && (d.needs_full_quit || d.unpacked_asar)) {
-								setNotice({
-									kind: "ok",
-									text: d.asar_still_sealed ? tr("restart.asarSwap") : tr("ok.done"),
-								});
-								loadAll();
+								setAskRestart(true);
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
@@ -1571,13 +1658,14 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const desktopLikely = hostSurface === "desktop" || clientGuessSurface() === "desktop";
 			const sealedReady = !located && desktopLikely && !!(s && (s.asar_still_sealed || s.desktop_exe || s.desktop_install));
 			const patchesLost = !located && !!(s && s.patches_lost);
-			const total = s && s.patches_total ? s.patches_total : 0;
-			const ready = s && typeof s.patches_ready === "number"
-				? s.patches_ready
-				: (s && typeof s.patches_applied === "number" ? s.patches_applied : 0);
-			const applied = ready;
-			const skipped = located && s && typeof s.patches_skipped === "number" ? s.patches_skipped : 0;
-			const pct = located && total ? Math.round((ready / total) * 100) : 0;
+			const tally = located ? tallyPatches(patchRowsOf(s)) : { applied: 0, pending: 0, unmatched: 0, skipped: 0, total: 0 };
+			const total = tally.total;
+			const applied = tally.applied;
+			const pct = located && total ? Math.round((applied / total) * 100) : 0;
+			const metricNotes = [];
+			if (tally.pending) metricNotes.push(t("metric.pendingShort", { n: tally.pending }));
+			if (tally.unmatched) metricNotes.push(t("metric.unmatchedShort", { n: tally.unmatched }));
+			if (tally.skipped) metricNotes.push(t("metric.skipShort", { n: tally.skipped }));
 
 			const versions = (updateInfo && updateInfo.versions) || [];
 			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
@@ -1660,8 +1748,8 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
-						h("b", null, located ? (ready + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
-						h("span", null, !located ? (patchesLost ? t("metric.lost") : (sealedReady ? t("metric.sealed") : t("metric.unlocated"))) : (skipped > 0 ? t("metric.purged.skip", { n: skipped }) : t("metric.purged"))),
+						h("b", null, located ? (applied + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
+						h("span", null, !located ? (patchesLost ? t("metric.lost") : (sealedReady ? t("metric.sealed") : t("metric.unlocated"))) : (metricNotes.length ? metricNotes.join(" · ") : t("metric.purged"))),
 					),
 					h("div", { className: "dshp-metric" },
 						h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },
@@ -1729,18 +1817,15 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
 				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
 				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
-				askRestart ? h("div", { className: "dshp-ask" },
-					h("span", null, hostText(t, "restart.confirm", hostSurface)),
-					h(Btn, { tiny: true, onClick: () => setAskRestart(false) }, t("restart.later")),
-					h(Btn, {
-						tiny: true,
-						kind: "primary",
-						onClick: () => {
-							setAskRestart(false);
-							restartDsh(setNotice, function () {}, t, hostSurface);
-						},
-					}, t("btn.restart")),
-				) : null,
+				askRestart ? h(RestartAsk, {
+					t: t,
+					theme: detectHostTheme(),
+					onLater: () => setAskRestart(false),
+					onRestart: () => {
+						setAskRestart(false);
+						restartDsh(setNotice, function () {}, t, hostSurface);
+					},
+				}) : null,
 				// h(ContinueRetrySection, null),
 				h("div", { className: "dshp-sub" },
 					h("h4", null, t("override.title")),
@@ -2070,8 +2155,13 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const pinned = pin ? (list || []).find((item) => item.ref === pin) : null;
 			if (pinned) return pinned;
 			const ver = String(localVer || "").replace(/^v/i, "");
+			const same = (list || []).filter((item) => ver && String(item.version || "").replace(/^v/i, "") === ver);
+			if (same.length) {
+				return same.find((item) => item.current)
+					|| same.find((item) => item.latest)
+					|| same[0];
+			}
 			return (list || []).find((item) => item.current)
-				|| (list || []).find((item) => ver && String(item.version || "").replace(/^v/i, "") === ver)
 				|| (list || []).find((item) => item.latest)
 				|| (list || [])[0]
 				|| null;
@@ -2410,33 +2500,59 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			setTimeout(ping, 800);
 		}
 
+		let restartOnce = false;
+
 		function restartDsh(setNotice, setBusy, t, surface) {
-			const surf = surface || clientGuessSurface() || "web";
+			if (restartOnce) return;
+			const surf = surface || clientGuessSurface() || "desktop";
+			const desktop = surf === "desktop" || clientGuessSurface() === "desktop";
+			restartOnce = true;
 			setBusy(true);
 			setNotice({ kind: "ok", text: hostText(t, "restarting", surf) });
+			const stop = (error) => {
+				restartOnce = false;
+				setNotice({ kind: "error", text: error ? t("restart.fail", { error }) : t("restart.notStarted") });
+				setBusy(false);
+			};
+			let sawDrop = false;
+			const watch = setTimeout(() => {
+				if (sawDrop) return;
+				stop("");
+			}, 25000);
 			fetch("/dsh-purge/restart", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
 				.then((r) => r.json())
 				.then((d) => {
 					if (!d.ok) throw new Error(d.error || "restart failed");
 					const next = (d && d.surface) || surf;
-					if ((next === "desktop" || d.fullApp) && d.restarting === false) {
-						setNotice({ kind: "error", text: t("restart.fail", { error: d.error || "not started" }) });
+					const full = next === "desktop" || (d && d.fullApp) || desktop;
+					if (full && d.already) {
+						clearTimeout(watch);
+						restartOnce = false;
+						setNotice({ kind: "ok", text: t("restart.already") });
 						setBusy(false);
 						return;
 					}
+					if (full && d.restarting === false) {
+						clearTimeout(watch);
+						stop(d.error || "not started");
+						return;
+					}
 					setNotice({ kind: "ok", text: hostText(t, "restarting", next) });
-					// 桌面端整应用会退出重开。先刷新内嵌 web 会单独重启 Host。
-					if (next === "desktop" || (d && d.fullApp) || clientGuessSurface() === "desktop") return;
+					if (full) return;
+					clearTimeout(watch);
+					restartOnce = false;
 					waitForRestart(setNotice, setBusy, t);
 				})
 				.catch((e) => {
-					if (surf === "desktop" || clientGuessSurface() === "desktop") return;
-					if (String(e.message || e).includes("Failed to fetch") || e.name === "TypeError") {
-						waitForRestart(setNotice, setBusy, t);
+					const msg = String((e && e.message) || e || "");
+					const dropped = /failed to fetch|networkerror|load failed/i.test(msg) || e.name === "TypeError";
+					if (dropped && desktop) {
+						sawDrop = true;
+						clearTimeout(watch);
 						return;
 					}
-					setNotice({ kind: "error", text: t("restart.fail", { error: e.message }) });
-					setBusy(false);
+					clearTimeout(watch);
+					stop(msg || "restart failed");
 				});
 		}
 
@@ -3156,7 +3272,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
        这里放占位符，由 bundle 的 build.mjs 在生成 lib/client.js 时替换成正文。 */
     const CSS = `
 :root{--rt-dock-w:620px}
-/* 右侧栏收起时给 frame 加内边距，中栏主动收窄。属性名跨 DSH 版本兼容：\n   旧版 details 栏 data-details-collapsed，新版 rightbar 栏 data-rightbar-collapsed。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-details-collapsed],\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-rightbar-collapsed]{padding-right:var(--rt-dock-w)}
+/* 右侧栏收起时给 frame 加内边距，中栏主动收窄。属性名跨 DSH 版本兼容：\n   旧版 details 栏 data-details-collapsed，新版 rightbar 栏 data-rightbar-collapsed。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-details-collapsed],\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-rightbar-collapsed]{padding-right:var(--rt-dock-w)}
 .rt-dock{position:absolute;top:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;
   background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 52%,transparent);
   backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
@@ -3164,7 +3280,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
   box-shadow:-12px 0 32px color-mix(in srgb,#000 22%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary);
   font-size:13px;line-height:1.5;transition:transform .18s ease,opacity .18s ease}
 .rt-dock.rt-embedded{position:relative;background:transparent!important;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
-/* 右侧栏打开（或新版全屏）时让位：滑出隐藏。必须同时否定两个属性名——\n   旧写法只用 :not([data-details-collapsed])，在新 shell 里该属性不存在会导致条件恒真、面板永远打不开。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]):not([data-details-collapsed]):not([data-rightbar-collapsed]) .rt-dock,\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"])[data-rightbar-fullscreen] .rt-dock{
+/* 右侧栏打开（或新版全屏）时让位：滑出隐藏。必须同时否定两个属性名——\n   旧写法只用 :not([data-details-collapsed])，在新 shell 里该属性不存在会导致条件恒真、面板永远打不开。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded)):not([data-details-collapsed]):not([data-rightbar-collapsed]) .rt-dock,\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-rightbar-fullscreen] .rt-dock{
   transform:translateX(100%);opacity:0;pointer-events:none}
 .rt-grip{position:absolute;left:-3px;top:0;bottom:0;width:6px;cursor:col-resize;background:transparent;z-index:2}
 .rt-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--dsw-alias-border-l1)}
@@ -7277,23 +7393,24 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 		syncDrillGrant();
 
-		const DOCK_GEOM_KEY = "dsh-purge-dock-geom-v2";
+		const DOCK_GEOM_KEY = "dsh-purge-dock-geom-v4";
+		/* 默认停在右上，底边留在输入框上面。拖动之后停在用户松开的位置，只保证不拖出窗口。 */
+		const DOCK_COMPOSER_CLEAR = 172;
 		function defaultDockGeom() {
-			/* 默认贴右侧，像侧边栏：靠右、顶边留标题栏、高度铺满可视区 */
-			const w = 620;
 			const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
 			const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+			const w = Math.min(620, Math.max(380, vw - 16));
 			const y = 48;
-			const h = Math.max(360, vh - y - 12);
+			const h = Math.max(240, Math.min(640, vh - y - DOCK_COMPOSER_CLEAR));
 			return { x: Math.max(8, vw - w - 8), y: y, w: w, h: h };
 		}
 		function clampDockGeom(g) {
 			const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
 			const vh = typeof window !== "undefined" ? window.innerHeight : 800;
 			const w = Math.min(Math.max(380, Number(g && g.w) || 620), Math.max(380, vw - 16));
-			const h = Math.min(Math.max(320, Number(g && g.h) || 520), Math.max(320, vh - 16));
-			const x = Math.min(Math.max(8, Number(g && g.x) || 8), Math.max(8, vw - 64));
-			const y = Math.min(Math.max(8, Number(g && g.y) || 8), Math.max(8, vh - 64));
+			const h = Math.min(Math.max(240, Number(g && g.h) || 520), Math.max(240, vh - 16));
+			const x = Math.min(Math.max(8, Number(g && g.x) || 8), Math.max(8, vw - w - 8));
+			const y = Math.min(Math.max(8, Number(g && g.y) || 8), Math.max(8, vh - Math.min(h, vh - 16) - 8));
 			return { x: x, y: y, w: w, h: h };
 		}
 		function loadDockGeom() {
@@ -7797,21 +7914,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				try { if (__dshPurgeDrill && __dshPurgeDrill.setDockWidth) __dshPurgeDrill.setDockWidth(geom.w); } catch { /* ignore */ }
 			}, [geom]);
 			useEffect(() => {
-				const onResize = () => setGeom((g) => {
-					const vw = window.innerWidth;
-					const vh = window.innerHeight;
-					const nearRight = (g.x + g.w) >= (vw - 28);
-					const tall = g.y <= 64 && g.h >= Math.min(vh * 0.55, vh - 80);
-					let next = { x: g.x, y: g.y, w: g.w, h: g.h };
-					if (nearRight) next.x = Math.max(8, vw - g.w - 8);
-					if (tall) {
-						next.y = 48;
-						next.h = Math.max(360, vh - next.y - 12);
-					} else if ((g.y + g.h) > vh - 8) {
-						next.h = Math.max(320, vh - g.y - 12);
-					}
-					return clampDockGeom(next);
-				});
+				const onResize = () => setGeom((g) => clampDockGeom(g));
 				window.addEventListener("resize", onResize);
 				return () => window.removeEventListener("resize", onResize);
 			}, []);
