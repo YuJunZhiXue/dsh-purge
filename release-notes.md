@@ -1,3 +1,19 @@
+# 1.1.58
+
+## 中文
+
+- 版本升级到 1.1.58。
+- 打开、应用、重启都会挂上提示词。磁盘上有正文就用磁盘，没有就用规则集，再没有就用内置默认，不用再点保存。
+- 启动不再在页面发出之后改写前端 client.js，避免输入框因模块版本号对不上而消失（#63）。
+- macOS / Linux 已解包桌面端点应用后会退出并重新打开；清洗标记两种写法都认（#64）。
+
+## English
+
+- Version 1.1.58.
+- Open, Apply, and restart all hang the prompt. A saved file wins, then the active rule set, then the built-in default. Save is not required.
+- Startup no longer rewrites frontend client.js after the page has taken a module revision, so the composer does not disappear (#63).
+- Unpacked macOS and Linux desktop builds quit and relaunch after Apply. Both inject markers count as clean (#64).
+
 # 1.1.57
 
 ## 中文

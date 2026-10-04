@@ -1527,16 +1527,13 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 									text: tr("restart.incomplete", { detail: parts.join("；") }),
 								});
 								loadAll();
-								return;
-							}
-							if (action === "apply" && (d.restarting || d.restart_after_apply)) {
-								loadAll();
-								restartDsh(setNotice, function () {}, tr, hostSurfaceOf(state));
+								setAskRestart(true);
 								return;
 							}
 							if (action === "apply") {
 								setNotice({ kind: "ok", text: tr("ok.done") });
 								loadAll();
+								setAskRestart(true);
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
