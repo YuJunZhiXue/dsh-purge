@@ -1,3 +1,21 @@
+# 1.1.57
+
+## 中文
+
+- 版本升级到 1.1.57。
+- 应用并重启后，设置框里的提示词直接挂到系统段；框空则用当前规则集。两者都空就停下来要求输入。
+- 创造、PTC、极简、unrestricted、梁神与标准模式一样清掉拦截和禁止，并保住各自的工具流程。
+- 演练授权按本机目录保存，更新后不用重授权；卸载成功后才清掉。空的环境初始化不再当成已配置。
+- 官方 Messages 请求的 system 字段改用当前系统提示，不再钉住第一条。
+
+## English
+
+- Version 1.1.57.
+- After Apply and restart, the settings-box prompt is hung on the system section. An empty box uses the active rule set. If both are empty, Apply stops and asks for a prompt.
+- Cordis, PTC, minimal, unrestricted, and Liangshen clear intercepts and bans the same way standard does, and keep their own tools.
+- Drill authorization is stored in this install and survives updates. It is cleared only after uninstall succeeds. An empty environment init is no longer treated as configured.
+- The official Messages request system field uses the current system prompt instead of the first snapshot.
+
 # 1.1.56
 
 ## 中文
