@@ -1,3 +1,19 @@
+# 1.1.59
+
+## 中文
+
+- 版本升级到 1.1.59。
+- 点应用后不再因为宿主路径或旧标记对不上，就报「清洗没有写进当前宿主」（#65）。
+- `resources\app\node_modules` 和 `resources\app\dsh\node_modules` 都认。原文里已经没有官方身份句、也没有丢掉注入的写法时，不再要求那两条标记。
+- complete 段补丁同时认 tab 和空格。
+
+## English
+
+- Version 1.1.59.
+- Apply no longer reports that the clean missed the current host just because the package path or the old markers do not match (#65).
+- Both `resources/app/node_modules` and `resources/app/dsh/node_modules` count. If the official identity sentence and the inject-dropping return are already gone, those two markers are not required.
+- The complete-prompt patch matches both tab and space indentation.
+
 # 1.1.58
 
 ## 中文
