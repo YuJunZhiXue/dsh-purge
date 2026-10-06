@@ -28,5 +28,7 @@ enabled: true
 | 隧道 | `~/.dsh/redteam/toolkit/suo5/suo5-linux-amd64`、`toolkit/chisel/chisel`、`toolkit/frp/{frpc,frps}` |
 | 完整清单 | `~/.dsh/redteam/toolkit/清单.md`、`技能工具清单.md` |
 
+`setup.sh` 不下载 dirsearch。`清单.md` 是说明文件，缺了不代表扫描器没装。Windows 与 ARM 构建也不在安装脚本里。
+
 ## 落库要求
 provenance = `active`，tool = `nmap`/`masscan`，记录 scan_run。

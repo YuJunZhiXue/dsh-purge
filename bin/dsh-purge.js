@@ -67,7 +67,7 @@ async function main() {
     const { made, errors } = await core.backupAll(state.ai_base);
     for (const b of made) console.log(`  ✓ 备份 / backup → ${b}`);
     for (const [p, e] of errors) console.log(`  ⚠ 备份失败 ${p}: ${e}`);
-    const report = await core.applyPatches(state.ai_base, core.ALL_PATCHES, { preserveClientBundles: true });
+    const report = await core.applyPatches(state.ai_base, core.ALL_PATCHES, { preserveClientBundles: false });
     for (const r of report) {
       const m = r.status === "applied" ? "✓ 已清洗" : r.status === "already" ? "- 已是最新" : r.status === "missing_file" ? "⚠ 文件缺失" : `✗ ${r.status}`;
       console.log(`  ${m} patch #${String(r.patch_id).padEnd(2)} ${r.name}`);

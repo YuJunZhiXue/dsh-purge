@@ -88,20 +88,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			return true;
 		}
 
-		function activeRuleHasBody(st) {
-			if (!st || !st.ok) return false;
-			const active = st.rules && st.rules.find((r) => r.id === st.active);
-			return Boolean(active && active.size > 0);
-		}
-
 		async function bothInjectEmpty(overrideText, defaultText) {
 			if (!promptBoxEmpty(overrideText)) return false;
 			if (!promptBoxEmpty(defaultText)) return false;
-			try {
-				return !activeRuleHasBody(await rulesApi("status"));
-			} catch {
-				return true;
-			}
+			return true;
 		}
 
 		function rulesApi(op, extra) {
@@ -423,9 +413,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.empty": "没有可回退的上一句",
 			"rewind.fail": "回退失败: {error}",
 			"rewind.once": "回退一次",
-			"rewind.once.hint": "把上一句放回输入框，并清掉已经发出去的内容",
+			"rewind.once.hint": "把这一轮发出去的那句放回输入框，并清掉这一轮",
 			"rewind.round": "回退上一轮",
-			"rewind.round.hint": "把上一轮放回输入框，并清掉已经发出去的内容",
+			"rewind.round.hint": "把这一轮发出去的那句放回输入框；子代理也只撤这一轮",
 			"continue.title": "失败重试 / 继续",
 			"continue.hint": "请求失败会自动重试；异常停止或中断可点「继续」或自动续跑。自己点停止不会自动继续。次数用完后需新开一轮。",
 			"continue.autoRetry": "失败自动重试",
@@ -735,9 +725,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.empty": "Nothing to undo",
 			"rewind.fail": "Undo failed: {error}",
 			"rewind.once": "Undo once",
-			"rewind.once.hint": "Put the last line back in the box and drop what was already sent",
+			"rewind.once.hint": "Put this round's message back in the box and drop only this round",
 			"rewind.round": "Undo last round",
-			"rewind.round.hint": "Put the last round back in the box and drop what was already sent",
+			"rewind.round.hint": "Put this round's message back in the box; subagents drop only this round",
 			"continue.title": "Retry / Continue",
 			"continue.hint": "Failed requests auto-retry. After an abnormal stop or interrupt, use Continue or auto-resume. A manual stop never auto-continues. Counts reset after a completed turn.",
 			"continue.autoRetry": "Auto-retry on failure",
@@ -873,7 +863,7 @@ body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary,body[data-ds-dark-
 @media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
 @media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
 
-.dshp-dock{position:fixed;z-index:10050;display:flex;flex-direction:column;width:var(--dshp-dock-w,620px);height:var(--dshp-dock-h,72vh);min-width:380px;min-height:320px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);box-sizing:border-box;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,var(--dshp-paper,#1c1c1c)) 52%,transparent);backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 65%,transparent);border-radius:12px;box-shadow:0 18px 48px color-mix(in srgb,#000 30%,transparent),0 0 0 1px color-mix(in srgb,#fff 6%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));overflow:visible}
+.dshp-dock{position:fixed;top:12px;right:12px;z-index:10050;display:flex;flex-direction:column;width:var(--dshp-dock-w,620px);height:var(--dshp-dock-h,72vh);min-width:380px;min-height:320px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);box-sizing:border-box;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,var(--dshp-paper,#1c1c1c)) 52%,transparent);backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 65%,transparent);border-radius:12px;box-shadow:0 18px 48px color-mix(in srgb,#000 30%,transparent),0 0 0 1px color-mix(in srgb,#fff 6%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));overflow:visible}
 .dshp-dock[data-open="0"]{display:none}
 .dshp-dock-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 55%,transparent);background:transparent;cursor:grab;user-select:none;touch-action:none;color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));border-radius:12px 12px 0 0}
 .dshp-dock-head:active{cursor:grabbing}
@@ -1250,7 +1240,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
 			const [updateJob, setUpdateJob] = useState(null);
 			const [askRestart, setAskRestart] = useState(false);
-			const [askOfficialRestart, setAskOfficialRestart] = useState(false);
+			const suppressRestartAsk = useRef(false);
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
@@ -1261,6 +1251,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const actionTicket = useRef(0);
 			const overrideRef = useRef("");
 			const defaultOverrideRef = useRef("");
+			const promptSeededRef = useRef(false);
 			const promptAreaRef = useRef(null);
 			overrideRef.current = override;
 			defaultOverrideRef.current = defaultOverride;
@@ -1342,7 +1333,8 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
 						applyUpdateInfo(d, tr, kind);
 						if (d.needsFullQuit) {
-							setAskOfficialRestart(true);
+							suppressRestartAsk.current = false;
+							setAskRestart(true);
 							setUpdateNotice({ kind: "ok", text: tr("restart.official.body") });
 							return d;
 						}
@@ -1417,7 +1409,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 							setState(d);
 							if (d.channel) setChannel(d.channel);
 							if (d.update && d.update.ok && !d.update.error) setUpdateInfo(d.update);
-							setAskOfficialRestart(Boolean(d.boot_full_quit));
+							if (d.boot_full_quit && !suppressRestartAsk.current) setAskRestart(true);
 						} else {
 							setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 							setNotice({ kind: "error", text: tr("err.status", { error: (d && d.error) || "bad response" }) });
@@ -1439,8 +1431,12 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					.then((d) => {
 						if (d && d.ok) {
 							const packed = typeof d.defaultContent === "string" ? d.defaultContent : "";
+							const shown = typeof d.content === "string" ? d.content : packed;
 							if (packed) setDefaultOverride(packed);
-							setOverride(typeof d.content === "string" ? d.content : packed);
+							if (!promptSeededRef.current) {
+								promptSeededRef.current = true;
+								setOverride(shown || packed);
+							}
 							setOverrideLoaded(true);
 						}
 						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
@@ -1527,13 +1523,21 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 									text: tr("restart.incomplete", { detail: parts.join("；") }),
 								});
 								loadAll();
-								setAskRestart(true);
+								if (d.restarting || d.needs_full_quit) {
+									suppressRestartAsk.current = false;
+									setAskRestart(true);
+								}
 								return;
 							}
 							if (action === "apply") {
 								setNotice({ kind: "ok", text: tr("ok.done") });
 								loadAll();
-								setAskRestart(true);
+								if (d.restarting || d.needs_full_quit) {
+									suppressRestartAsk.current = false;
+									setAskRestart(true);
+								} else {
+									setAskRestart(false);
+								}
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
@@ -1566,7 +1570,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						.then((r) => r.json())
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
-							if (!d.ok || responseNeedsPrompt(d) || (promptBoxEmpty(overrideRef.current) && d.injectSource !== "rule")) {
+							if (!d.ok || responseNeedsPrompt(d)) {
 								rejectNeedPrompt(tr);
 								return;
 							}
@@ -1794,34 +1798,18 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						),
 					),
 				) : null,
-				askOfficialRestart ? h("div", {
-					className: "dshp-modal-bg",
-					role: "dialog",
-					"aria-modal": "true",
-					"aria-labelledby": "dshp-official-restart-title",
-				},
-					h("div", { className: "dshp-modal" },
-						h("h4", { id: "dshp-official-restart-title" }, t("restart.official.title")),
-						h("p", null, t("restart.official.body")),
-						h("div", { className: "dshp-modal-ops" },
-							h(Btn, {
-								kind: "primary",
-								onClick: () => {
-									setAskOfficialRestart(false);
-									restartDsh(setNotice, function () {}, t, hostSurface);
-								},
-							}, t("btn.restart")),
-						),
-					),
-				) : null,
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
 				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
 				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
 				askRestart ? h(RestartAsk, {
 					t: t,
 					theme: detectHostTheme(),
-					onLater: () => setAskRestart(false),
+					onLater: () => {
+						suppressRestartAsk.current = true;
+						setAskRestart(false);
+					},
 					onRestart: () => {
+						suppressRestartAsk.current = true;
 						setAskRestart(false);
 						restartDsh(setNotice, function () {}, t, hostSurface);
 					},
@@ -2526,10 +2514,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					const next = (d && d.surface) || surf;
 					const full = next === "desktop" || (d && d.fullApp) || desktop;
 					if (full && d.already) {
-						clearTimeout(watch);
-						restartOnce = false;
-						setNotice({ kind: "ok", text: t("restart.already") });
-						setBusy(false);
+						setNotice({ kind: "ok", text: hostText(t, "restarting", next) });
 						return;
 					}
 					if (full && d.restarting === false) {
@@ -3026,7 +3011,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					onClick: (e) => { e.preventDefault(); e.stopPropagation(); runRewind("once"); },
 				},
 					h("b", null, rewindText(t, "rewind.once", "回退一次")),
-					h("span", null, rewindText(t, "rewind.once.hint", "把上一句放回输入框，并清掉已经发出去的内容")),
+					h("span", null, rewindText(t, "rewind.once.hint", "把这一轮发出去的那句放回输入框，并清掉这一轮")),
 				),
 				h("button", {
 					type: "button",
@@ -3035,7 +3020,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					onClick: (e) => { e.preventDefault(); e.stopPropagation(); runRewind("round"); },
 				},
 					h("b", null, rewindText(t, "rewind.round", "回退上一轮")),
-					h("span", null, rewindText(t, "rewind.round.hint", "把上一轮放回输入框，并清掉已经发出去的内容")),
+					h("span", null, rewindText(t, "rewind.round.hint", "把这一轮发出去的那句放回输入框；子代理也只撤这一轮")),
 				),
 			);
 			try {
@@ -3261,28 +3246,23 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
     const h = React.createElement
 
     /*
-     * 布局接缝：AppFrame 是 display:grid（sidebar | 1fr | details），
-     * shell.overlay 是它内部 position:absolute;inset:0 的浮动层，带稳定属性
-     * data-shell-overlay。面板打开且详情栏关闭时，用 :has() 给 frame 加
-     * padding-right，让中栏（1fr）主动收窄 —— 面板常驻但不遮挡对话。
-     * 右侧栏打开时 frame 失去对应 collapsed 属性，面板滑出隐藏、宽度让回右侧栏。
-     * 注意属性名随 DSH 版本变化，这里同时兼容旧 data-details-collapsed 与新 data-rightbar-collapsed。
+     * 演练台自己是一块浮动窗：position:fixed，用 left/top/width/height 放。
+     * 不给官方 frame 加 padding，不改官方输入框的宽度。嵌在清洗面板里时走 .rt-embedded。
      */
-    /* 样式表在 ./styles.js（唯一维护点）。浏览器半侧不能运行期 import，
-       这里放占位符，由 bundle 的 build.mjs 在生成 lib/client.js 时替换成正文。 */
     const CSS = `
-:root{--rt-dock-w:620px}
-/* 右侧栏收起时给 frame 加内边距，中栏主动收窄。属性名跨 DSH 版本兼容：\n   旧版 details 栏 data-details-collapsed，新版 rightbar 栏 data-rightbar-collapsed。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-details-collapsed],\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-rightbar-collapsed]{padding-right:var(--rt-dock-w)}
-.rt-dock{position:absolute;top:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;
+.rt-dock{position:fixed;top:12px;right:12px;z-index:20;display:flex;flex-direction:column;box-sizing:border-box;
   background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 52%,transparent);
   backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
-  border-left:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,#444) 70%,transparent);
-  box-shadow:-12px 0 32px color-mix(in srgb,#000 22%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary);
-  font-size:13px;line-height:1.5;transition:transform .18s ease,opacity .18s ease}
-.rt-dock.rt-embedded{position:relative;background:transparent!important;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
-/* 右侧栏打开（或新版全屏）时让位：滑出隐藏。必须同时否定两个属性名——\n   旧写法只用 :not([data-details-collapsed])，在新 shell 里该属性不存在会导致条件恒真、面板永远打不开。 */\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded)):not([data-details-collapsed]):not([data-rightbar-collapsed]) .rt-dock,\ndiv:has(> [data-shell-overlay] .rt-dock[data-open="1"]:not(.rt-embedded))[data-rightbar-fullscreen] .rt-dock{
-  transform:translateX(100%);opacity:0;pointer-events:none}
-.rt-grip{position:absolute;left:-3px;top:0;bottom:0;width:6px;cursor:col-resize;background:transparent;z-index:2}
+  border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,#444) 70%,transparent);
+  border-radius:12px;
+  box-shadow:0 18px 48px color-mix(in srgb,#000 28%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary);
+  font-size:13px;line-height:1.5}
+.rt-dock.rt-embedded{position:relative;inset:auto;width:100%;height:100%;max-width:none;border:0;border-radius:0;box-shadow:none;background:transparent!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.rt-grip,.rt-resize-r,.rt-resize-b,.rt-resize-c{position:absolute;z-index:3;touch-action:none}
+.rt-grip{left:-3px;top:0;bottom:0;width:8px;cursor:ew-resize;background:transparent}
+.rt-resize-r{right:-3px;top:0;bottom:14px;width:8px;cursor:ew-resize}
+.rt-resize-b{left:8px;right:14px;bottom:-3px;height:8px;cursor:ns-resize}
+.rt-resize-c{right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize}
 .rt-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--dsw-alias-border-l1)}
 .rt-title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .rt-dot{width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-brand-primary)}
@@ -3812,11 +3792,9 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         try { f(snap) } catch { /* ignore subscriber errors */ }
       }
     }
-    /* 面板宽度 → :root 自定义属性（frame 的 padding-right 依赖它） */
+    /* 保留导出。面板尺寸只写在自己的元素上，不再改官方 frame 的宽度。 */
     let dockWidthTag = null
-    const setDockWidth = (px) => {
-      if (dockWidthTag) dockWidthTag.textContent = ':root{--rt-dock-w:' + px + 'px}'
-    }
+    const setDockWidth = () => {}
     const useUI = () => {
       const [st, setSt] = React.useState(() => Object.assign({}, ui))
       React.useEffect(() => {
@@ -4502,11 +4480,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       }
       React.useEffect(load, [refreshKey])
 
-      const open = (name) => {
-        if (active === name) { setActive(null); setDetail(null); return }
-        setActive(name)
+      const open = (skill) => {
+        const name = skill && skill.name
+        const key = (skill && skill.library ? skill.library : 'redteam') + ':' + name
+        if (active === key) { setActive(null); setDetail(null); return }
+        setActive(key)
         setDetail(null)
-        api({ op: 'skillRead', name: name }).then((r) => {
+        api({ op: 'skillRead', name: name, library: skill.library || 'redteam' }).then((r) => {
           if (r && r.ok) setDetail(r)
           else setErr((r && r.error) || '读取失败')
         }, (e) => setErr(String((e && e.message) || e)))
@@ -4516,36 +4496,48 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       let filtered = needle
         ? items.filter((s) => (s.name + ' ' + s.description + ' ' + s.whenToUse).toLowerCase().indexOf(needle) >= 0)
         : items
-      if (srcOnly) filtered = filtered.filter((s) => s.fromPlugin === true)
-      if (brokenOnly) filtered = filtered.filter((s) => s.availability === 'broken' || s.availability === 'unknown')
+      if (srcOnly) filtered = filtered.filter((s) => s.library !== 'official' && s.fromPlugin === true)
+      if (brokenOnly) filtered = filtered.filter((s) => s.library !== 'official' && (s.availability === 'broken' || s.availability === 'unknown'))
       /* 目录聚合：一眼看出"这么多技能是哪来的"（本项目/别的插件/自带根…） */
       const dirs = (meta.byDir || []).filter((d) => d.n > 0).slice(0, 6)
       const availSummary = meta.availability ? meta.availability.summary : null
       const needRestart = err !== null && String(err).indexOf('unknown op') >= 0
 
-      const listItems = filtered.map((s) => h('div', Object.assign({
-        key: s.name, className: 'rt-item' + (active === s.name ? ' on' : ''),
-      }, clickable(() => open(s.name), { label: '查看技能 ' + s.name, expanded: active === s.name })),
+      const renderSkill = (s) => h('div', Object.assign({
+        key: (s.library || 'redteam') + ':' + s.name, className: 'rt-item' + (active === ((s.library || 'redteam') + ':' + s.name) ? ' on' : ''),
+      }, clickable(() => open(s), { label: '查看技能 ' + s.name, expanded: active === ((s.library || 'redteam') + ':' + s.name) })),
         h('div', { className: 'rt-item-name' }, s.name,
           s.modelInvocable === false ? h('span', { className: 'rt-tag', style: { marginLeft: 6 } }, '仅人工') : null,
-          /* 可用性状态：能跑 / 有缺口 / 判不了 —— 一眼看出哪些技能现在用不了 */
-          h('span', {
-            className: 'rt-avail rt-avail-' + (s.availability || 'unknown'),
-            style: { marginLeft: 6 },
-            title: (s.availability === 'available'
-              ? '可用：正文能加载，必需的环境变量/本机路径/基础设施都在'
-              : (s.problems || []).join('\n') || '未知'),
-          }, s.availability === 'available' ? '可用' : s.availability === 'broken' ? '不可用' : '未知')),
+          s.library === 'official'
+            ? h('span', { className: 'rt-tag', style: { marginLeft: 6 }, title: '官方技能目录，不按红队工具路径检查' }, '官方')
+            : h('span', {
+              className: 'rt-avail rt-avail-' + (s.availability || 'unknown'),
+              style: { marginLeft: 6 },
+              title: (s.availability === 'available'
+                ? '可用：正文能加载，必需的环境变量/本机路径/基础设施都在'
+                : (s.problems || []).join('\n') || '未知'),
+            }, s.availability === 'available' ? '可用' : s.availability === 'broken' ? '不可用' : '未知'),
         h('div', { className: 'rt-item-desc' }, s.description || '（无描述）'),
         h('div', { className: 'rt-kb-sub' },
           [s.source ? '来源 ' + s.source : null,
             s.fromPlugin ? '本插件自带' : null,
             s.provider ? s.provider : null,
             s.dir ? s.dir : null].filter(Boolean).join(' · ')),
-        (s.problems || []).length > 0 && s.availability !== 'available'
+        (s.problems || []).length > 0 && s.availability !== 'available' && s.library !== 'official'
           ? h('div', { className: 'rt-kb-sub', style: { color: 'var(--dsw-alias-state-warn-primary, #f59e0b)' } },
               '⚠ ' + String(s.problems[0]).slice(0, 60))
           : null))
+      const redteamRows = filtered.filter((s) => s.library !== 'official').map(renderSkill)
+      const officialRows = filtered.filter((s) => s.library === 'official').map(renderSkill)
+      const listItems = []
+      if (redteamRows.length > 0) {
+        listItems.push(h('div', { key: 'head-redteam', className: 'rt-kb-sub', style: { margin: '8px 0 4px', fontWeight: 600 } }, '红队技能'))
+        listItems.push.apply(listItems, redteamRows)
+      }
+      if (officialRows.length > 0) {
+        listItems.push(h('div', { key: 'head-official', className: 'rt-kb-sub', style: { margin: '8px 0 4px', fontWeight: 600 } }, '官方技能'))
+        listItems.push.apply(listItems, officialRows)
+      }
 
       return h('div', { className: 'rt-split' },
         h('div', { className: 'rt-list' },
@@ -4575,7 +4567,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
                 }, clickable(() => load(true), { label: '重新检查技能可用性' })), '重查可用性'))
             : null,
           h('div', { style: { fontSize: 11, color: 'var(--dsw-alias-label-secondary)', marginBottom: 6 } },
-            '共 ' + items.length + ' 个技能 · 来自 ' + ((meta.byDir || []).length) + ' 个目录',
+            '红队 ' + ((meta.libraries && meta.libraries.redteam) || 0) + ' · 官方 ' + ((meta.libraries && meta.libraries.official) || 0),
             items.length > 100 ? h('div', { style: { marginTop: 3 } },
               '（技能多来自其它插件注册的根或你自己的技能目录；本插件只自带 ' + (meta.fromPlugin || 0) + ' 个）') : null),
           listItems),
@@ -4595,8 +4587,11 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
                 h('div', { className: 'rt-kv' }, h('b', null, '何时使用'), h('span', null, detail.whenToUse || '—')),
                 h('div', { className: 'rt-kv' }, h('b', null, '来源'), h('span', null, (detail.provider || '—') + ' / ' + (detail.source || '—'))),
                 (() => {
-                  const s2 = items.find((x) => x.name === detail.name)
+                  const s2 = items.find((x) => ((x.library || 'redteam') + ':' + x.name) === active)
                   if (!s2) return null
+                  if (s2.library === 'official') {
+                    return h('div', { className: 'rt-kv' }, h('b', null, '类型'), h('span', null, '官方技能。由宿主按任务调用，不按红队工具路径检查。'))
+                  }
                   const avail = s2.availability || 'unknown'
                   return h('div', null,
                     h('div', { className: 'rt-kv' }, h('b', null, '可用性'),
@@ -6970,6 +6965,35 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       return ca !== '' && ca !== pa && ca > pa
     }
 
+    const RT_GEOM_KEY = 'rt-dock-geom-v1'
+    function clampRtGeom(g) {
+      const vw = (typeof window !== 'undefined' && window.innerWidth) || 1280
+      const vh = (typeof window !== 'undefined' && window.innerHeight) || 800
+      const w = Math.min(Math.max(320, Number(g && g.w) || 620), Math.max(320, vw))
+      const h = Math.min(Math.max(240, Number(g && g.h) || 520), Math.max(240, vh))
+      const x = Math.min(Math.max(0, Number(g && g.x) || 0), Math.max(0, vw - w))
+      const y = Math.min(Math.max(0, Number(g && g.y) || 0), Math.max(0, vh - h))
+      return { x: x, y: y, w: w, h: h }
+    }
+    function defaultRtGeom() {
+      const vw = (typeof window !== 'undefined' && window.innerWidth) || 1280
+      const vh = (typeof window !== 'undefined' && window.innerHeight) || 800
+      let w = 620
+      try {
+        const saved = Number(window.localStorage.getItem('rt-dock-width'))
+        if (Number.isFinite(saved) && saved >= 320 && saved <= 1200) w = saved
+      } catch (e) { /* 隐私模式 */ }
+      const h = Math.max(240, Math.min(640, vh - 24))
+      return clampRtGeom({ x: Math.max(0, vw - w - 12), y: 12, w: w, h: h })
+    }
+    function loadRtGeom() {
+      try {
+        const raw = JSON.parse(window.localStorage.getItem(RT_GEOM_KEY) || 'null')
+        if (raw && typeof raw === 'object') return clampRtGeom(raw)
+      } catch (e) { /* 隐私模式或坏数据 */ }
+      return defaultRtGeom()
+    }
+
     function Panel(props) {
       /* embedded：嵌在 dsh-purge 外层 dock 里时，不再自带收起/全面浏览/拖拽条，避免与外层按钮重叠 */
       const embedded = !!(props && props.embedded)
@@ -6979,26 +7003,22 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [snapshot, setSnapshot] = React.useState(null)
       const [err, setErr] = React.useState(null)
       const [newName, setNewName] = React.useState('')
-      /* 面板宽度按靶标之外**全局**记住：拖一次就够，不该每次刷新都回到 620px。
-         夹在 [380,900] 之间并做兜底，避免 localStorage 里的脏值把面板挤没。 */
-      const [width, setWidth] = React.useState(() => {
-        try {
-          const saved = Number(window.localStorage.getItem('rt-dock-width'))
-          if (Number.isFinite(saved) && saved >= 380 && saved <= 900) return saved
-        } catch (e) { /* 隐私模式：用默认值 */ }
-        return 620
-      })
+      const [geom, setGeom] = React.useState(loadRtGeom)
       const [creating, setCreating] = React.useState(false)
       const [refreshKey, setRefreshKey] = React.useState(0)
       const [digest, setDigest] = React.useState(null)
       const [seen, setSeen] = React.useState(null)
 
-      /* 面板宽度 → :root 自定义属性（frame 的 padding-right 依赖它）；嵌入态由外层 dock 管宽度 */
       React.useEffect(() => {
         if (embedded) return undefined
-        setDockWidth(width)
-        try { window.localStorage.setItem('rt-dock-width', String(width)) } catch (e) { /* 隐私模式 */ }
-      }, [width, embedded])
+        try { window.localStorage.setItem(RT_GEOM_KEY, JSON.stringify(geom)) } catch (e) { /* 隐私模式 */ }
+      }, [geom, embedded])
+      React.useEffect(() => {
+        if (embedded) return undefined
+        const onResize = () => setGeom((g) => clampRtGeom(g))
+        window.addEventListener('resize', onResize)
+        return () => window.removeEventListener('resize', onResize)
+      }, [embedded])
 
       const loadSnapshot = (id) => {
         if (!id) { setSnapshot(null); return }
@@ -7046,17 +7066,50 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         }, () => { if (eng) loadSnapshot(eng) })
       }
 
-      const startResize = (e) => {
+      const trackPointer = (e, move) => {
+        if (e.button !== 0) return
         e.preventDefault()
-        const startX = e.clientX
-        const startW = width
-        const move = (ev) => setWidth(Math.max(380, Math.min(900, startW + (startX - ev.clientX))))
+        e.stopPropagation()
         const up = () => {
           window.removeEventListener('mousemove', move)
           window.removeEventListener('mouseup', up)
         }
         window.addEventListener('mousemove', move)
         window.addEventListener('mouseup', up)
+      }
+      const startDrag = (e) => {
+        if (e.target && e.target.closest && e.target.closest('button,a,input,select,textarea,label')) return
+        const sx = e.clientX
+        const sy = e.clientY
+        const ox = geom.x
+        const oy = geom.y
+        trackPointer(e, (ev) => setGeom((g) => clampRtGeom({ x: ox + (ev.clientX - sx), y: oy + (ev.clientY - sy), w: g.w, h: g.h })))
+      }
+      const startResizeLeft = (e) => {
+        const sx = e.clientX
+        const ox = geom.x
+        const ow = geom.w
+        trackPointer(e, (ev) => {
+          const dx = ev.clientX - sx
+          setGeom((g) => clampRtGeom({ x: ox + dx, y: g.y, w: ow - dx, h: g.h }))
+        })
+      }
+      const startResizeRight = (e) => {
+        const sx = e.clientX
+        const ow = geom.w
+        trackPointer(e, (ev) => setGeom((g) => clampRtGeom({ x: g.x, y: g.y, w: ow + (ev.clientX - sx), h: g.h })))
+      }
+      const startResizeBottom = (e) => {
+        const sy = e.clientY
+        const oh = geom.h
+        trackPointer(e, (ev) => setGeom((g) => clampRtGeom({ x: g.x, y: g.y, w: g.w, h: oh + (ev.clientY - sy) })))
+      }
+      const startResizeCorner = (e) => {
+        const sx = e.clientX
+        const sy = e.clientY
+        const ow = geom.w
+        const oh = geom.h
+        trackPointer(e, (ev) => setGeom((g) => clampRtGeom({ x: g.x, y: g.y, w: ow + (ev.clientX - sx), h: oh + (ev.clientY - sy) })))
       }
 
       /* 切靶标：重新读该靶标的未读快照，并立刻取一次摘要 */
@@ -7168,11 +7221,26 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
         ? { className: 'rt-full', style: { display: 'flex' } }
         : embedded
           ? { className: 'rt-dock rt-embedded', 'data-open': '1', style: { width: '100%', display: 'flex' } }
-          : { className: 'rt-dock', 'data-open': st.open ? '1' : '0', style: { width: width + 'px', display: st.open ? 'flex' : 'none' } }
+          : {
+              className: 'rt-dock',
+              'data-open': st.open ? '1' : '0',
+              style: {
+                left: geom.x + 'px',
+                top: geom.y + 'px',
+                right: 'auto',
+                bottom: 'auto',
+                width: geom.w + 'px',
+                height: geom.h + 'px',
+                display: st.open ? 'flex' : 'none',
+              },
+            }
 
       return h('div', shellProps,
-        (full || embedded) ? null : h('div', { className: 'rt-grip', onMouseDown: startResize }),
-        h('div', { className: 'rt-head' },
+        (full || embedded) ? null : h('div', { className: 'rt-grip', title: '拖动调整宽度', onMouseDown: startResizeLeft }),
+        (full || embedded) ? null : h('div', { className: 'rt-resize-r', title: '拖动调整宽度', onMouseDown: startResizeRight }),
+        (full || embedded) ? null : h('div', { className: 'rt-resize-b', title: '拖动调整高度', onMouseDown: startResizeBottom }),
+        (full || embedded) ? null : h('div', { className: 'rt-resize-c', title: '拖动调整大小', onMouseDown: startResizeCorner }),
+        h('div', { className: 'rt-head', onMouseDown: (full || embedded) ? undefined : startDrag, title: (full || embedded) ? undefined : '按住拖动面板' },
           embedded ? null : h('div', { className: 'rt-title' }, h('span', { className: 'rt-dot' }),
             full ? '演练台 · 全面浏览' : '演练台',
             full ? h('span', { className: 'rt-tag', style: { marginLeft: 6 } }, '独立窗口') : null),
@@ -7195,7 +7263,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           full ? h('button', { className: 'rt-btn', title: '回到带侧栏的普通界面（或按 Esc）', onClick: exitFull }, '退出全面浏览') : null,
           embedded ? null : h('button', { className: 'rt-btn', title: '刷新名册、快照与当前页面数据', onClick: refreshAll }, '刷新'),
           (full || embedded) ? null : h('button', { className: 'rt-btn', title: '在新浏览器窗口打开完整控制台', onClick: openFull }, '全面浏览'),
-          (full || embedded) ? null : h('button', { className: 'rt-btn', title: '收起面板（对话列恢复全宽）', onClick: () => setUI({ open: false }) }, '收起')),
+          (full || embedded) ? null : h('button', { className: 'rt-btn', title: '收起面板', onClick: () => setUI({ open: false }) }, '收起')),
         /* 页签栏用标准 tablist/tab 角色：读屏软件据此播报「第几个页签、是否选中」。
            键盘用户 Tab 进来后可用 Enter/Space 切换（由 clickable 提供）。 */
         h('div', { className: 'rt-tabs', role: 'tablist' }, tabs.map((t) => {
@@ -7902,16 +7970,14 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				document.head.append(styleTag);
 				const widthTag = document.createElement("style");
 				widthTag.setAttribute("data-dsh-purge-dock-w", "1");
-				widthTag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px;--rt-dock-w:" + geom.w + "px}";
+				widthTag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px}";
 				document.head.append(widthTag);
-				try { if (__dshPurgeDrill.setDockWidth) __dshPurgeDrill.setDockWidth(geom.w); } catch { /* ignore */ }
 				return () => { styleTag.remove(); widthTag.remove(); };
 			}, []);
 			useEffect(() => {
 				saveDockGeom(geom);
 				const tag = document.querySelector('style[data-dsh-purge-dock-w="1"]');
-				if (tag) tag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px;--rt-dock-w:" + geom.w + "px}";
-				try { if (__dshPurgeDrill && __dshPurgeDrill.setDockWidth) __dshPurgeDrill.setDockWidth(geom.w); } catch { /* ignore */ }
+				if (tag) tag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px}";
 			}, [geom]);
 			useEffect(() => {
 				const onResize = () => setGeom((g) => clampDockGeom(g));
@@ -8017,6 +8083,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				style: {
 					left: geom.x + "px",
 					top: geom.y + "px",
+					right: "auto",
+					bottom: "auto",
 					width: geom.w + "px",
 					height: geom.h + "px",
 				},

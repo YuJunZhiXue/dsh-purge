@@ -35,6 +35,8 @@ VPS  : http://<你的VPS_IP>:9100/gogo                          （技能 vps-re
 curl -o gogo http://<你的VPS_IP>:9100/gogo && chmod +x gogo
 ```
 
+安装脚本不下载 gogo，需自行放到主文件路径。Windows 与 ARM 文件同样要自己补；当前平台只用上面的主文件。
+
 **零依赖**：单个静态二进制，指纹与提取规则全部内置，Windows 2003 都能跑。**不需要**额外配置文件。
 
 ## 纪律

@@ -18,7 +18,7 @@ enabled: true
 | --- | --- | --- | --- |
 | **feroxbuster** | `/usr/bin/feroxbuster` | 2.13.1 | Rust，递归爆破最强，自动跟随目录层级，**首选** |
 | **ffuf** | `/usr/bin/ffuf` | 2.1.0-dev | 最快、最灵活，支持多字典/vhost/参数 fuzz |
-| **dirsearch** | `$DSH_HOME/redteam/toolkit/dirsearch/dirsearch` | v0.5.0 | Python，字典全、报告友好，带自带运行时 |
+| **dirsearch** | `$DSH_HOME/redteam/toolkit/dirsearch/dirsearch` | v0.5.0 | Python。`setup.sh` 不下载，需自行放到该路径 |
 | **gobuster** | `/usr/bin/gobuster` | — | 轻量稳定，dir/dns/vhost 三模式 |
 
 ## 一、feroxbuster（首选：递归 + 自动过滤）

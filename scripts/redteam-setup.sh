@@ -249,6 +249,12 @@ if [ "$CHECK_ONLY" != 1 ]; then
   [ -x "${BIN[naabu]}" ]     || { mkdir -p "$TK/naabu";     dl_asset "projectdiscovery/naabu"     "linux_amd64\.zip$" "$TK/naabu/n.zip" 0     && python3 -c "import zipfile;zipfile.ZipFile('$TK/naabu/n.zip').extractall('$TK/naabu')"         && chmod +x "${BIN[naabu]}"; }
   doctor "${BIN[httpx]}" httpx
   [ -x "${BIN[httpx]}" ]     || { mkdir -p "$TK/httpx";     dl_asset "projectdiscovery/httpx"     "linux_amd64\.zip$" "$TK/httpx/h.zip" 0     && python3 -c "import zipfile;zipfile.ZipFile('$TK/httpx/h.zip').extractall('$TK/httpx')"         && chmod +x "${BIN[httpx]}"; }
+  if [ -x "${BIN[httpx]}" ]; then
+    mkdir -p "$HOME/.local/bin"
+    printf '#!/usr/bin/env bash\nexec "%s" "$@"\n' "${BIN[httpx]}" > "$HOME/.local/bin/pd-httpx"
+    chmod +x "$HOME/.local/bin/pd-httpx"
+    ok "pd-httpx wrapper -> ${BIN[httpx]}"
+  fi
 
   # ksubdomain（无状态子域爆破）
   doctor "${BIN[ksubdomain]}" ksubdomain

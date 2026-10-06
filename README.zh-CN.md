@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.1.59</strong></p>
+<p align="center"><strong>Version 1.1.60</strong></p>
 
 <p align="center">
   <em>本机官方 DeepSeek Harness 网络安全红队评测插件。清洗宿主策略，并带内嵌演练台。不同模型可换不同提示词。默认提示词面向国模「小码酱」。求 Star 收藏 ⭐</em>
@@ -31,7 +31,7 @@
 >
 > Node.js **≥18**；Windows 无闪窗需要 **Node ≥22** 的 `registerHooks`，更低版本仍用文件级 `windowsHide`。装完要点一次 **应用**（成功后会自动重启）。
 >
-> 插件市场只看介绍：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)。不要用 `deepseek.stream/api/plugins/download?...` 安装。
+> 插件市场页只看介绍：[DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge)。不要用市场里的一键安装，也不要用 `deepseek.stream/api/plugins/download?...`。市场一键走的是 `git+https://github.com/yujunzhixue/dsh-purge.git`，会在 `git ls-remote` 失败；后面的 allowBuilds 提示对不上，这个包没有 `prepare` 脚本。安装用下面的 `.tar.gz` 命令。
 
 ## 目录
 
@@ -62,7 +62,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 | **宿主策略** | 调整默认文案、权限策略和工具上限。官方能力保留，不另写一套身份 |
 | **启动时** | 自动再检查并应用。npm 升级盖掉 `node_modules` 之后不用手改文件 |
 
-不写死盘符。按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`，再退回 `~/.dsh`。不改 Harness 源码仓库，在 **dsh-purge** 的「清洗」里点「应用」才写入。身份只来自你的 `prompt-inject.md`。
+不写死盘符。按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`，再退回 `~/.dsh`。不改 Harness 源码仓库，在 **dsh-purge** 的「清洗」里点「应用」才写入。身份来自插件里的加密提示词，也就是提示词框默认显示的那一份。不读取宿主磁盘上的提示词文件。
 
 本插件只处理使用者本机已安装的官方 `@deepseek-ai` 包和本机配置。它不是公网扫描器，也不是针对第三方站点的攻击套件。仓库内不含木马、未授权渗透脚本或对外攻击载荷。
 
@@ -126,7 +126,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 | 官方 Harness 0.1.x | 不支持 |
 | 其它未列出版本 | 对不上的补丁会显示待应用或跳过，不要指望能用 |
 
-插件版本是 **1.1.59**。1.1.45 有问题，略过。
+插件版本是 **1.1.60**。1.1.45 有问题，略过。
 
 ---
 
@@ -137,7 +137,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 | 你正在用 | profile | 安装 |
 |---|---|---|
 | 官方 `dsh web` | `web` | [Web](#web) |
-| 官方 Harness 桌面 EXE | `default` | [官方桌面 EXE](#official-exe) |
+| 官方 Harness 桌面 EXE | `desktop` | [官方桌面 EXE](#official-exe) |
 
 `dsh` 不在 PATH、或不想走远程安装时，用 [手动安装](#manual)。
 
@@ -149,7 +149,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 2. 点会话标题旁的 **dsh-purge**，在右侧栏的 **清洗** 里点 **「应用」**。宿主的设置页里没有这个条目。
 3. 点「应用」成功后会自动重启一次，让补丁进入当前进程。应用没做完不会重启。
 
-> **macOS 官方桌面**：点「应用」会解开 `app.asar`。本插件会自动修补官方 `dsh` CLI 入口（asar / `app/` 双向兼容）并补上 `app/runtime` 链接；若你仍看到 `MODULE_NOT_FOUND ... app.asar/.../cli.js`，再点一次「应用」，或重装 Harness。
+> **macOS / Windows 官方桌面**：点「应用」会解开 `app.asar`，并修补官方 `dsh` 入口（asar 不在时改走 `app/`），同时补上 `app/runtime` 链接。若 `dsh.cmd` 里已有 `dsh-purge cli entry begin`，但写成了 `set "entry=%entry%"`，用当前版本再点一次「应用」会改回来。`app.asar` 还在、补丁只写在解开目录时，再点「应用」不会让当前进程读到那些补丁。
 
 Web 的「应用 / 重启 / 卸载」只动 Web。桌面端的只动桌面应用，不会去拉 `dsh web`。不要在 Web 里点桌面端的应用，也不要反过来。
 
@@ -184,19 +184,21 @@ dsh plugin --profile web add .
 已经安装 **DeepSeek Harness 官方桌面客户端** 时，用下面的命令，或点按钮走 `dsh://`。社区桌面端不维护，不要用这个协议去装它。当前只适配 **0.2.0-rc.2**。
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
+dsh plugin --profile desktop add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
+
+官方桌面 0.2 读的 profile 是 `desktop`。不要改成 `default`，也不要改成 `git+https://github.com/yujunzhixue/dsh-purge.git`。git 地址会先跑 `git ls-remote`，失败后的 allowBuilds 提示可以忽略。
 
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 打开插件市场页</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.59&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.60&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 唤起客户端一键安装</strong></a>
 </p>
 
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.59&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.60&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 <details>
@@ -212,7 +214,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.59',
+    version: '1.1.60',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -231,7 +233,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.59&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.60&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -242,7 +244,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | 插件唯一标识符 |
 | name | `dsh-purge` | 插件展示名称 |
-| version | `1.1.59` | 语义化版本号 |
+| version | `1.1.60` | 语义化版本号 |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub 仓库 |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | 申请权限 |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub 源码包地址 |
@@ -287,8 +289,10 @@ dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/re
 **官方 Harness 桌面 EXE**
 
 ```sh
-dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
+dsh plugin --profile desktop add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz
 ```
+
+官方桌面 0.2 读的 profile 是 `desktop`。不要改成 `default`，也不要改成 `git+https://github.com/yujunzhixue/dsh-purge.git`。git 地址会先跑 `git ls-remote`，失败后的 allowBuilds 提示可以忽略。
 
 命令结束后，提醒：完全退出并重启刚装的那个宿主，再点会话标题旁的 **dsh-purge**，在「清洗」里点「应用」。Web 和桌面端不要交叉点应用。然后停止。
 
@@ -306,8 +310,8 @@ dsh plugin --profile default add https://github.com/YuJunZhiXue/dsh-purge/archiv
 
 | 你实际在用的 | 只改这个目录 | 不要改 |
 |---|---|---|
-| 官方 `dsh web` | `$DSH_HOME/profiles/web` | `default` |
-| 官方 Harness 桌面 EXE | `$DSH_HOME/profiles/default` | `web` |
+| 官方 `dsh web` | `$DSH_HOME/profiles/web` | `desktop` |
+| 官方 Harness 桌面 EXE | `$DSH_HOME/profiles/desktop` | `web` |
 
 对应 `profiles/<名>/package.json` 还不存在时，先正常启动一次该宿主，让官方程序自己建好 profile，再继续。
 
@@ -349,8 +353,7 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 怎么确认找对了：
 
 - Web：`$DSH_HOME/profiles/web/package.json` 里 `"name"` 是 `dsh-profile-web`
-- 官方 EXE：`$DSH_HOME/profiles/default/package.json` 存在
-- 社区桌面端暂不维护，不要改 `profiles/desktop`
+- 官方 EXE：`$DSH_HOME/profiles/desktop/package.json` 里 `"name"` 是 `dsh-profile-desktop`
 
 本机常有两份 `.dsh`（用户目录一份、安装目录一份）。便携包、安装目录里的官方 `dsh` **用安装根下那份**，不要改到空的 `%USERPROFILE%\.dsh`。改完下面步骤后，启动的必须是这份主目录对应的宿主。
 
@@ -367,7 +370,7 @@ $DSH_HOME/
       cordis.patch.yml
       lib/
   profiles/
-    web/package.json           ← 或 desktop / default
+    web/package.json           ← 或 desktop
 ```
 
 有 git 时：
@@ -401,14 +404,14 @@ Rename-Item $src "dsh-purge"
 | 宿主 | 要改的文件 |
 |---|---|
 | Web | `$DSH_HOME/profiles/web/package.json` |
-| 官方桌面 EXE | `$DSH_HOME/profiles/default/package.json` |
+| 官方桌面 EXE | `$DSH_HOME/profiles/desktop/package.json` |
 
 先复制一份 `package.json.bak`。然后**只追加两处**，原有依赖、原有 bundle、其它字段全部留着：
 
 1. `dependencies` 增加一行：`"dsh-purge": "file:../../plugins/dsh-purge"`
 2. `dsh.profile.bundles` **末尾**追加 `"dsh-purge"`（已经有就不要再加）
 
-`file:../../plugins/dsh-purge` 是从 `profiles/web`（或 `desktop` / `default`）走到 `$DSH_HOME/plugins/dsh-purge` 的相对路径，三层目录都一样，不要改成绝对路径。
+`file:../../plugins/dsh-purge` 是从 `profiles/web` 或 `profiles/desktop` 走到 `$DSH_HOME/plugins/dsh-purge` 的相对路径，两处都一样，不要改成绝对路径。
 
 改前（官方默认常见长这样，你机器上还会有其它插件，那些一行都不要删）：
 
@@ -467,7 +470,7 @@ Rename-Item $src "dsh-purge"
 cd "$DSH_HOME/profiles/web"       # Web
 pnpm install
 
-cd "$DSH_HOME/profiles/default"   # 官方 EXE
+cd "$DSH_HOME/profiles/desktop"   # 官方 EXE
 pnpm install
 ```
 
@@ -475,14 +478,14 @@ Windows PowerShell（路径换成第 1 步找到的那份）：
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\web"
+# 官方桌面 EXE：
 # cd "$env:USERPROFILE\.dsh\profiles\desktop"
-# cd "$env:USERPROFILE\.dsh\profiles\default"
 # 便携包把 $env:DSH_HOME 指到那份 .dsh，不要写死盘符：
 # cd "$env:DSH_HOME\profiles\web"
 pnpm install
 ```
 
-成功标志：出现 `$DSH_HOME/profiles/<web|default>/node_modules/dsh-purge/package.json`。
+成功标志：出现 `$DSH_HOME/profiles/<web|desktop>/node_modules/dsh-purge/package.json`。
 
 常见失败：
 
@@ -649,7 +652,9 @@ purge_status   purge_apply   purge_revert
 
 设置页「应用」成功后会自动重启，以加载已改的包文件；也可手动点「重启」。补丁标题下是正式版：可以看版本和切换。回退后会固定在该版本，要回到最新再点「更新」。测试版通道已去掉。
 
-输入框旁的「回退」会丢掉最近一轮对话，并把上一句填回输入框；聊天里 `/rewind` 同样可用。宿主不能在原会话里截断，所以回退会另开一条承载截断后的内容，并把原来那条从侧边栏移出。多退几次不会在列表里堆出一串分支。
+输入框旁的「回退一次」和「回退上一轮」都留在当前这条对话里，不另开分支。已发送的那句会回到输入框，这一轮已经发出的内容和已完成的任务会从当前对话撤掉，改字后**重新发送**即可。从 **1.1.60** 起，多轮对话后回退按**当前这一轮**定位，不会又退到第一条用户消息。聊天里 `/rewind` 同样可用。
+
+**极简 / PTC 与标准不一致时**：同一任务在标准模式能跑、在极简或 PTC 被拦，通常是 preset 里 `run_code` 或 plan 拦截句没洗净，或内置 minimal 缺少 `agent-instructions`。请升到 **1.1.60+**，**完全退出宿主 → 清洗里应用 → 自动重启 → 新开一轮对话** 再试；只换 preset 不重应用，旧进程里的补丁不会更新。
 
 ### 自己的服务器
 
@@ -695,18 +700,14 @@ flowchart TD
   B -->|否| D["备份原件为 .dshpurge.bak"]
   D --> E["按补丁列表替换对应文件"]
   E --> F["覆盖 shim"]
-  F --> G{"用户改过提示词?"}
-  G -->|没有| H["写入内置默认提示词"]
-  G -->|改过| I["保留现有 prompt-inject.md"]
+  F --> G["注入插件加密默认（提示词框默认显示的那份）"]
 ```
 
 每次会话的覆盖：
 
 ```mermaid
 flowchart TD
-  A["新会话"] --> B{"prompt-inject.md 有内容?"}
-  B -->|有| C["原样写入 dsh-purge systemPrompt 段"]
-  B -->|没有| D["不写入覆盖段"]
+  A["重启或新会话"] --> B["注入插件加密默认，不必点保存，不读宿主磁盘"]
 ```
 
 Skill 不进注入段：
@@ -757,7 +758,7 @@ flowchart LR
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会显示跳过，这次应用仍算完成，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件源仓库（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁）。
-- npm 上暂未发布同名包，用 GitHub、[插件市场](https://deepseek.stream/plugins/dsh-purge) 或 `dsh plugin add .` 安装。
+- npm 上暂未发布同名包。官方 Web 用 `dsh plugin --profile web add` 加 master.tar.gz；官方桌面用 `dsh plugin --profile desktop add` 加同一个包。当前目录已是本仓库时，可以 `dsh plugin --profile web add .` 或 `dsh plugin --profile desktop add .`。[插件市场](https://deepseek.stream/plugins/dsh-purge)只看介绍。
 
 ---
 

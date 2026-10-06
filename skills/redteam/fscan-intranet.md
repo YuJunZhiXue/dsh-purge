@@ -30,6 +30,8 @@ enabled: true
 VPS  : http://<你的VPS_IP>:9100/fscan                     （技能 vps-reverse-shell 的载荷目录）
 ```
 
+安装脚本只下载 linux/amd64 的 `fscan`。Windows 与 ARM 文件需自行补上；当前平台只用上面的主文件。
+
 **传到跳板机/目标**（内网扫描必须在能到达内网的位置执行）：
 
 ```bash
