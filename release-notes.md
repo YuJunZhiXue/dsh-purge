@@ -1,3 +1,19 @@
+# 1.1.62
+
+## 中文
+
+- 版本 **1.1.62**。
+- 继续/重试重新打开。
+- 锚点门：首轮输出上限 1024→8192，最多 2 步；已调工具即放开，英文思考过不了 we 锚也不再卡住。
+- 已有预设的锚点配置与包内不一致时同步，不整份覆盖。
+
+## English
+
+- **1.1.62**.
+- Continue/retry is on again.
+- Anchor gate: bootstrap cap 8192, max 2 steps; promote after the first tool call.
+- Existing presets sync the anchor-gate block when it differs from the package.
+
 # 1.1.61
 
 ## 中文

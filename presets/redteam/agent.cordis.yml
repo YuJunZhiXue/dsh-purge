@@ -116,15 +116,15 @@
       - **自己的 VPS / 自建服务器上开的代理不算隧道**：隧道必须说清目标侧那一端（`entry_kind`）。
       - 报告只收录拿到分的成果，且每条要能复现（目标 → 拿到什么 → 怎么拿到的（命令）→ 原始请求）。
 
-# 锚点门：第一段思考含 we 且不含 let me 才放开 1024 输出上限；锚不住最多 4 步。
+# 锚点门：bootstrap 阶段限输出，避免首轮空转；指挥端会先连打 preflight/开靶/读技能，1024 易截断。
 # 不裁工具、不换人设。压缩后再关一次。放开后工作区长说明改成点名文件。
 - id: anchor-gate
   name: ./anchor-gate.mjs
   config:
     anchorGate: true
-    maxBootstrapSteps: 4
+    maxBootstrapSteps: 2
     promoteAfterFirstResponse: true
-    bootstrapMaxTokens: 1024
+    bootstrapMaxTokens: 8192
     instructionHint: true
 
 - id: redteam-tools

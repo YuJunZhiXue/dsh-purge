@@ -41,6 +41,8 @@ export function hasAnchoredReasoning(content) {
 export function decidePromotion(state, config) {
   if (state.toolCalled && config.anchorGate !== true) return true
   if (state.toolCalled && config.anchorGate === true && (state.anchored || state.steps >= config.maxBootstrapSteps)) return true
+  /* 红队指挥首轮必调工具；英文思考常写 I need 过不了 we 锚，但仍应在少量 step 后放开输出上限 */
+  if (state.toolCalled && config.anchorGate === true && state.steps >= 1 && config.promoteAfterFirstResponse === true) return true
   if (state.toolCalled && config.anchorGate === true && config.promoteAfterFirstResponse === true && state.turnEnded) return true
   if (!state.toolCalled && state.responded && config.promoteAfterFirstResponse === true) return true
   return false
