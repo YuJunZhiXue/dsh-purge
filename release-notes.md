@@ -1,3 +1,25 @@
+# 1.1.61
+
+## 中文
+
+- 版本 **1.1.61**。
+- **多宿主 Apply**：npm-global 与桌面 `resources/app` 一并补丁（#72 类路径问题）。
+- **#73**：代理 / IP / DNS 等 benign 话题不再误触攻击闸门（`net-scope.js`）。
+- **#74**：自定义提示词持久化——`resolveInjectText` 读 `prompt-inject.md`，UI 保存走 `saveOverrideContent`，启动 `ensureOperatorBody`。
+- **极简**：#80 保持官方 persistent-shell；UI 选 minimal 以 `agent-preset/selected` 为准（不再被会话头 `standard` 误导）；`adaptInjectForMinimalPreset` 对齐 shell-only 工具表。
+- **拒答续跑**：`refusal-recover` 识别「我不做 / 不参与」等句式。
+- 注入链：`injectMatchers` 防重复段；默认提示词重加密进 `asset-table.js`。
+
+## English
+
+- **1.1.61**.
+- **Multi-host Apply**: patch npm-global and desktop `resources/app` together.
+- **#73**: Benign proxy/IP/DNS topics no longer trip the attack gate.
+- **#74**: Custom prompt persists via `prompt-inject.md` + `saveOverrideContent`.
+- **Minimal**: #80 official shell-only preset; preset from `agent-preset/selected`; runtime `adaptInjectForMinimalPreset`.
+- **Refusal recover**: broader Chinese refusal phrasing.
+- Inject assembly dedupe; default prompt re-sealed.
+
 # 1.1.60
 
 ## 中文

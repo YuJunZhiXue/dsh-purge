@@ -64,16 +64,21 @@ async function main() {
       console.log("[ERROR] 提示词和规则集都是空的，必须先添加提示词");
       process.exit(1);
     }
-    const { made, errors } = await core.backupAll(state.ai_base);
-    for (const b of made) console.log(`  ✓ 备份 / backup → ${b}`);
-    for (const [p, e] of errors) console.log(`  ⚠ 备份失败 ${p}: ${e}`);
-    const report = await core.applyPatches(state.ai_base, core.ALL_PATCHES, { preserveClientBundles: false });
+    const { hosts, report } = await core.applyPatchesAllHosts(core.ALL_PATCHES, {
+      preserveClientBundles: false,
+      forApply: true,
+    });
+    for (const h of hosts) console.log(`  宿主 / host → ${h.aiBase}`);
     for (const r of report) {
       const m = r.status === "applied" ? "✓ 已清洗" : r.status === "already" ? "- 已是最新" : r.status === "missing_file" ? "⚠ 文件缺失" : `✗ ${r.status}`;
       console.log(`  ${m} patch #${String(r.patch_id).padEnd(2)} ${r.name}`);
     }
-    const flash = core.silenceCmdFlash(state.ai_base);
+    const flashHost = hosts[0]?.aiBase || state.ai_base;
+    const flash = core.silenceCmdFlash(flashHost);
     console.log(`  cmd-flash=${flash.entry} phase-1=${flash.phase1} ok=${flash.ok}`);
+    if (hosts.length > 1) {
+      console.log(`  多宿主 / multi-host: ${hosts.length} 份 @deepseek-ai 已清洗`);
+    }
     console.log(inject.source === "rule"
       ? "  - 使用当前规则集，不改写提示词文件"
       : "  - 使用已有提示词文件");
@@ -91,8 +96,8 @@ async function main() {
     console.log("");
     console.log("全部完成 / All done。重启 dsh 生效 / Restart dsh to take effect.");
   } else if (mode === "--revert") {
-    if (state.ai_base) {
-      const { reverted, errors } = await core.revertAll(state.ai_base);
+    if (state.ai_base || core.enumeratePatchAiBases().length) {
+      const { reverted, errors } = await core.revertAllHosts();
       for (const p of reverted) console.log(`  ✓ 已还原 / Reverted ${p}`);
       for (const [p, e] of errors) console.log(`  ⚠ 还原失败 ${p}: ${e}`);
       if (reverted.length === 0) console.log("  - 没有补丁备份可还原 / no patch backup");
