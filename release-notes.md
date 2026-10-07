@@ -1,3 +1,15 @@
+# 1.1.63
+
+## 中文
+
+- 版本 **1.1.63**。
+- 官方更新脚本去掉中文注释，避免 `official update script is not ASCII`。
+
+## English
+
+- **1.1.63**.
+- Official update script is ASCII only, so the handoff no longer fails the ASCII check.
+
 # 1.1.62
 
 ## 中文
