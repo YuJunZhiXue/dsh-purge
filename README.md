@@ -4,10 +4,10 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.1.63</strong></p>
+<p align="center"><strong>Version 1.1.64</strong></p>
 
 <p align="center">
-  <em>Local official DeepSeek Harness cybersecurity red-team plugin. Clean host policy, and ship a built-in drill console. Swap prompts per model. Default prompt for Chinese models — 小码酱. Please star ⭐</em>
+  <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
 </p>
 
 <p align="center">
@@ -25,16 +25,15 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **Current support is DeepSeek Harness 0.2 only** (official desktop **0.2.0-rc.2**). **0.1.x is not supported.** On other host versions, unmatched originals stay pending or skipped. Nothing is rewritten blindly.
+> **Official Web and the official desktop app are both supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.0-rc.2**) uses profile `desktop`. Install and Apply them separately. This release targets dsh 0.2 only. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
 >
-> **Apply writes the prompt and patches, then restarts the host automatically.** After the host comes back, start a new chat — that is when the inject enters the session. If Apply fails (for example patches did not all apply), it does not restart.
+> Adding the plugin to a profile does not patch the host. Click **dsh-purge** beside the session title → **Clean** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat — that is when the inject enters the session.
 >
-> Node.js **≥18**; Windows no-flash import hooks need **Node ≥22** `registerHooks`, older Node still gets file-level `windowsHide` patches. After install, click **Apply** once (a successful Apply restarts for you).
->
-> The Hub page is for reading only: [DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge). Do not use the Hub one-click install, and do not install via `deepseek.stream/api/plugins/download?...`. Hub one-click runs `git+https://github.com/yujunzhixue/dsh-purge.git`, which fails at `git ls-remote`. The allowBuilds hint after that does not apply: this package has no `prepare` script. Install with the `.tar.gz` command below.
+> Node.js **≥18**. Windows no-flash needs **Node ≥22**. Do not use the Hub one-click install. Commands are below.
 
 ## Contents
 
+- [Sponsor](#sponsor)
 - [What this is](#what-this-is)
 - [Attribution required](#attribution-required)
 - [Supported hosts](#supported-hosts)
@@ -48,9 +47,24 @@
 
 ---
 
+<a id="sponsor"></a>
+
+## ☕ Sponsor
+
+If this project helps you, send it over — I'm out here asking~
+
+| Asset | Address |
+| --- | --- |
+| USDT (TRC20) | `TV5ajPkRD8RH623Dx9mqvYZVNN8nPGRKid` |
+| Solana | `6x16GhRgLVpKFFXaU1seKNdx2rypspSJTL4dbpt6Xpwk` |
+| Ethereum | `0xB68BD60C0e8c519513B7DF9bB147696815423B3E` |
+| Bitcoin | `bc1qu70yxkrtwnymt8ryluz9x8y8hqzune5340npht` |
+
+---
+
 ## What this is
 
-**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine.
+**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
 
 Harness does more than forward a prompt. It rewrites prompts, approval gates, sandbox policy, and session migration at runtime. Asking only “will the model answer” treats a host-layer block as a model refusal. This plugin separates those two layers on your own install, for controlled evaluation and for seeing which default policy is too tight.
 
@@ -118,15 +132,12 @@ Using them without attribution, hiding the source, or passing them off as your o
 
 ## Supported hosts
 
-This release supports **DeepSeek Harness 0.2** only (official desktop **0.2.0-rc.2**). **0.1.x is not supported.**
+Pick the plugin that matches your dsh. The latest plugin supports **dsh 0.2** only. Older dsh builds need the matching older plugin. Do not apply this release to 0.1.x.
 
-| Host | Status |
-|---|---|
-| Official Harness 0.2 desktop / `dsh web` | Supported |
-| Official Harness 0.1.x | Not supported |
-| Any other version | Unmatched patches stay pending or skipped; do not expect them to work |
+- **dsh 0.2** (official desktop **0.2.0-rc.2** / official `dsh web`): use **1.1.40** or newer. The current release is **1.1.64**. The install commands on this page install that line.
+- **dsh 0.1.7** (including **0.1.7-rc.1** and **0.1.7-rc.2**): use **1.1.39** or older. Pick the tag on [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases).
 
-The plugin version is **1.1.63**. 1.1.45 is skipped; it has bugs.
+Unmatched patches stay pending or skipped. Nothing is rewritten blindly.
 
 ---
 
@@ -140,6 +151,8 @@ Only official `dsh web` and the official desktop EXE are maintained. Install and
 | Official Harness desktop EXE | `desktop` | [Official desktop EXE](#official-exe) |
 
 If `dsh` is not on PATH, or you do not want a remote install, use [Manual install](#manual).
+
+The Hub page is for reading only: [DeepSeek Harness Hub](https://deepseek.stream/plugins/dsh-purge). Do not use the Hub one-click install, and do not install via `deepseek.stream/api/plugins/download?...`. Hub one-click runs `git+https://github.com/yujunzhixue/dsh-purge.git`, which fails at `git ls-remote`. The allowBuilds hint after that does not apply: this package has no `prepare` script. Install with the `.tar.gz` command below.
 
 ### After the command: three steps
 
@@ -192,13 +205,13 @@ Official desktop 0.2 loads the `desktop` profile. Do not use `default`, and do n
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 Open Hub page</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.63&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.64&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
 </p>
 
 🔗 **Raw protocol URL:**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.63&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.64&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 <details>
@@ -214,7 +227,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.63',
+    version: '1.1.64',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -233,7 +246,7 @@ export function installDshPurgeToDesktop() {
 **HTML link:**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.63&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.64&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 Install in desktop client
 </a>
 ```
@@ -244,16 +257,14 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | Plugin id |
 | name | `dsh-purge` | Display name |
-| version | `1.1.63` | Semver |
+| version | `1.1.64` | Semver |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub repo |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | Requested permissions |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub source archive |
 
 </details>
 
-Then fully quit the official client, including the tray, and open it again.
-
-On the official desktop, click **Apply** (a successful Apply restarts automatically).
+Then fully quit the official client, including the tray, open it again, and follow the three steps above to click **Apply**.
 
 ### How to tell it installed
 
@@ -584,45 +595,9 @@ On the Clean page, under Prompt. One host per line, then Save list. Steps are in
 
 ## Layout
 
-```
-dsh-purge/
-├── bin/dsh-purge.js
-├── client.js
-├── cordis.patch.yml
-├── docs/
-│   ├── banner.svg
-│   └── preview/
-│       ├── dock-auth.png
-│       ├── dock-clean.png
-│       ├── dock-drill.png
-│       ├── own-servers.png
-│       ├── own-servers-en.png
-│       ├── rules.png
-│       └── settings.png
-├── lib/
-│   ├── redteam/
-│   ├── child-process-hide.mjs
-│   ├── core.js
-│   ├── hide-console.js
-│   ├── identity.js
-│   ├── index.js
-│   ├── restart-web.js
-│   ├── rewind.js
-│   ├── rules.js
-│   ├── skills.js
-│   ├── uninstall-restart.js
-│   ├── uninstall.js
-│   └── update.js
-├── presets/redteam/
-├── skills/redteam/
-├── package.json
-├── screenshots.json
-├── LICENSE
-├── README.md
-└── README.zh-CN.md
-```
+`bin/` is the CLI, `lib/` is patches and the drill console, `presets/redteam/` is the red-team preset, `skills/redteam/` is the bundled skills, and `client.js` is the dock.
 
-Runtime user files: `$DSH_HOME/prompt-inject.md`, `$DSH_HOME/rules/`, `$DSH_HOME/skills/`, `$DSH_HOME/net-scope-allow.txt`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Skills are not part of the `dsh-purge` inject section and do not replace the prompt.
+Runtime files live under `$DSH_HOME`: `prompt-inject.md`, `rules/`, `skills/`, `net-scope-allow.txt`, `redteam/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Web and the desktop app each use their own home. Skills are not part of the inject section and do not replace the prompt.
 
 ---
 
@@ -760,19 +735,6 @@ What changed, and the zip, are on [Releases](https://github.com/YuJunZhiXue/dsh-
 - After an upgrade, unmatched originals show as skipped. Apply still completes, and those files are left unchanged.
 - Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
 - The npm package name is not published yet. Official Web: `dsh plugin --profile web add` the master.tar.gz. Official desktop: `dsh plugin --profile desktop add` the same archive. From this repo, `dsh plugin --profile web add .` or `dsh plugin --profile desktop add .`. The [Hub](https://deepseek.stream/plugins/dsh-purge) page is an introduction only.
-
----
-
-## ☕ Sponsor
-
-If this project helps you, send it over — I'm out here asking~
-
-| Asset | Address |
-| --- | --- |
-| USDT (TRC20) | `TV5ajPkRD8RH623Dx9mqvYZVNN8nPGRKid` |
-| Solana | `6x16GhRgLVpKFFXaU1seKNdx2rypspSJTL4dbpt6Xpwk` |
-| Ethereum | `0xB68BD60C0e8c519513B7DF9bB147696815423B3E` |
-| Bitcoin | `bc1qu70yxkrtwnymt8ryluz9x8y8hqzune5340npht` |
 
 ---
 

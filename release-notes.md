@@ -1,3 +1,33 @@
+# 1.1.64
+
+## 中文
+
+- 版本 **1.1.64**。
+- 红队流程八项。角色稿只在**新建靶标**时播种；已经建好的靶标，要在演练台里把智能体同步一次才会换成新稿。
+- **内网**改为叶子节点，自己按收集、梳理、发现、利用做，不再往下派活。
+- 并发名额：不带 key 的 release 只放最早的一条。子智能体结束由服务端自动释放；手动释放必须带上 acquire 返回的 key。
+- 预检带 `include` 时只体检点名的技能，不再被全局缺密钥拖成失败。缺项带上由用户执行的修复说明。
+- IPv6 计分至少两个冒号，`dc01:389` 这类主机名不再 ×3。计分只留在 `score-rules.js`。
+- 攻击链计分跳过已停用的得分点。
+- `.env` 认 `export KEY=value`。未加引号的行内注释会剥掉，引号里的 `#` 保留。
+- 内网计分 code 改为 `central-system`、`boundary-logical`、`boundary-strong` 等，以 `redteam_score_list` 实际返回为准。
+- 漏洞发现和利用从 `priority=high` 打起。优先级为空时，先回报指挥补一轮评估。
+- 删掉没有调用的代码。设置页里过期的 `legacyApplyPath(...)` 调用改为 `applyPathOp`。
+
+## English
+
+- **1.1.64**.
+- Eight red-team flow fixes. Role prompts seed **new** engagements only; sync agents on an existing engagement to pick them up.
+- The internal role is a leaf and does collect, assess, scan, and exploit itself.
+- A release without a key drops only the oldest reservation. Ending a subagent auto-releases; a manual release must carry the acquire key.
+- Preflight `include` checks only the named skills. Broken items include fixes for the user to run.
+- IPv6 scoring needs at least two colons, so `dc01:389` is no longer ×3. Scoring lives only in `score-rules.js`.
+- Attack-chain scoring skips disabled score points.
+- `.env` accepts `export KEY=value` and strips unquoted inline comments. A `#` inside quotes stays.
+- Internal score codes match the live list (`central-system`, `boundary-logical`, `boundary-strong`, and the rest), taken from `redteam_score_list`.
+- Vuln-scan and exploit start at `priority=high`. If priority is empty, report back and run another assess first.
+- Unused code removed. Stale settings calls to `legacyApplyPath` now call `applyPathOp`.
+
 # 1.1.63
 
 ## 中文
