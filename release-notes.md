@@ -1,3 +1,23 @@
+# 1.1.65
+
+## 中文
+
+- 版本 **1.1.65**。
+- 默认提示词按 `lib/default-prompt-inject.md` 重新加密进槽。磁盘上仍是用户自己改过的稿时，不覆盖。
+- 红队接入截图登记、得分点看图，以及报告六段。可把某次演练导出成目录。
+- 技能正文缺工具路径、缺密钥或 VPS 还是占位符时，不再把整条技能标成不可用。缺口留在详情里。
+- 打开页面或组装提示词时，会把当前默认稿同步到磁盘，不必先点保存。
+- 删掉没有调用的桌面启动封装、旧迁移脚本，以及已经注释掉的手动继续入口。
+
+## English
+
+- **1.1.65**.
+- The default prompt is sealed again from `lib/default-prompt-inject.md`. A prompt the user already edited on disk is left as-is.
+- Red team gains shot registration, score-point images, and the six-part report. An engagement can be exported to a folder.
+- A skill stays usable when a documented tool path, key, or VPS placeholder is missing. The gap stays on the skill detail.
+- Opening the page or assembling the prompt writes the current default to disk, without a Save click first.
+- Unused desktop launch helpers, the old migration script, and the commented manual-continue entry are removed.
+
 # 1.1.64
 
 ## 中文
