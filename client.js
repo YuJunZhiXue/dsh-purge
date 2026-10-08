@@ -188,6 +188,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.patch": "项目",
 			"table.status": "状态",
 			"status.applied": "已应用",
+			"status.off": "已关闭",
 			"status.pending": "待应用",
 			"status.unmatched": "没对上",
 			"status.skipped": "跳过",
@@ -199,7 +200,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"warn.noInject": "官方始终用默认提示词。红队开了规则集就只用规则集；没开时用去掉 CTF 的默认提示词，再接红队操作。两边都空会提示必须添加。",
 			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
-			"saved.restoreInject": "已填入默认提示词，点保存写入",
+			"saved.restoreInject": "已恢复默认提示词",
 			"skip": "跳过",
 			"unknown": "未知",
 			"delete": "删除",
@@ -416,6 +417,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.once.hint": "把这一轮发出去的那句放回输入框，并清掉这一轮",
 			"rewind.round": "回退上一轮",
 			"rewind.round.hint": "把这一轮发出去的那句放回输入框；子代理也只撤这一轮",
+			"hooksDeny.title": "Hooks 拦截",
+			"hooksDeny.bypass": "放行 hooks 的 deny / ask（补丁 30 / 31 / 64 / 65）",
+			"hooksDeny.hint": "关掉后，用户自己的 PreToolUse / UserPromptSubmit / Stop hook 的 deny 会按官方逻辑生效。官方 ask 分支本身是空操作，关开关不会弹出审批框。改完后点「应用」并重启才写进宿主。",
+			"saved.hooksDeny": "已保存",
 			"continue.title": "失败重试 / 继续",
 			"continue.hint": "请求失败会自动重试；异常停止或中断可点「继续」或自动续跑。自己点停止不会自动继续。次数用完后需新开一轮。",
 			"continue.autoRetry": "失败自动重试",
@@ -500,6 +505,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"table.patch": "Item",
 			"table.status": "Status",
 			"status.applied": "Applied",
+			"status.off": "Off",
 			"status.pending": "Pending",
 			"status.unmatched": "No match",
 			"status.skipped": "Skipped",
@@ -511,7 +517,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"warn.noInject": "Official mode always uses the default prompt. Red team uses only the active rule set; otherwise it uses the default prompt without the CTF section, then the red team steps. If both are empty you will be asked to add a prompt.",
 			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
-			"saved.restoreInject": "Default prompt loaded. Save to write.",
+			"saved.restoreInject": "Default prompt restored",
 			"skip": "Skipped",
 			"unknown": "Unknown",
 			"delete": "Delete",
@@ -728,6 +734,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rewind.once.hint": "Put this round's message back in the box and drop only this round",
 			"rewind.round": "Undo last round",
 			"rewind.round.hint": "Put this round's message back in the box; subagents drop only this round",
+			"hooksDeny.title": "Hook interception",
+			"hooksDeny.bypass": "Bypass hook deny / ask (patches 30 / 31 / 64 / 65)",
+			"hooksDeny.hint": "When off, your own PreToolUse / UserPromptSubmit / Stop hook deny runs as the official host wrote it. The official ask branch is a no-op; turning this off will not show an approval dialog. Click Apply and restart to write the host files.",
+			"saved.hooksDeny": "Saved",
 			"continue.title": "Retry / Continue",
 			"continue.hint": "Failed requests auto-retry. After an abnormal stop or interrupt, use Continue or auto-resume. A manual stop never auto-continues. Counts reset after a completed turn.",
 			"continue.autoRetry": "Auto-retry on failure",
@@ -973,12 +983,13 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			if (st === "pending") return "wait";
 			if (st === "unmatched") return "bad";
 			if (st === "na") return "ok";
-			if (st === "missing_file" || st === "skipped" || st === "unlocated") return "miss";
+			if (st === "missing_file" || st === "skipped" || st === "unlocated" || st === "off") return "miss";
 			return "bad";
 		}
 
 		function statusLabel(st, t) {
 			if (st === "applied" || st === "already") return t("status.applied");
+			if (st === "off") return t("status.skipped");
 			if (st === "pending") return t("status.pending");
 			if (st === "unmatched") return t("status.unmatched");
 			if (st === "skipped") return t("status.skipped");
@@ -1094,6 +1105,61 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					) : null,
 				);
 			});
+		}
+
+		function HooksDenySection({ onSaved }) {
+			const t = useT();
+			const [cfg, setCfg] = useState(null);
+			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const [busy, setBusy] = useState(false);
+
+			useEffect(() => {
+				apiJson("/dsh-purge/hooks-deny")
+					.then((d) => { if (d && d.ok) setCfg({ hooksDenyBypass: d.hooksDenyBypass !== false }); })
+					.catch(() => {});
+			}, []);
+
+			const save = (hooksDenyBypass) => {
+				if (!cfg || busy) return;
+				setCfg({ hooksDenyBypass });
+				setBusy(true);
+				apiJson("/dsh-purge/hooks-deny", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ hooksDenyBypass }),
+				})
+					.then((d) => {
+						if (d && d.ok) {
+							setCfg({ hooksDenyBypass: d.hooksDenyBypass === true });
+							setNotice({ kind: "ok", text: t("saved.hooksDeny") });
+							if (typeof onSaved === "function") onSaved();
+						} else {
+							setNotice({ kind: "error", text: t("err.save", { error: (d && d.error) || "" }) });
+						}
+					})
+					.catch((e) => setNotice({ kind: "error", text: t("err.save", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			};
+
+			if (!cfg) return null;
+			return h("div", { className: "dshp-cr", style: { marginTop: 12 } },
+				h("div", { className: "dshp-sub" },
+					h("h4", null, t("hooksDeny.title")),
+					noticeNode(notice),
+				),
+				h("p", { className: "dshp-hint", style: { margin: "0 0 4px", color: "var(--dshp-mute)", fontSize: 12 } }, t("hooksDeny.hint")),
+				h("div", { className: "dshp-cr-row" },
+					h("label", null,
+						h("input", {
+							type: "checkbox",
+							checked: cfg.hooksDenyBypass === true,
+							disabled: busy,
+							onChange: (e) => save(e.target.checked),
+						}),
+						t("hooksDeny.bypass"),
+					),
+				),
+			);
 		}
 
 		function ContinueRetrySection() {
@@ -1597,9 +1663,36 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 
 			const restoreOverride = useCallback(() => {
 				if (!defaultOverride) return;
+				const tr = t;
+				const ticket = ++actionTicket.current;
 				overrideRef.current = defaultOverride;
 				setOverride(defaultOverride);
-				setNotice({ kind: "ok", text: t("saved.restoreInject") });
+				setPatchBusy(true);
+				setNotice({ kind: "idle", text: "" });
+				apiJson("/dsh-purge/override", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ content: defaultOverride }),
+				})
+					.then((d) => {
+						if (ticket !== actionTicket.current) return;
+						if (!d || !d.ok) {
+							setNotice({ kind: "error", text: tr("err.save", { error: (d && d.error) || "" }) });
+							return;
+						}
+						if (typeof d.content === "string") {
+							overrideRef.current = d.content;
+							setOverride(d.content);
+						}
+						setNotice({ kind: "ok", text: tr("saved.restoreInject") });
+					})
+					.catch((e) => {
+						if (ticket !== actionTicket.current) return;
+						setNotice({ kind: "error", text: tr("err.save", { error: e.message }) });
+					})
+					.finally(() => {
+						if (ticket === actionTicket.current) setPatchBusy(false);
+					});
 			}, [defaultOverride, t]);
 
 			const waitHostAfterUninstall = useCallback((tr) => {
@@ -1777,6 +1870,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				),
 				h("div", { className: "dshp-bar", "aria-hidden": "true" }, h("i", { style: { width: pct + "%" } })),
 				h(PatchGroups, { state: s }),
+				h(HooksDenySection, { onSaved: loadAll }),
 				h("div", { className: "dshp-row", style: { marginTop: 14 } },
 					h(Btn, { kind: "primary", disabled: patchBusy || uninstallBusy || !overrideLoaded, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
 					h(Btn, { kind: "danger", disabled: patchBusy || uninstallBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),

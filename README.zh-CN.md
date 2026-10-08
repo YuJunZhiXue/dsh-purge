@@ -1,15 +1,29 @@
+<p align="center">
+  <img src="docs/banner.svg" alt="dsh-purge" width="720">
+</p>
 
+<h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-# ⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）
+<p align="center"><strong>Version 1.1.66</strong></p>
 
-**Version 1.1.65**
+<p align="center">
+  <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
+</p>
 
-*DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分*
+<p align="center">
+  <a href="https://github.com/YuJunZhiXue/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/YuJunZhiXue/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
+  <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
+  <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.0--rc.2-blue" alt="DSH"></a>
+  <br>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
+</p>
 
-  
-
-
-[English](README.md) | [中文](README.zh-CN.md)
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
+</p>
 
 > **官方 Web 和官方桌面端都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.0-rc.2**）用 profile `desktop`。两边分开安装、分开点「应用」。当前版本只适配 dsh 0.2；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
 >
@@ -33,7 +47,7 @@
 
 ---
 
-
+<a id="sponsor"></a>
 
 ## ☕ 赞助
 
@@ -124,7 +138,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 请选择支持的版本。最新版只支持 **dsh 0.2**。更早的 dsh 使用对应的老版本插件，不要拿当前版本去打 0.1.x。
 
-- **dsh 0.2**（官方桌面 **0.2.0-rc.2** / 官方 `dsh web`）：用 **1.1.40** 及以上，当前是 **1.1.65**。本页安装命令装的就是这一档。
+- **dsh 0.2**（官方桌面 **0.2.0-rc.2** / 官方 `dsh web`）：用 **1.1.40** 及以上，当前是 **1.1.66**。本页安装命令装的就是这一档。
 - **dsh 0.1.7**（含 **0.1.7-rc.1**、**0.1.7-rc.2**）：用 **1.1.39** 及更早。[Releases](https://github.com/YuJunZhiXue/dsh-purge/releases) 里选对应标签。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。
@@ -199,7 +213,7 @@ dsh plugin --profile desktop add https://github.com/YuJunZhiXue/dsh-purge/archiv
 🔗 **原生协议链接：**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.65&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.66&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 **协议参数和网页触发代码**
@@ -214,7 +228,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.65',
+    version: '1.1.66',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -233,7 +247,7 @@ export function installDshPurgeToDesktop() {
 **HTML 静态链接方式：**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.65&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.66&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 唤起客户端一键安装
 </a>
 ```
@@ -245,7 +259,7 @@ export function installDshPurgeToDesktop() {
 | ----------- | --------------------------------------------------------------------------- | ------------ |
 | id          | `dsh-purge`                                                                 | 插件唯一标识符      |
 | name        | `dsh-purge`                                                                 | 插件展示名称       |
-| version     | `1.1.65`                                                                    | 语义化版本号       |
+| version     | `1.1.66`                                                                    | 语义化版本号       |
 | repo        | `YuJunZhiXue/dsh-purge`                                                     | GitHub 仓库    |
 | permissions | `系统提示词注入, 本机补丁, 设置页`                                                        | 申请权限         |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub 源码包地址 |
@@ -553,29 +567,29 @@ dsh-purge --uninstall
 
 **清洗**
 
-清洗
+![清洗](docs/preview/dock-clean.png)
 
 **演练台授权**
 
-演练台授权
+![演练台授权](docs/preview/dock-auth.png)
 
 **演练台**
 
-演练台
+![演练台](docs/preview/dock-drill.png)
 
 **补丁**
 
-补丁
+![补丁](docs/preview/settings.png)
 
 **规则集**
 
-规则集
+![规则集](docs/preview/rules.png)
 
 **自己的服务器**
 
 在清洗页，提示词下面。每行一台，点保存名单。步骤见 [自己的服务器](#自己的服务器)。
 
-自己的服务器
+![自己的服务器](docs/preview/own-servers.png)
 
 
 | 区域        | 说明                                                                                                         |
@@ -583,7 +597,6 @@ dsh-purge --uninstall
 | dsh-purge | 会话标题旁的按钮，打开或收起右侧栏                                                                                          |
 | 清洗        | 原来的规则设定：补丁、提示词、规则集、Skill                                                                                   |
 | 演练台       | 授权后的资产、技能与环境页。未授权时按钮标「未授权」                                                                                 |
-|           |                                                                                                            |
 | 补丁        | 分组查看状态，应用、还原或卸载                                                                                            |
 | 提示词       | 编辑 `prompt-inject.md`，作为会话覆盖段                                                                              |
 | 自己的服务器    | 每行登记一个 IP 或完整主机名，保存后写入 `$DSH_HOME/net-scope-allow.txt`                                                     |
@@ -643,8 +656,6 @@ purge_status   purge_apply   purge_revert
 5. 密钥、密码、网段和通配符会在保存时丢掉。没有写进名单的大陆、香港、澳门地址仍然禁止。
 
 上面的 `203.0.113.10` 和 `example.com` 只是写法示例，不是放行地址。把它们换成你自己的那一台再保存。
-
-自己的服务器
 
 ---
 

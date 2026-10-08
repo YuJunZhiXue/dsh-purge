@@ -1,3 +1,23 @@
+# 1.1.66
+
+## 中文
+
+- 版本 **1.1.66**。
+- **#80**：清洗页可关掉 hooks deny / ask 旁路。关掉且文件干净显示跳过，不计入已应用；关掉后再打开，64/65 会按官方形态再打一次。
+- **#81**：继续 / 拒答续跑的来源 kind 改为 `dsh-purge`；限流和传输失败不再自动续一轮。
+- 重启后不用点保存也会挂上默认提示词；每一轮都补回全文。空的应用请求不再清空磁盘上的提示词。
+- 声明过的 overlay 只剩 `.dshpurge.bak` 时，应用会先拷回再加载。
+- 红队报告补上得分点短名。中文 README 恢复题图和预览图。
+
+## English
+
+- **1.1.66**.
+- **#80**: The clean page can turn off the hooks deny/ask bypass. Off + clean files show skipped and are not counted as applied. Turning it back on reapplies 64/65 from the official form.
+- **#81**: Continue / refusal-recover use source kind `dsh-purge`. RATE_LIMIT and TRANSPORT no longer start another continue turn.
+- Restart hangs the default prompt without a Save click; every step puts the full text back. An empty Apply body no longer wipes the disk prompt.
+- A declared overlay that exists only as `.dshpurge.bak` is copied back before load.
+- Red-team reports get short score-point names. Chinese README restores the banner and preview images.
+
 # 1.1.65
 
 ## 中文

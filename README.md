@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.1.65</strong></p>
+<p align="center"><strong>Version 1.1.66</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
@@ -134,7 +134,7 @@ Using them without attribution, hiding the source, or passing them off as your o
 
 Pick the plugin that matches your dsh. The latest plugin supports **dsh 0.2** only. Older dsh builds need the matching older plugin. Do not apply this release to 0.1.x.
 
-- **dsh 0.2** (official desktop **0.2.0-rc.2** / official `dsh web`): use **1.1.40** or newer. The current release is **1.1.65**. The install commands on this page install that line.
+- **dsh 0.2** (official desktop **0.2.0-rc.2** / official `dsh web`): use **1.1.40** or newer. The current release is **1.1.66**. The install commands on this page install that line.
 - **dsh 0.1.7** (including **0.1.7-rc.1** and **0.1.7-rc.2**): use **1.1.39** or older. Pick the tag on [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases).
 
 Unmatched patches stay pending or skipped. Nothing is rewritten blindly.
@@ -205,13 +205,13 @@ Official desktop 0.2 loads the `desktop` profile. Do not use `default`, and do n
 <p align="center">
   <a href="https://deepseek.stream/plugins/dsh-purge"><strong>🌐 Open Hub page</strong></a>
   &nbsp;·&nbsp;
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.65&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.66&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>🚀 Install in desktop client</strong></a>
 </p>
 
 🔗 **Raw protocol URL:**
 
 ```
-dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.65&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
+dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.66&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz
 ```
 
 <details>
@@ -227,7 +227,7 @@ export function installDshPurgeToDesktop() {
   const params = new URLSearchParams({
     id: 'dsh-purge',
     name: 'dsh-purge',
-    version: '1.1.65',
+    version: '1.1.66',
     repo: 'YuJunZhiXue/dsh-purge',
     permissions: '系统提示词注入, 本机补丁, 设置页',
     downloadUrl: 'https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz',
@@ -246,7 +246,7 @@ export function installDshPurgeToDesktop() {
 **HTML link:**
 
 ```html
-<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.65&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
+<a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.66&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz">
   🚀 Install in desktop client
 </a>
 ```
@@ -257,7 +257,7 @@ export function installDshPurgeToDesktop() {
 |---|---|---|
 | id | `dsh-purge` | Plugin id |
 | name | `dsh-purge` | Display name |
-| version | `1.1.65` | Semver |
+| version | `1.1.66` | Semver |
 | repo | `YuJunZhiXue/dsh-purge` | GitHub repo |
 | permissions | `系统提示词注入, 本机补丁, 设置页` | Requested permissions |
 | downloadUrl | `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` | GitHub source archive |
@@ -584,7 +584,6 @@ On the Clean page, under Prompt. One host per line, then Save list. Steps are in
 | dsh-purge | button beside the session title; opens or collapses the dock |
 | Clean | the old Rules page: patches, prompt, rule sets, skills |
 | Drill | assets, skills, and environment after authorization. The tab says Unauthorized until then |
-| Light / Ink | card appearance |
 | Patches | grouped status, Apply, Restore, or Uninstall |
 | Prompt | edit `prompt-inject.md` as the session override |
 | Own servers | one IP or exact hostname per line, saved to `$DSH_HOME/net-scope-allow.txt` |
@@ -640,8 +639,6 @@ The box sits under Prompt. If the dock does not show it yet, quit DeepSeek Harne
 5. Keys, passwords, ranges, and wildcards are dropped on save. Unlisted mainland China, Hong Kong, and Macau addresses stay forbidden.
 
 `203.0.113.10` and `example.com` above are only examples of the form. Replace them with your own host before you save.
-
-![Own servers](docs/preview/own-servers-en.png)
 
 ---
 
