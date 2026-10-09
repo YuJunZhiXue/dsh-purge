@@ -2878,9 +2878,10 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		function scheduleComposerFill(sessionId, text, inputActions) {
-			if (!sessionId || !text || isPluginDraft(text)) return;
+			if (!sessionId || !text || isPluginDraft(text)) return () => {};
 			let stopped = false;
 			let filled = false;
+			const timers = [];
 			const tryFill = () => {
 				if (stopped) return;
 				const current = liveDraft(sessionId, inputActions);
@@ -2896,13 +2897,18 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				hostSetDraft(sessionId, text);
 				filled = true;
 			};
-			for (const ms of FILL_DELAYS) window.setTimeout(tryFill, ms);
+			for (const ms of FILL_DELAYS) timers.push(window.setTimeout(tryFill, ms));
+			return () => {
+				stopped = true;
+				for (const t of timers) { try { window.clearTimeout(t); } catch { /* ignore */ } }
+			};
 		}
 
 		function scheduleEchoClear(sessionId, inputActions) {
-			if (!sessionId) return;
+			if (!sessionId) return () => {};
 			let last = "";
 			let stopped = false;
+			const timers = [];
 			const tryClear = () => {
 				if (stopped || !last) return;
 				const current = String(liveDraft(sessionId, inputActions) || "").trim();
@@ -2917,11 +2923,16 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				stopped = true;
 			};
 			apiJson("/dsh-purge/last-user?sessionId=" + encodeURIComponent(sessionId)).then((data) => {
+				if (stopped) return;
 				last = String(data?.text || "").trim();
 				if (!last || isPluginDraft(last)) return;
 				tryClear();
-				for (const ms of [0, 50, 180, 400]) window.setTimeout(tryClear, ms);
+				for (const ms of [0, 50, 180, 400]) timers.push(window.setTimeout(tryClear, ms));
 			}).catch(() => {});
+			return () => {
+				stopped = true;
+				for (const t of timers) { try { window.clearTimeout(t); } catch { /* ignore */ } }
+			};
 		}
 
 		async function dropInheritedQueue(sessions, sessionId) {
@@ -3893,7 +3904,20 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(req),
-    }).then((res) => res.json())
+    }).then(async (res) => {
+      const text = await res.text().catch(() => '')
+      let data = null
+      try { data = text ? JSON.parse(text) : null } catch {
+        return { ok: false, error: res.status + ' non-json: ' + String(text).slice(0, 120) }
+      }
+      if (!res.ok) {
+        return Object.assign({}, data || {}, {
+          ok: false,
+          error: (data && (data.error || data.message)) || (res.status + ' ' + res.statusText),
+        })
+      }
+      return data
+    })
 
     let ui = { open: true, tab: 'assets' }
     const subs = new Set()
@@ -5413,7 +5437,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           a.href = url
           a.download = 'report-' + String(label || 'score').replace(/[^\w.\-]/g, '_') + '.md'
           a.click()
-          URL.revokeObjectURL(url)
+          /* 立刻 revoke 会在部分浏览器里让 click 启动的下载断流,延后一拍 */
+          setTimeout(() => { try { URL.revokeObjectURL(url) } catch { /* ignore */ } }, 1000)
           setMsg({ ok: '已下载：' + label })
         } catch (e) { setMsg({ err: '下载失败：' + ((e && e.message) || e) }) }
       }
@@ -7008,6 +7033,17 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [open, setOpen] = React.useState(false)
       const [msg, setMsg] = React.useState(null)
       const [countdown, setCountdown] = React.useState(0)
+      const countdownRef = React.useRef(null)
+      const clearCountdown = React.useCallback(() => {
+        if (countdownRef.current) { try { clearInterval(countdownRef.current) } catch { /* ignore */ } }
+        countdownRef.current = null
+      }, [])
+      React.useEffect(() => () => clearCountdown(), [clearCountdown])
+      const closeModal = React.useCallback(() => {
+        clearCountdown()
+        setCountdown(0)
+        setOpen(false)
+      }, [clearCountdown])
 
       const check = (silent) => {
         if (!silent) setBusy(true)
@@ -7038,9 +7074,10 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           setMsg({ ok: '已安装 ' + (r.installed || '') + '，正在重启当前宿主…' })
           /* 重启会断开这个页面：倒计时提示用户稍后刷新 */
           setCountdown(6)
-          const t = setInterval(() => {
+          clearCountdown()
+          countdownRef.current = setInterval(() => {
             setCountdown((n) => {
-              if (n <= 1) { clearInterval(t); window.location.reload(); return 0 }
+              if (n <= 1) { clearCountdown(); window.location.reload(); return 0 }
               return n - 1
             })
           }, 1000)
@@ -7072,7 +7109,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
               title: '重新检查 npm 上的最新版本',
             }, busy ? '检查中…' : '检查更新'),
         open
-          ? h('div', { className: 'rt-modal', 'aria-hidden': 'true', onClick: () => setOpen(false) },
+          ? h('div', { className: 'rt-modal', 'aria-hidden': 'true', onClick: closeModal },
               h('div', { className: 'rt-modal-box', onClick: (e) => e.stopPropagation() },
                 h('h4', { style: { marginTop: 0 } }, '更新 RedTeam 模式'),
                 h('div', { className: 'rt-kv' }, h('b', null, '当前版本'), h('span', null, current || '未知')),
@@ -7098,7 +7135,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
                   ? h('div', { className: 'rt-foot' }, '宿主正在重启，' + countdown + ' 秒后自动刷新页面…')
                   : null,
                 h('div', { style: { display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 10 } },
-                  h('button', { className: 'rt-btn', onClick: () => setOpen(false) }, '关闭'),
+                  h('button', { className: 'rt-btn', onClick: closeModal }, '关闭'),
                   h('button', {
                     className: 'rt-btn rt-btn-primary',
                     disabled: busy || blockers.length > 0 || mode === 'dev',
@@ -7521,6 +7558,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		let drillGrantGen = 0;
 		let drillGrantPosting = 0;
 		let drillGrantState = { ready: false, granted: false };
+		let drillSyncRetryTimer = null;
 		const AUTH_LEGAL_HTML = "<h3>严正法律免责与合规使用声明</h3>\r\n    <p>本声明在进入演练台前必须全文阅读。本项目是非营利开源项目，遵守国家法律法规及所在平台的规范，仅供学习与研究、技术参考。严禁任何主体把本项目用于商业售卖、付费倒卖或黑灰产牟利。</p>\r\n    <p>开发者坚决反对并严禁任何形式的违法犯罪，绝不支持、不鼓励、不协助未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统，或生成违法违禁内容。任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。不得以科研、教学、测试、演示或内部学习为由规避下列条款。</p>\r\n    <h3>1. 本仓库不含违法内容</h3>\r\n    <p>dsh-purge 发布的代码、文档、补丁与默认提示词不是木马、后门、未授权渗透工具、勒索软件、撞库脚本，也不是针对公网或第三方系统的攻击载荷。项目不提供违法内容，也不教唆、组织、协助实施违法犯罪。</p>\r\n    <h3>2. 本机操作不构成对外授权</h3>\r\n    <p>应用补丁、写入、回滚、卸载，都在本机文件和本机进程内完成。这些操作不对任何公网主机或未授权系统进行扫描、探测、入侵或攻击发包，也不得把本机当作跳板。</p>\r\n    <p>插件若开启检测更新，仅可能访问本插件自己的 GitHub 仓库以核对版本。该访问与对第三方系统的网络攻击无关，不能被解释为对外渗透的授权。</p>\r\n    <h3>3. 允许使用的范围</h3>\r\n    <p>只允许用在你能证明有权处理的环境：本人有权管理的本机官方 Harness；离线的本地合成靶标；所有者已经出具合法书面授权的网络安全演练靶场；合规实验室里的受控环境。书面授权要能对应具体目标、时间和范围。只填写一个单位名称，或只有口头说法，不构成授权。</p>\r\n    <p>未经所有者合法书面授权的目标、公网在线系统、生产业务，以及能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施，都不得作为演练对象。</p>\r\n    <h3>4. 必须遵守的法律，按条、款</h3>\r\n    <p>《中华人民共和国刑法》第二百八十五条第一款：禁止违反国家规定，侵入国家事务、国防建设、尖端科学技术领域的计算机信息系统。</p>\r\n    <p>同条第二款：禁止侵入前款规定以外的计算机信息系统，或者用其他技术手段，获取该系统中存储、处理或者传输的数据，或者对该系统实施非法控制。</p>\r\n    <p>同条第三款：禁止提供专门用于侵入、非法控制计算机信息系统的程序、工具；明知他人实施侵入、非法控制而为其提供程序、工具，同样禁止。</p>\r\n    <p>第二百八十六条第一款：禁止对计算机信息系统功能进行删除、修改、增加、干扰，造成系统不能正常运行。</p>\r\n    <p>同条第二款：禁止对系统中存储、处理或者传输的数据和应用程序进行删除、修改、增加。</p>\r\n    <p>同条第三款：禁止故意制作、传播计算机病毒等破坏性程序，影响计算机系统正常运行。</p>\r\n    <p>第二百八十七条：禁止利用计算机实施金融诈骗、盗窃、贪污、挪用公款、窃取国家秘密或者其他犯罪。</p>\r\n    <p>第二百八十七条之一第一款第（一）项：禁止设立用于实施诈骗、传授犯罪方法、制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组。</p>\r\n    <p>同款第（二）项：禁止发布有关制作或者销售毒品、枪支、淫秽物品等违禁物品、管制物品或者其他违法犯罪的信息。</p>\r\n    <p>同款第（三）项：禁止为实施诈骗等违法犯罪活动发布信息。</p>\r\n    <p>第二百八十七条之二：禁止明知他人利用信息网络实施犯罪，仍为其提供技术支持，或者提供广告推广、支付结算等帮助。</p>\r\n    <p>第二百五十三条之一第一款、第三款：禁止向他人出售或者提供公民个人信息；禁止窃取或者以其他方法非法获取公民个人信息。</p>\r\n    <p>《中华人民共和国网络安全法》第十三条第二款：使用网络不得危害网络安全，不得利用网络从事危害国家安全、荣誉和利益，煽动颠覆国家政权、推翻社会主义制度，煽动分裂国家、破坏国家统一，宣扬恐怖主义、极端主义，宣扬民族仇恨、民族歧视，传播暴力、淫秽色情信息，编造、传播虚假信息扰乱经济秩序和社会秩序，以及侵害他人名誉、隐私、知识产权和其他合法权益等活动。</p>\r\n    <p>第十四条：禁止利用网络从事危害未成年人身心健康的活动。</p>\r\n    <p>第二十九条：禁止非法侵入他人网络、干扰他人网络正常功能、窃取网络数据；禁止提供专门用于侵入网络、干扰网络正常功能及防护措施、窃取网络数据的程序、工具；明知他人从事危害网络安全的活动，禁止为其提供技术支持、广告推广、支付结算等帮助。</p>\r\n    <p>第三十三条：公共通信和信息服务、能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施实行重点保护。未获合法授权，不得侵入、干扰或破坏。</p>\r\n    <p>第四十六条：禁止窃取或者以其他非法方式获取个人信息，禁止非法出售或者非法向他人提供个人信息。</p>\r\n    <p>第四十八条：禁止设立用于实施诈骗，传授犯罪方法，制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组；禁止利用网络发布涉及上述违法犯罪活动的信息。</p>\r\n    <p>第五十条：发送的电子信息、提供的应用软件不得设置恶意程序，不得含有法律、行政法规禁止发布或者传输的信息。</p>\r\n    <p>《中华人民共和国数据安全法》第八条：开展数据处理活动，不得危害国家安全、公共利益，不得损害个人、组织的合法权益。</p>\r\n    <p>第三十二条第一款：收集数据应当采取合法、正当的方式，不得窃取或者以其他非法方式获取数据。</p>\r\n    <p>同条第二款：法律、行政法规对收集、使用数据的目的和范围有规定的，只能在该目的和范围内收集、使用。</p>\r\n    <p>第五十一条：窃取或者以其他非法方式获取数据，或者因此损害个人、组织合法权益的，依照有关法律、行政法规处罚。</p>\r\n    <p>《中华人民共和国个人信息保护法》第五条：处理个人信息应当合法、正当、必要、诚信，不得通过误导、欺诈、胁迫等方式处理。</p>\r\n    <p>第六条第一款、第二款：处理个人信息应当具有明确、合理的目的，并与该目的直接相关，采取对个人权益影响最小的方式；收集限于实现处理目的的最小范围，不得过度收集。</p>\r\n    <p>第十条：禁止非法收集、使用、加工、传输他人个人信息，禁止非法买卖、提供或者公开他人个人信息；禁止从事危害国家安全、公共利益的个人信息处理活动。</p>\r\n    <p>第十三条：没有取得个人同意，也不属于订立履行合同所必需、履行法定职责、应对突发、公共利益新闻舆论、处理本人已经合法公开的信息，以及法律行政法规规定的其他情形之一的，不得处理个人信息。</p>\r\n    <p>第二十八条、第二十九条：生物识别、医疗健康、金融账户、行踪轨迹，以及不满十四周岁未成年人的个人信息，属于敏感个人信息。没有特定目的、充分必要性和严格保护措施，并且没有取得个人单独同意的，不得处理。</p>\r\n    <p>此外还须遵守其他现行有效的法律、行政法规、监管规定，以及所使用模型的服务条款与滥用政策。</p>\r\n    <h3>5. 据此禁止的方向</h3>\r\n    <p>未授权进入。禁止把没有书面授权的单位、域名、地址、公网系统、生产业务或关键信息基础设施登记为靶标，禁止对其扫描、探测、侵入、控制或发包。对应刑法第二百八十五条第一款、第二款，网络安全法第二十九条、第三十三条。</p>\r\n    <p>破坏与恶意程序。禁止删除、修改、增加、干扰他人系统功能或其中的数据、应用程序；禁止制作、传播病毒、勒索程序或其他破坏性程序；禁止在信息或软件中设置恶意程序。对应刑法第二百八十六条第一款至第三款，网络安全法第五十条。</p>\r\n    <p>工具与帮助。禁止把本项目或本机提供给他人，用于侵入、非法控制或窃取数据；禁止明知对方在实施网络犯罪，仍提供程序、工具、技术支持、广告推广或支付结算。对应刑法第二百八十五条第三款、第二百八十七条之二，网络安全法第二十九条。</p>\r\n    <p>数据。禁止窃取、非法收集、超范围使用、泄露、出售或向他人提供业务数据、账号、口令和其他受保护数据。对应数据安全法第八条、第三十二条、第五十一条。</p>\r\n    <p>个人信息。禁止非法收集、使用、加工、传输、买卖、提供或公开他人个人信息；禁止过度收集；禁止以误导、欺诈、胁迫方式处理；禁止擅自处理生物识别、医疗健康、金融账户、行踪轨迹和儿童个人信息。对应刑法第二百五十三条之一第一款、第三款，网络安全法第四十六条，个人信息保护法第五条、第六条、第十条、第十三条、第二十八条、第二十九条。</p>\r\n    <p>诈骗与违法信息。禁止设立或利用网站、群组实施诈骗、传授犯罪方法、制作或销售违禁物品、管制物品；禁止发布此类信息；禁止利用计算机实施诈骗、盗窃、贪污、挪用公款、窃取国家秘密。对应刑法第二百八十七条、第二百八十七条之一第一款第（一）项至第（三）项，网络安全法第四十八条。</p>\r\n    <p>内容。禁止生成或传播危害国家安全、荣誉和利益的内容，禁止煽动颠覆、分裂，禁止恐怖主义、极端主义、民族仇恨，禁止暴力、淫秽色情、赌博，禁止编造虚假信息扰乱经济秩序和社会秩序，禁止侵害名誉、隐私、知识产权，禁止危害未成年人身心健康的内容。对应网络安全法第十三条第二款、第十四条。</p>\r\n    <p>结果扩散。演练中形成的记录、资产信息和文件，只留在书面授权写明的目标和期限里，不得交给无权获知的人，也不得改作授权以外的用途。</p>\r\n    <h3>6. 责任由使用者承担</h3>\r\n    <p>本项目依据 MIT 协议按现状提供。开发者不就完整性、安全性与适用性作保证。使用者对自己的下载、部署、运行、修改、传播，以及全部输入与输出，承担独立、完全的民事、行政及刑事法律责任。作者与贡献者不承担因滥用产生的直接、间接或连带责任。</p>\r\n    <p>勾选确认的是操作者本人，不能代替没有阅读本声明的人，也不能把别人的系统说成已经授权。</p>\r\n    <h3>7. 违约即终止授权</h3>\r\n    <p>一旦用于非法攻击、恶意活动或上述任一禁止方向，使用许可自该行为发生之日起自动终止，且不可撤销。必须立即停止使用，并销毁本项目的代码、脚本与衍生数据，依法承担责任。授权终止后，演练台不得继续打开或继续使用。</p>\r\n    <h3>8. 与 DeepSeek 官方的关系</h3>\r\n    <p>本项目是独立的开源项目，与 DeepSeek 官方或其关联主体没有隶属、商业合作、授权或官方背书。文中的「官方」只表示评测对象是使用者本机安装的官方 DeepSeek Harness 软件包，不代表 DeepSeek 官方开发、认可或担保本插件。</p>\r\n    <p>文末。倒计时结束、滚到这里并勾选全部三项，才表示你以本人身份认可本声明，并完成本次演练台授权。</p>";
 
 		function readWelcomeAck() {
@@ -7560,6 +7598,8 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		function syncDrillGrant(attempt) {
 			const n = attempt || 0;
 			const gen = drillGrantGen;
+			/* 复位上一次调度的重试 timer,避免多次 writeDrillAuth 叠加链条 */
+			if (drillSyncRetryTimer) { try { clearTimeout(drillSyncRetryTimer); } catch { /* ignore */ } drillSyncRetryTimer = null; }
 			fetch("/dsh-purge/drill-grant", { method: "GET" })
 				.then((r) => r.json())
 				.then((r) => {
@@ -7578,7 +7618,12 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				})
 				.catch(() => {
 					if (gen !== drillGrantGen) return;
-					if (n < 5) window.setTimeout(() => syncDrillGrant(n + 1), 400);
+					if (n < 5) {
+						drillSyncRetryTimer = window.setTimeout(() => {
+							drillSyncRetryTimer = null;
+							syncDrillGrant(n + 1);
+						}, 400);
+					}
 				});
 		}
 
@@ -7856,10 +7901,16 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					} catch { /* ignore */ }
 				}
 			} catch { /* ignore */ }
-			/* 新会话：模式下拉里的「红队模式」chip（选好但还没写入 session） */
+			/* 新会话：模式下拉里的「红队模式」chip（选好但还没写入 session）
+			 * 优先走语义化 data-* 挂点,其次 class 子串模糊匹配 + 文本兜底;
+			 * 不写死 CSS Module 哈希(HKgFRW_seat 这种每次构建都会变)。 */
 			try {
+				const semantic = document.querySelector(
+					"[data-agent-preset='redteam'], [data-preset-id='redteam'], [data-mode='redteam']"
+				);
+				if (semantic) return true;
 				const nodes = document.querySelectorAll(
-					"[class*='seatLabel'], [class*='HKgFRW_seat'], [class*='seat'][class*='Label'], button[class*='seat']",
+					"[class*='seat' i][class*='label' i], [class*='seatLabel' i], button[class*='seat' i], [role='button'][class*='seat' i]"
 				);
 				for (const el of nodes) {
 					const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
@@ -7867,9 +7918,13 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				}
 			} catch { /* ignore */ }
 			try {
-				const labels = document.querySelectorAll("[class*='PfFEtG_label'], [title*='红队'], [title*='RedTeam']");
+				const labels = document.querySelectorAll(
+					"[class*='label' i][class*='preset' i], [class*='presetLabel' i], [title*='红队'], [title*='RedTeam']"
+				);
 				for (const el of labels) {
-					if (isRedteamPresetId(el.textContent)) return true;
+					const text = String(el.textContent || "").trim();
+					if (/红队模式/.test(text) || /^RedTeam\b/i.test(text)) return true;
+					if (isRedteamPresetId(text)) return true;
 				}
 			} catch { /* ignore */ }
 			return false;
@@ -7911,17 +7966,10 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			}).then((r) => r.json()).catch(() => null);
 		}
 
-		/** 同步探测（拦截 submit 时不能 await） */
-		function fetchEnvAdaptStatusSync() {
-			try {
-				const xhr = new XMLHttpRequest();
-				xhr.open("POST", "/redteam/api", false);
-				xhr.setRequestHeader("content-type", "application/json");
-				xhr.send(JSON.stringify({ op: "platformEnvAdaptStatus" }));
-				if (xhr.status >= 200 && xhr.status < 300) return JSON.parse(xhr.responseText);
-			} catch { /* ignore */ }
-			return null;
-		}
+		/** 同步探测的占位：不再做同步 XHR（会卡 UI 主线程、Chrome 已逐步弃用）。
+		 * 调用方 mustBlockSubmit 在 cache 过期/缺失时按"未知→保守 block"处理,
+		 * 同时 EnvAdaptSendGate 的 useEffect 轮询会异步 refresh,下次调用即可放行。 */
+		function fetchEnvAdaptStatusSync() { return null; }
 
 		/** 红队发送前门禁：未就绪 → 授权并打开环境适配；可确认跳过。 */
 		function EnvAdaptSendGate() {
@@ -7958,37 +8006,37 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
 			const mustBlockSubmit = useCallback(() => {
 				if (!isRedteamModeActive()) return false;
-				let cached = cacheRef.current;
+				const cached = cacheRef.current;
+				/* cache 过期时触发异步刷新;本次调用按最后一次 cache 判断,未知保守 block */
 				if (!cached.at || Date.now() - cached.at > 2500) {
-					const fresh = fetchEnvAdaptStatusSync();
-					if (fresh) {
-						cached = {
-							at: Date.now(),
-							ready: !!fresh.ready,
-							skipped: !!fresh.skipped,
-						};
-						cacheRef.current = cached;
-						setStatus(fresh);
-					}
+					refresh().catch(() => {});
 				}
 				if (cached.ready) return false;
 				blockAndOpen();
 				return true;
-			}, [blockAndOpen]);
+			}, [blockAndOpen, refresh]);
 
-			/* 挂住宿主 SessionInputShell.submit —— 比点按钮启发式可靠 */
+			/* 挂住宿主 SessionInputShell.submit —— 比点按钮启发式可靠。
+			 * patch 必须可逆:存 origSubmit 到 WeakMap,unmount / 依赖变更时恢复,
+			 * 否则插件禁用后 shell.submit 还是我们的 wrapper,持死 mustBlockSubmit 闭包。 */
 			useEffect(() => {
-				const wrapped = new WeakSet();
+				const patched = new WeakMap();
+				const patchedShells = [];
 				const patchShell = (shell) => {
-					if (!shell || wrapped.has(shell)) return;
+					if (!shell || patched.has(shell)) return;
 					if (typeof shell.submit !== "function") return;
-					wrapped.add(shell);
-					const orig = shell.submit.bind(shell);
+					const origSubmit = shell.submit;
+					const origActionsSubmit = (shell.actions && typeof shell.actions.submit === "function")
+						? shell.actions.submit
+						: null;
+					patched.set(shell, { origSubmit, origActionsSubmit });
+					patchedShells.push(shell);
+					const bound = origSubmit.bind(shell);
 					shell.submit = function gatedSubmit(mode) {
 						try {
 							if (mustBlockSubmit()) return;
 						} catch { /* 门禁异常时不吞掉发送 */ }
-						return orig(mode);
+						return bound(mode);
 					};
 					if (shell.actions && typeof shell.actions === "object") {
 						shell.actions.submit = () => shell.submit("queue");
@@ -8004,7 +8052,18 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 				};
 				tick();
 				const iv = window.setInterval(tick, 400);
-				return () => window.clearInterval(iv);
+				return () => {
+					window.clearInterval(iv);
+					for (const shell of patchedShells) {
+						const info = patched.get(shell);
+						if (!info) continue;
+						try { shell.submit = info.origSubmit; } catch { /* ignore */ }
+						if (info.origActionsSubmit && shell.actions) {
+							try { shell.actions.submit = info.origActionsSubmit; } catch { /* ignore */ }
+						}
+					}
+					patchedShells.length = 0;
+				};
 			}, [mustBlockSubmit]);
 
 			useEffect(() => {
@@ -8314,17 +8373,29 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			const [host, setHost] = useState(null);
 			useEffect(() => {
 				let dead = false;
+				let warnedMiss = false;
 				const ensure = () => {
 					if (dead || typeof document === "undefined") return;
-					const row = document.querySelector('[class*="heroWorkspaceRow"]');
+					/* 多路挂点兜底:语义化 data-* 优先,class 子串模糊匹配兜底(不绑定具体 CSS Module 哈希) */
+					const row =
+						document.querySelector('[data-dsh-hero-workspace-row]') ||
+						document.querySelector('[data-conversation-hero]') ||
+						document.querySelector('[class*="heroWorkspaceRow" i]') ||
+						document.querySelector('[class*="hero" i][class*="workspace" i][class*="row" i]');
 					if (!row) {
+						if (!warnedMiss) {
+							warnedMiss = true;
+							try { console.warn("[dsh-purge] HeroNewSessionMount: anchor row missing (host 可能改版)"); } catch { /* ignore */ }
+						}
 						setHost((prev) => (prev ? null : prev));
 						return;
 					}
+					warnedMiss = false;
 					let el = row.querySelector(":scope > .dshp-hero-chip");
 					if (!el) {
 						el = document.createElement("div");
 						el.className = "dshp-hero-chip";
+						el.setAttribute("data-testid", "dsh-purge-hero-chip");
 						row.appendChild(el);
 					}
 					setHost((prev) => (prev === el ? prev : el));
@@ -8365,17 +8436,29 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			const [host, setHost] = useState(null);
 			useEffect(() => {
 				let dead = false;
+				let warnedMiss = false;
 				const ensure = () => {
 					if (dead || typeof document === "undefined") return;
-					const row = document.querySelector("[data-conversation-tabs]");
+					/* 多路挂点兜底:data-* 优先,ARIA / class 子串兜底 */
+					const row =
+						document.querySelector("[data-conversation-tabs]") ||
+						document.querySelector("[data-conversation-tabrow]") ||
+						document.querySelector("[role='tablist'][aria-label*='对话' i]") ||
+						document.querySelector("[class*='conversation' i][class*='tab' i][class*='row' i]");
 					if (!row) {
+						if (!warnedMiss) {
+							warnedMiss = true;
+							try { console.warn("[dsh-purge] TabRowPurgeMount: tab row anchor missing"); } catch { /* ignore */ }
+						}
 						setHost((prev) => (prev ? null : prev));
 						return;
 					}
+					warnedMiss = false;
 					let el = row.querySelector(":scope > .dshp-tab-chip");
 					if (!el) {
 						el = document.createElement("div");
 						el.className = "dshp-tab-chip";
+						el.setAttribute("data-testid", "dsh-purge-tab-chip");
 						row.appendChild(el);
 					}
 					setHost((prev) => (prev === el ? prev : el));
