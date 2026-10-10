@@ -46,6 +46,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			if (path.indexOf("/dsh-purge/update") !== -1) return method === "POST" ? 180000 : 45000;
 			if (path.indexOf("/dsh-purge/uninstall") !== -1) return 90000;
 			if (path.indexOf("/dsh-purge/skill") !== -1) return method === "POST" ? 120000 : 20000;
+			// status 会在"应用"期间被后端的同步落盘阻塞，默认 20s 必然被 abort，界面只会显示"读取失败: timeout"。
+			if (path.indexOf("/dsh-purge/status") !== -1) return 60000;
+			if (path.indexOf("/dsh-purge/apply") !== -1) return 240000;
+			if (path.indexOf("/dsh-purge/revert") !== -1) return 120000;
+			if (path.indexOf("/dsh-purge/restart") !== -1) return 60000;
 			return 20000;
 		}
 		function isAbortError(e) {
