@@ -1,3 +1,23 @@
+# 1.1.69
+
+## 中文
+
+- 版本 **1.1.69**。
+- 发送时剥掉 ChatML / `project_instructions`，框和磁盘不动。
+- 应用 + 重启挂当前默认，不必再点保存；框里仍是插件旧默认会刷到加密槽。
+- 红队只排不折：注入 → cap → 红队正文；目标卡/角色段改名 `dshpg-*`。
+- 隔离 ctx 也注册 inject/cap；#86 steer 改 next-turn；#87 hang 用 LF 比对。
+- 红队操作稿锁「上面的提示词作准」；指挥端去掉「给了单位名就授权」。
+
+## English
+
+- **1.1.69**.
+- Peel ChatML / `project_instructions` on the wire; box and disk stay intact.
+- Apply + restart hangs the current default; no extra Save. Stale plugin defaults refresh from the sealed slot.
+- Redteam: inject → cap → ops only (no fold). Card/role sections renamed `dshpg-*`.
+- Isolated ctx also registers inject/cap. #86 steer → next-turn. #87 hang needle uses LF.
+- Redteam ops note: inject wins. Commander no longer says a company name means authorized.
+
 # 1.1.68
 
 ## 中文
