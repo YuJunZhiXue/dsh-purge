@@ -1,3 +1,25 @@
+# 1.1.68
+
+## 中文
+
+- 版本 **1.1.68**。
+- **#92**：技能面板认 YAML 块标量 `description`（`|` / `>`），不再误报不可用。
+- **#93**：红队「版本/更新」：`file://` 转成本地路径；Windows 用 `.cmd` + `shell` 起 npm/pnpm；npm 404 回落 GitHub tags。
+- **#94**：官方桌面 CLI 入口补 `app.asar.unpacked` 回退。Hub 首次安装仍可能撞官方 asar 路径。
+- **#95**：拆除 `refusal-recover`（读错字段永不触发；修好会无限复读）。
+- **#96**：bash 前台等待从插件标过的 600s 迁回 60s，后续工具不再被堵 10 分钟。
+- 注入置顶；capability 段改名 `dshpg-capabilities`；用户 prompt 一律 followup（#85）；默认关闭自动「继续」。
+
+## English
+
+- **1.1.68**.
+- **#92**: Skill panel parses YAML block-scalar `description`.
+- **#93**: Redteam update: `file://` → fs path; Windows npm/pnpm via `.cmd`; GitHub tags if registry 404.
+- **#94**: Desktop CLI falls back to `app.asar.unpacked`. Hub first-install may still hit stock asar.
+- **#95**: Removed `refusal-recover` (dead reader / unbounded nudge loop).
+- **#96**: Restore marked bash foreground wait 600s → 60s.
+- Inject leads; capability section renamed; user prompt always followup; autoContinue default off.
+
 # 1.1.67
 
 ## 中文
