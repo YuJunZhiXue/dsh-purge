@@ -29,8 +29,6 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **Updates paused.** The author has no steady income for now because of work. Maintenance is on hold: no new releases, issues / PRs are not taken, and new dsh versions are not guaranteed. The repo stays usable; see Sponsor below. When maintenance resumes, this README will say so.
-
 > **Official Web and the official desktop app are both supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.0-rc.2**) uses profile `desktop`. Install and Apply them separately. This release targets dsh 0.2 only. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
 >
 > Adding the plugin to a profile does not patch the host. Click **dsh-purge** beside the session title → **Clean** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat — that is when the inject enters the session.
@@ -42,7 +40,6 @@
 - [Sponsor](#sponsor)
 - [What this is](#what-this-is)
 - [Attribution required](#attribution-required)
-- [Unauthorized commercial use](#unauthorized-commercial-use)
 - [Supported hosts](#supported-hosts)
 - [Install](#install)
 - [Preview](#preview)
@@ -99,27 +96,6 @@ Using them without attribution, hiding the source, or passing them off as your o
 
 ---
 
-## Unauthorized commercial use
-
-Douyin live account **「老张的ai」** (room name **「老张AI讲堂」**) is selling this repository: taking fees in the live room, no attribution, and ignoring the non-profit rule above. The author was in the room. They still charged.
-
-This project is free and non-profit. Selling courses, the plugin, tokens, or reselling it voids the license on the spot. The author reserves the right to pursue it.
-
-Recorded 2026-10-12:
-
-<p align="center">
-  <img src="docs/notice/laozhang-live-1.jpg" width="360" alt="老张的ai live asking for a fee">
-  <img src="docs/notice/laozhang-live-2.jpg" width="360" alt="老张的ai live charging money">
-</p>
-
-WeChat name **「老张的ai科技」**, same handle as the live-room viewer board. Asked if they were this repo's developer, they said they were. The author said they would report it.
-
-<p align="center">
-  <img src="docs/notice/laozhang-wechat-1.jpg" width="420" alt="老张的ai科技 WeChat claiming to be the developer">
-</p>
-
----
-
 <a id="strict-legal--compliance-disclaimer"></a>
 
 <div>
@@ -171,19 +147,12 @@ Unmatched patches stay pending or skipped; nothing is rewritten blindly.
 
 ## Install
 
-Web and the official desktop EXE are the two maintained hosts. **Install both. Apply each separately.** A Web install does not reach the desktop app, and a desktop install does not reach Web.
+Web and the official desktop EXE are the two maintained hosts. Install and patch each **separately**, and only the host you actually run.
 
-**Web (official `dsh web`)**
-
-```sh
-dsh plugin --profile web add dsh-purge
-```
-
-**Desktop (official EXE)**
-
-```sh
-dsh plugin --profile desktop add dsh-purge
-```
+| What you run | Profile | Command |
+|---|---|---|
+| Official `dsh web` | `web` | `dsh plugin --profile web add dsh-purge` |
+| Official desktop EXE | `desktop` | `dsh plugin --profile desktop add dsh-purge` |
 
 If this directory is already a clone, use `add .` instead of the package name. If `dsh` is not on PATH, use [Manual install](#manual). Registry blocked: add `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz` with the same `--profile`.
 
@@ -220,23 +189,19 @@ Paste the block below to a local assistant. It should only run the install comma
 
 <!-- AI-AGENT-START -->
 
-Install the DeepSeek Harness plugin `dsh-purge` into both the Web profile and the official desktop profile. Do not scan the whole disk, do not read or edit other files, do not apply settings, and do not restart the app.
-
-If `dsh` is not on PATH, tell the user and stop. If this directory is already a clone, use `.` instead of the package name in both commands. If the npm registry is blocked, use `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz`. If one profile is missing, skip that command and still install the other.
+Install the DeepSeek Harness plugin `dsh-purge` into the Web profile only. Do not scan the whole disk, do not read or edit other files, do not apply settings, and do not restart the app. Do not install into the desktop profile.
 
 **Web (official `dsh web`)**
+
+If `dsh` is not on PATH, tell the user and stop.
 
 ```sh
 dsh plugin --profile web add dsh-purge
 ```
 
-**Desktop (official EXE)**
+If this directory is already a clone, use `dsh plugin --profile web add .`. If the npm registry is blocked, use `dsh plugin --profile web add https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz`.
 
-```sh
-dsh plugin --profile desktop add dsh-purge
-```
-
-After the commands finish, tell the user to fully quit and restart `dsh web`, and to quit the desktop tray then reopen the EXE. On each host, open **dsh-purge** beside the session title and **Apply** on **Clean**. Then stop.
+After the command finishes, tell the user to fully quit and restart `dsh web`, then open **dsh-purge** beside the session title and **Apply** on **Clean**. Then stop.
 
 <!-- AI-AGENT-END -->
 
@@ -412,7 +377,7 @@ purge_status   purge_apply   purge_revert
 
 After a successful Apply, the host restarts so patched packages load; you can also click **Restart** manually. Under the patch title are the stable release and the test release. The test release follows the `beta` branch. **Switch to stable** installs `master` and clears any pin. Picking an older stable version pins it; click **Update** to return to the latest. Old test tags are not listed.
 
-The composer **Undo once** and **Undo last round** follow official DSH `session.fork({ atSeq })`: the withdrawn turn is cut off, a new session keeps the earlier context, the old session is archived, and the line returns to the input so **send again** re-injects. `/rewind` does the same.
+The composer **Undo once** and **Undo last round** stay in the current conversation and do not open a branch. The sent line goes back into the input, and that cut's already-sent messages and completed tasks leave the current conversation; edit and **send again**. From **1.1.61**, rewind bounds follow the **current turn**, not the first user message. `/rewind` does the same.
 
 If the **same task works in standard but fails in minimal or PTC**, preset `run_code`, sandbox, or plan intercept text is often still uncleared, or built-in minimal is missing `agent-instructions`. Use **1.1.61+**, then **quit the host fully → Apply in Clean → restart → start a new chat**. Switching preset alone does not reload patches in the running process.
 
