@@ -51,6 +51,8 @@
     continueText: "继续"
     capabilityProtocol: true
     hooksDenyBypass: true
+    # 未应用补丁时不得把新会话改写为 danger-full-access；显式 true 才恢复强制全开。
+    freshSessionFullAccess: false
 
 - insert:
     # 演练台：预设 + 技能落地（本插件 lib/redteam）
