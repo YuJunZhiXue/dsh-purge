@@ -2,6 +2,17 @@
 
 import * as core from "../lib/core.js";
 import * as rules from "../lib/rules.js";
+import { detectSurface } from "../lib/surface.js";
+import { findDesktopAppExecutable } from "../lib/desktop.js";
+
+// The CLI runs outside the app, so the surface cannot be read from the process and the web
+// lookup wins by default. It then finds whatever node_modules/@deepseek-ai happens to be on
+// disk — an npx cache, for instance — instead of the host this command is meant to inspect and
+// repair. On a machine with the desktop app installed, that app is the host; DSH_SURFACE still
+// wins when it is set.
+if (!process.env.DSH_SURFACE && detectSurface() !== "desktop" && findDesktopAppExecutable({ discover: true })) {
+  process.env.DSH_SURFACE = "desktop";
+}
 
 const args = process.argv.slice(2);
 
